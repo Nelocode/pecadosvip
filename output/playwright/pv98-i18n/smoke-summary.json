@@ -1,0 +1,106 @@
+{
+  "schema": "pecadosvip.browser-i18n-smoke",
+  "version": 1,
+  "generatedAt": "2026-08-28T20:33:36Z",
+  "result": "PASS",
+  "productionActivation": false,
+  "runtime": {
+    "kind": "Vinext standalone",
+    "origin": "http://127.0.0.1:4327",
+    "browser": "Chromium via Playwright CLI"
+  },
+  "rootMatrix": {
+    "locales": ["es", "en", "fr", "it"],
+    "viewports": [320, 390, 768, 1440],
+    "observations": 16,
+    "status200": 16,
+    "htmlLangMatched": 16,
+    "localizedTitleMatched": 16,
+    "localizedHoldingHeadingMatched": 16,
+    "selectorFourLanguagesMatched": 16,
+    "metadataNoindexMatched": 16,
+    "headerNoindexMatched": 16,
+    "noHorizontalOverflow": 16,
+    "visibleElementsWithinViewport": 16,
+    "skipLinkKeyboardChecks": 4,
+    "skipLinkKeyboardPassed": 4
+  },
+  "localeStates": {
+    "es": {
+      "title": "Sitio en preparación | PecadosVip",
+      "holdingHeading": "Contenido en preparación"
+    },
+    "en": {
+      "title": "Site in preparation | PecadosVip",
+      "holdingHeading": "Content in preparation"
+    },
+    "fr": {
+      "title": "Site en préparation | PecadosVip",
+      "holdingHeading": "Contenu en préparation"
+    },
+    "it": {
+      "title": "Sito in preparazione | PecadosVip",
+      "holdingHeading": "Contenuto in preparazione"
+    }
+  },
+  "localizedLegal": [
+    { "path": "/es/legal/privacidad", "status": 200, "htmlLang": "es", "selectorLinks": 4 },
+    { "path": "/en/legal/privacidad", "status": 200, "htmlLang": "en", "selectorLinks": 4 },
+    { "path": "/fr/legal/privacidad", "status": 200, "htmlLang": "fr", "selectorLinks": 4 },
+    { "path": "/it/legal/privacidad", "status": 200, "htmlLang": "it", "selectorLinks": 4 }
+  ],
+  "localizedNotFound": [
+    { "path": "/es/perfiles/no-existe", "status": 404, "htmlLang": "es", "heading": "Página no encontrada", "homeHref": "/es" },
+    { "path": "/en/perfiles/no-existe", "status": 404, "htmlLang": "en", "heading": "Page not found", "homeHref": "/en" },
+    { "path": "/fr/perfiles/no-existe", "status": 404, "htmlLang": "fr", "heading": "Page introuvable", "homeHref": "/fr" },
+    { "path": "/it/perfiles/no-existe", "status": 404, "htmlLang": "it", "heading": "Pagina non trovata", "homeHref": "/it" }
+  ],
+  "negativeRoutes": [
+    { "path": "/de", "status": 404 },
+    { "path": "/es-ES", "status": 404 },
+    { "path": "/ES", "status": 404 },
+    { "path": "/preview-local-sintetico", "status": 404 }
+  ],
+  "recoveryStatus": 200,
+  "diagnostics": {
+    "failures": 0,
+    "pageErrors": 0,
+    "expectedDocument404ConsoleEntries": 8,
+    "unexpectedConsoleErrors": 0,
+    "requestFailures": 0,
+    "externalRequests": 0,
+    "unexpectedHttpErrors": 0
+  },
+  "clientBoundary": {
+    "notFoundChunk": "dist/client/_next/static/chunks/not-found-CfLh-WlY.js",
+    "bytes": 1502,
+    "fullCatalogHeroCopyPresent": false
+  },
+  "screenshots": [
+    {
+      "path": "holding-es-320.png",
+      "bytes": 81005,
+      "sha256": "BA7BC9F7931B9BB9CBE4E9BFBE08F8D2449D29BB408C8B93E319B2D30DE58645"
+    },
+    {
+      "path": "holding-es-1440.png",
+      "bytes": 213470,
+      "sha256": "F3C2E3FE111DDA4138AE038B3B8452E354F94BAFB2DAA966F7295E4134399664"
+    },
+    {
+      "path": "not-found-it-390.png",
+      "bytes": 77517,
+      "sha256": "54BD3893FDC96A12B417748814AE652D45AF448C0DCE6F1C5F550A20D1AFD69C"
+    },
+    {
+      "path": "legal-it-1440.png",
+      "bytes": 209954,
+      "sha256": "F816878A842C7D5D9E5DF9AB31A4430684983432FECCCB27F5847B50A20C1442"
+    }
+  ],
+  "limits": [
+    "Local loopback Chromium against the Vinext standalone build; no deployed browser session was tested.",
+    "A human linguistic review remains pending for Spanish, English, French and Italian.",
+    "No positive public profile route exists in the current empty runtime snapshot."
+  ]
+}

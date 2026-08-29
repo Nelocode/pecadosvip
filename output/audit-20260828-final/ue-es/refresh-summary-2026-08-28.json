@@ -1,0 +1,89 @@
+{
+  "audit_kind": "repository-only applicability and evidence refresh",
+  "audit_date": "2026-08-28",
+  "observed_at_utc": "2026-08-29T02:00:48Z",
+  "asset": "PecadosVip web delivery",
+  "snapshot": {
+    "branch": "codex/pagina-web-checkpoint",
+    "head": "35a9f1313c0a044473f8747af415830f469237bc",
+    "working_tree_dirty_entries": 62,
+    "commit_bound_candidate": false,
+    "deployed_url_observed": false
+  },
+  "scope": {
+    "mode": "read-only toward audited asset",
+    "external_live_source_verification": false,
+    "active_security_testing": false,
+    "form_submission": false,
+    "code_or_compliance_mutation": false,
+    "outputs_only": "output/audit-20260828-final/ue-es"
+  },
+  "applicability": {
+    "exit_code": 0,
+    "applicable": 2,
+    "uncertain": 7,
+    "not_applicable": 6,
+    "applicable_modules": [
+      "privacy",
+      "security-passive"
+    ],
+    "uncertain_modules": [
+      "cookie-consent",
+      "public-accessibility",
+      "eaa-service-accessibility",
+      "consumer-ecommerce",
+      "dsa",
+      "ens",
+      "eni"
+    ]
+  },
+  "catalog_validation": {
+    "exit_code": 0,
+    "ok": true,
+    "instruments": 56,
+    "controls": 46,
+    "source_refs": 56,
+    "binding_law_total": 48,
+    "binding_law_complete": 48
+  },
+  "source_freshness_strict": {
+    "exit_code": 1,
+    "as_of": "2026-08-28",
+    "max_age_days": 30,
+    "fresh": 52,
+    "pending_verification": [
+      "EU-DIR-2023-2673",
+      "EU-GREEN-2024-825",
+      "EU-NIS2-2022-2555",
+      "ISO-IEC-25010-2023"
+    ],
+    "stale": 0,
+    "interpretation": "The nonzero exit is an intentional fail-closed result caused by material PENDING_VERIFICATION states; temporal freshness does not establish legal interpretation or applicability."
+  },
+  "current_report_schema_validation": {
+    "exit_code": 0,
+    "ok": true,
+    "schema": "audit",
+    "input": "compliance/ue-es/audit.json",
+    "interpretation": "Schema validity is structural only and does not refresh the report facts, evidence, legal effect or release status."
+  },
+  "release_gate": {
+    "status": "NO-GO",
+    "not_legal_certification": true,
+    "requires_legal_counsel": true,
+    "reason": "Material operator, service, contracting, data, image-rights, regional, accessibility, technology/cookie, provider, legal-text, deployment and human-review facts remain unresolved."
+  },
+  "external_or_human_evidence_pending": [
+    "legal operator identity, establishment, size and responsible roles",
+    "exact service and advertising classification",
+    "B2C and distance-contract formation model",
+    "directed regional inventory for Madrid, Catalunya, Castilla-La Mancha and Castilla y Leon",
+    "processing purposes, bases, retention, recipients, transfers, rights operations, Article 9 assessment and Article 35 DPIA screening",
+    "identity, consent, licence, withdrawal and takedown evidence for each person and media asset",
+    "deployed hosting, CDN, forms, analytics, cookies, terminal storage and provider inventory",
+    "approved legal notice, privacy, cookies, consumer terms and complaint/cancellation texts",
+    "private-accessibility applicability, human assistive-technology testing and named review",
+    "named human linguistic review for Spanish, English, French and Italian",
+    "deployed-origin evidence, acceptance and production authorization"
+  ]
+}

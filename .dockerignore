@@ -1,0 +1,65 @@
+# Remote builders receive only the files required to install and build the app.
+# The deny-all baseline keeps evidence, client inventories, local CMS data,
+# synthetic source assets, tests, logs, archives, credentials and Git metadata
+# outside the Docker build context.
+**
+
+!Dockerfile
+!.dockerignore
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!patches
+!patches/image-size@2.0.2.patch
+!tsconfig.json
+!next-env.d.ts
+!next.config.ts
+!vite-env.d.ts
+!vite.config.ts
+
+!.openai
+!.openai/hosting.json
+
+!app
+!app/**
+!lib
+!lib/**
+!public
+!public/**
+
+!scripts
+!scripts/prepare-standalone.ts
+!scripts/production-holding-smoke.ts
+!scripts/validate-build-artifact.ts
+!scripts/vite-local-synthetic-media.ts
+
+# Runtime translation catalogs are imported by lib/i18n/catalog.ts.
+!compliance
+!compliance/multilingual
+!compliance/multilingual/catalogs
+!compliance/multilingual/catalogs/es.json
+!compliance/multilingual/catalogs/en.json
+!compliance/multilingual/catalogs/fr.json
+!compliance/multilingual/catalogs/it.json
+
+# Final sensitive-file denials must remain after every allowlist negation.
+# Docker applies the last matching rule, so these prevent files nested below
+# app/, lib/ or public/ from being reintroduced by the broad source allowlist.
+**/.env
+**/.env.*
+**/.netrc
+**/.npmrc
+**/.ssh
+**/.ssh/**
+**/credentials.json
+**/id_ed25519
+**/id_rsa
+**/secrets.json
+**/service-account*.json
+**/service_account*.json
+**/*.jks
+**/*.key
+**/*.keystore
+**/*.p12
+**/*.pem
+**/*.pfx

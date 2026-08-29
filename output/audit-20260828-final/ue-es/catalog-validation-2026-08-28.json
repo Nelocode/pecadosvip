@@ -1,0 +1,14 @@
+{
+  "catalog": {
+    "controls": 46,
+    "source_refs": 56
+  },
+  "errors": [],
+  "ok": true,
+  "registry": {
+    "binding_law_complete": 48,
+    "binding_law_completeness_percent": 100.0,
+    "binding_law_total": 48,
+    "instruments": 56
+  }
+}

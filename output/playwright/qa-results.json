@@ -1,0 +1,48 @@
+{
+  "captured_at": "2026-08-27T14:50:00Z",
+  "environment": "local production build at 127.0.0.1:4191; server stopped after testing",
+  "browser": "Chromium through Playwright CLI",
+  "critical_navigation": {
+    "home_to_profiles_native_link": "PASS",
+    "destination": "/perfiles",
+    "console_errors": 0,
+    "console_warnings": 0
+  },
+  "filters": {
+    "city_madrid_with_empty_optional_controls": "PASS",
+    "safe_empty_state": true,
+    "invalid_filter_exposure": false,
+    "console_errors": 0
+  },
+  "keyboard": {
+    "first_tab_target": "Saltar al contenido principal",
+    "enter_hash": "#main-content",
+    "active_element_id": "main-content",
+    "active_element_tag": "MAIN",
+    "result": "PASS"
+  },
+  "responsive": [
+    {"width": 360, "scrollWidth": 360, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0},
+    {"width": 390, "scrollWidth": 390, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0},
+    {"width": 768, "scrollWidth": 768, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0},
+    {"width": 1024, "scrollWidth": 1024, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0},
+    {"width": 1440, "scrollWidth": 1440, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0},
+    {"width": 1920, "scrollWidth": 1920, "overflow": false, "h1": 1, "postForms": 0, "externalResources": 0}
+  ],
+  "http_smoke": {
+    "status_200": ["/", "/madrid", "/barcelona", "/perfiles", "/contacto"],
+    "status_404": ["/perfiles/no-existe"],
+    "robots": "Disallow: /",
+    "sitemap_urls": 0,
+    "canonical_emitted": false,
+    "json_ld_emitted": false,
+    "active_external_contact": false,
+    "post_forms": 0
+  },
+  "limitations": [
+    "No screen-reader test was run.",
+    "No complete contrast, 200 percent zoom, 400 percent reflow or pointer target-size audit was run.",
+    "Visual fidelity to the client mockups is not assessed because no controlling mockup was selected.",
+    "This log records local test observations and does not prove deployed behaviour."
+  ]
+}
