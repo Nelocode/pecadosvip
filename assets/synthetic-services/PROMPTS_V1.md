@@ -40,7 +40,7 @@ Los siguientes bloques son la petición principal y los objetos específicos usa
 24. `preferences-water-play-v01`: lavabo poco profundo de piedra negra con ondas concéntricas, dos gotas escultóricas de vidrio y detalle de latón.
 25. `wellbeing-sensual-massage-v01`: piedras de basalto, toalla carbón doblada, rodillo de madera, vela baja y frasco de aceite ámbar sin etiqueta.
 26. `roleplay-editorial-pse-v01`: estudio editorial vacío, silla de dirección negra sin texto, foco, hojas de contacto en blanco y clips dorados.
-27. `roleplay-consensual-sm-v01`: dos bandas negras abiertas con cierre de seguridad dorado y fichas verde y roja; símbolo no explícito, sin ataduras.
+27. `roleplay-consensual-sm-v02`: dos arcos abstractos lisos de obsidiana, claramente separados, con fichas de vidrio verde y roja; símbolo decorativo no explícito, sin bandas, cierres, ataduras ni accesorios identificables. La versión v01 fue descartada porque sus bandas y cierres podían interpretarse como ataduras.
 28. `preferences-oral-intimacy-v01`: dos recipientes curvos de vidrio orientados entre sí y una única perla entre ambos; formas no anatómicas.
 29. `roleplay-adult-accessories-v01`: vitrina cerrada con pequeñas cajas negras y accesorios escultóricos abstractos no explícitos.
 30. `roleplay-private-striptease-v01`: escenario de cabaré vacío, cortina borgoña entreabierta, zapatos dorados y abanico de plumas; sin personas.

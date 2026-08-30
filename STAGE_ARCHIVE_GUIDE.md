@@ -31,7 +31,7 @@ El inventario dentro del ZIP comprueba integridad interna, pero no es una firma 
 - Archivos rastreados por Git mediante git ls-files --cached.
 - Archivos no rastreados y no ignorados mediante git ls-files --others --exclude-standard.
 - La plantilla segura rastreada .env.example, con valores vacíos o banderas fail-closed.
-- Exactamente los 19 archivos rastreados `output/playwright/**` declarados en la allowlist del script como evidencia QA, incluidas las capturas y el resumen del checkpoint 87.
+- Exactamente los 25 archivos rastreados `output/playwright/**` y los 54 archivos de evidencia final declarados en las allowlists del script, incluidas las capturas, auditorías y comparaciones visuales requeridas.
 - Los ocho insumos declarados en INPUT_MANIFEST.csv, después de comprobar existencia y SHA-256 contra C:\Users\artot\OneDrive\Desktop\Página_Web.
 - La solicitud pegada conocida, solo si todavía existe.
 - LEEME_PRIMERO.md, VALIDAR_ARCHIVO.ps1, inventario SHA-256 y reporte de exclusiones.
@@ -44,7 +44,7 @@ El ZIP mantiene dos áreas separadas:
 
 ## Exclusiones de seguridad
 
-Se excluyen .git, node_modules, caches, cobertura, builds, outputs no allowlisted, archivos .env* salvo .env.example, configuraciones npm/netrc, PEM/llaves/JKS/keystores, archivos con nombres de token o credencial, archivos anteriores de stage-archives y datos/medios/backups locales del CMS. Los 19 archivos Playwright rastreados son la única excepción explícita de output. Si cualquier otro archivo rastreado coincide con una exclusión, el script falla en vez de omitirlo silenciosamente.
+Se excluyen .git, node_modules, caches, cobertura, builds, outputs no allowlisted, archivos .env* salvo .env.example, configuraciones npm/netrc, PEM/llaves/JKS/keystores, archivos con nombres de token o credencial, archivos anteriores de stage-archives y datos/medios/backups locales del CMS. Los 25 archivos Playwright y los 54 archivos de evidencia final allowlisted son las únicas excepciones explícitas de output. Si cualquier otro archivo rastreado coincide con una exclusión, el script falla en vez de omitirlo silenciosamente.
 
 Un enlace simbólico o reparse point seleccionado causa fallo cerrado. Los formatos textuales reconocidos se escanean; un texto mayor de 2 MiB o una extensión no clasificada falla en vez de saltarse. También se rechazan patrones de secretos de alta confianza. Este control no sustituye un escáner de secretos especializado ni una revisión humana antes de git add.
 

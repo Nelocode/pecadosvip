@@ -327,13 +327,13 @@ const mediaDefinitions: Readonly<
     ),
   },
   'roleplay-consensual-sm': {
-    filename: 'roleplay-consensual-sm-v01.webp',
+    filename: 'roleplay-consensual-sm-v02.webp',
     objectPosition: '50% 45%',
     alt: alt(
-      'Dos bandas negras abiertas con cierres de seguridad dorados y fichas verde y roja.',
-      'Two open black bands with gold safety clasps and green and red glass tokens.',
-      'Deux bandes noires ouvertes avec fermoirs de sécurité dorés et jetons vert et rouge.',
-      'Due fasce nere aperte con chiusure di sicurezza dorate e gettoni verde e rosso.',
+      'Dos arcos abstractos de obsidiana separados junto a fichas de vidrio verde y roja.',
+      'Two separated abstract obsidian arcs beside green and red glass tokens.',
+      "Deux arcs abstraits en obsidienne séparés près de jetons en verre vert et rouge.",
+      'Due archi astratti di ossidiana separati accanto a gettoni di vetro verde e rosso.',
     ),
   },
   'preferences-oral-intimacy': {

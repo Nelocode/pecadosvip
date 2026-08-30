@@ -35,7 +35,7 @@ Evidencia local:
 - `output/design-qa/services-unique-catalog-mobile.png`
 - `output/design-qa/services-reference-vs-implementation-unique.png`
 
-La extensión del 30 de agosto sustituyó los retratos decorativos de servicios por 34 bodegones generados específicamente para la maqueta: uno por cada ruta, sin compartir claves, rutas ni bytes. El mosaico completo permitió comparar silueta, objeto principal y densidad visual de las 34 composiciones; el manifiesto y las pruebas recalculan hashes, formatos y dimensiones desde los archivos reales. La versión activa de llegada a hotel fue regenerada sin símbolos o trazos semejantes a marcas, y el candidato descartado quedó fuera de las rutas.
+La extensión del 30 de agosto sustituyó los retratos decorativos de servicios por 34 bodegones generados específicamente para la maqueta: uno por cada ruta, sin compartir claves, rutas ni bytes. El mosaico completo permitió comparar silueta, objeto principal y densidad visual de las 34 composiciones; el manifiesto y las pruebas recalculan hashes, formatos y dimensiones desde los archivos reales. La llegada a hotel fue regenerada sin símbolos o trazos semejantes a marcas. La escena de sado consensuado también se regeneró como dos arcos abstractos separados, sin bandas, cierres ni ataduras. Ambos candidatos descartados quedaron aislados fuera del manifiesto y de las rutas.
 
 Se comparó en una sola imagen la referencia gráfica del cliente y la implementación final. La composición conserva el sistema negro, marfil y dorado, la jerarquía editorial, el contraste de superficies y la densidad premium de la referencia, mientras diferencia con claridad servicios y perfiles. “Generada para la maqueta” describe la procedencia técnica y no acredita derechos de publicación.
 
