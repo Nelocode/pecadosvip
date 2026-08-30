@@ -31,6 +31,22 @@ test('validation rejects duplicate slugs, minors and media without rights eviden
   assert.equal(codes.has('MEDIA_RIGHTS_MISSING'), true);
 });
 
+test('service routes require unique safe slugs, complete copy and approval evidence', () => {
+  const snapshot = makeSnapshot();
+  snapshot.services[0].slug = '../unsafe';
+  const duplicate = structuredClone(snapshot.services[0]);
+  duplicate.id = 'service-duplicate';
+  snapshot.services.push(duplicate);
+  snapshot.services[0].description = '';
+  snapshot.services[0].approval = { state: 'pending' };
+
+  const codes = new Set(validateContentSnapshot(snapshot).map((issue) => issue.code));
+  assert.equal(codes.has('SERVICE_SLUG_DUPLICATE'), true);
+  assert.equal(codes.has('SERVICE_SLUG_INVALID'), true);
+  assert.equal(codes.has('SERVICE_CONTENT_MISSING'), true);
+  assert.equal(codes.has('SERVICE_PUBLICATION_EVIDENCE_MISSING'), true);
+});
+
 test('route generation supports more than eight profiles without a hardcoded ceiling', () => {
   const snapshot = makeSnapshot(9);
   const routes = buildRouteManifest(snapshot);

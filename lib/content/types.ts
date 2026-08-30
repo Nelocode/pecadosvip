@@ -12,7 +12,74 @@ export type CitySlug = (typeof citySlugs)[number];
 export type PublicationStatus = 'draft' | 'hidden' | 'published' | 'archived';
 export type Availability = 'available' | 'limited' | 'unavailable' | 'on-request';
 export type ApprovalState = 'pending' | 'approved' | 'rejected';
-export type CmsRole = 'admin' | 'editor';
+export type CmsRole =
+  | 'super_admin'
+  | 'booking_agent'
+  | 'seo_specialist'
+  | 'kyc_officer'
+  | 'admin'
+  | 'editor';
+
+export type LanguageFluency = 'native' | 'fluent' | 'intermediate' | 'basic';
+
+export type SpokenLanguage = {
+  language: string;
+  fluency: LanguageFluency;
+};
+
+export type RateItem = {
+  durationMinutes: number;
+  durationLabel: string;
+  price: number;
+  currency: 'EUR';
+  notes?: string;
+};
+
+export type RateMatrix = {
+  rates: RateItem[];
+  displacementSurcharge?: number;
+  specializedServiceSurcharges?: Array<{
+    serviceName: string;
+    extraPrice: number;
+  }>;
+};
+
+export type TourItinerary = {
+  id: string;
+  citySlug: CitySlug;
+  startDate: string;
+  endDate: string;
+  active: boolean;
+  notes?: string;
+};
+
+export type SupplementServiceItem = {
+  serviceId: string;
+  extraPrice: number;
+  notes?: string;
+};
+
+export type ServicePreferences = {
+  includedServiceIds: string[];
+  supplementServices: SupplementServiceItem[];
+  serviceLimits: string[];
+};
+
+export type PhysicalTraits = {
+  ethnicity?: string;
+  hairColor?: string;
+  eyeColor?: string;
+  silhouette?: string;
+  nationality?: string;
+};
+
+export type KycDocumentRecord = {
+  id: string;
+  documentType: 'id_card' | 'verification_selfie' | 'rights_contract';
+  fileId: string;
+  encryptedAt: string;
+  verifiedBy: string;
+};
 
 export type ApprovalRecord = {
   state: ApprovalState;
@@ -55,8 +122,18 @@ export type Profile = {
   age: number | null;
   biography: string;
   measurements: ProfileMeasurements;
+  physicalTraits?: PhysicalTraits;
   languages: string[];
+  spokenLanguages?: SpokenLanguage[];
   serviceIds: string[];
+  servicePreferences?: ServicePreferences;
+  rates?: RateMatrix;
+  incall?: boolean;
+  outcall?: boolean;
+  coverageZones?: string[];
+  tours?: TourItinerary[];
+  verifiedBadge?: boolean;
+  kycDocuments?: KycDocumentRecord[];
   media: MediaAsset[];
   availability: Availability;
   citySlugs: CitySlug[];

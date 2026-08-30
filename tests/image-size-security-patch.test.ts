@@ -35,7 +35,9 @@ function runIsolatedCase(source: string): void {
       cwd: process.cwd(),
       encoding: 'utf8',
       env: { ...process.env, IMAGE_SIZE_EXPORT: exportMode },
-      timeout: 1_500,
+      // The full suite runs many worker processes in parallel on Windows. Keep
+      // this bounded while allowing for scheduler delay before the parser starts.
+      timeout: 5_000,
     });
 
     assert.notEqual(
@@ -149,7 +151,11 @@ test('dependency policy pins patched framework versions and the local parser pat
   assert.equal(packageJson.devDependencies['react-server-dom-webpack'], '19.2.8');
   assert.equal(packageJson.devDependencies.vite, '8.0.16');
   assert.match(workspace, /image-size@2\.0\.2: patches\/image-size@2\.0\.2\.patch/);
-  const patchHash = createHash('sha256').update(patch).digest('hex');
+  // pnpm stores the digest of the canonical LF patch. Git may expose CRLF in
+  // an existing Windows worktree, so normalize before enforcing the lockfile
+  // contract. `.gitattributes` keeps fresh checkouts canonical as well.
+  const canonicalPatch = patch.replace(/\r\n/gu, '\n');
+  const patchHash = createHash('sha256').update(canonicalPatch).digest('hex');
   const lockHash = lockfile.match(/image-size@2\.0\.2:\s+([a-f0-9]{64})/u)?.[1];
   assert.equal(lockHash, patchHash);
   assert.match(

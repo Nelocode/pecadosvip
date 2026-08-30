@@ -132,6 +132,7 @@ test('contact choices are a named list and unavailable entries are plain status 
   assert.match(contact, /method="post"/);
   assert.match(contact, /htmlFor="contact-name"/);
   assert.match(contact, /htmlFor="contact-reply"/);
+  assert.match(contact, /name="replyTo"[\s\S]*type="email"/);
   assert.match(contact, /htmlFor="contact-city"/);
   assert.match(contact, /htmlFor="contact-message"/);
   assert.match(contact, /aria-describedby="contact-privacy-note"/);

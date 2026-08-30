@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { isRuntimeRouteIndexable } from './content/runtime-publication.ts';
 import {
   localizedPath,
+  SOURCE_LOCALE,
   SUPPORTED_LOCALES,
   type Locale,
 } from './i18n/locales.ts';
@@ -150,14 +151,20 @@ export function buildLocalizedPublicMetadata(
     ? []
     : input.languageAlternates ?? SUPPORTED_LOCALES;
   const languageUrls = publishableOrigin && alternateLocales.length > 0
-    ? Object.fromEntries(
-        alternateLocales.map(
-          (locale) => [
-            locale,
-            new URL(localizedPath(locale, input.semanticPath), publishableOrigin).toString(),
-          ],
+    ? {
+        ...Object.fromEntries(
+          alternateLocales.map(
+            (locale) => [
+              locale,
+              new URL(localizedPath(locale, input.semanticPath), publishableOrigin).toString(),
+            ],
+          ),
         ),
-      )
+        'x-default': new URL(
+          localizedPath(SOURCE_LOCALE, input.semanticPath),
+          publishableOrigin,
+        ).toString(),
+      }
     : undefined;
   const imageUrl = publishableOrigin
     ? new URL('/og.png', publishableOrigin).toString()

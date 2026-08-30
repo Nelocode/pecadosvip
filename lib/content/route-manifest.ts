@@ -1,5 +1,8 @@
 import { evaluateRelease } from './release-gates.ts';
-import { isProfilePublicationReady } from './validation.ts';
+import {
+  isProfilePublicationReady,
+  isServicePublicationReady,
+} from './validation.ts';
 import {
   localizedPath,
   SOURCE_LOCALE,
@@ -15,7 +18,15 @@ import type {
 
 export type RouteEntry = {
   path: string;
-  kind: 'home' | 'city' | 'profiles' | 'profile' | 'contact' | 'legal';
+  kind:
+    | 'home'
+    | 'city'
+    | 'profiles'
+    | 'profile'
+    | 'services'
+    | 'service'
+    | 'contact'
+    | 'legal';
   indexable: boolean;
   lastModified?: string;
 };
@@ -60,15 +71,14 @@ export function buildRouteManifest(snapshot: ContentSnapshot): RouteEntry[] {
   );
   const publishableServices = new Set(
     snapshot.services
-      .filter(
-        (service) =>
-          service.status === 'published' && hasApprovalEvidence(service.approval),
-      )
+      .filter(isServicePublicationReady)
       .map((service) => service.id),
   );
+  const routedServiceIds = new Set<string>();
   const routes: RouteEntry[] = [
     { path: '/', kind: 'home', indexable: releaseReady },
     { path: '/perfiles', kind: 'profiles', indexable: releaseReady },
+    { path: '/servicios', kind: 'services', indexable: releaseReady },
     { path: '/contacto', kind: 'contact', indexable: releaseReady },
   ];
 
@@ -94,6 +104,17 @@ export function buildRouteManifest(snapshot: ContentSnapshot): RouteEntry[] {
         kind: 'profile',
         indexable: releaseReady,
         lastModified: profile.updatedAt,
+      });
+      profile.serviceIds.forEach((serviceId) => routedServiceIds.add(serviceId));
+    }
+  }
+
+  for (const service of snapshot.services) {
+    if (routedServiceIds.has(service.id) && isServicePublicationReady(service)) {
+      routes.push({
+        path: `/servicios/${service.slug}`,
+        kind: 'service',
+        indexable: releaseReady,
       });
     }
   }
@@ -136,6 +157,8 @@ export function buildLocalizedRouteManifest(
       const localizedDynamicContentReady =
         (route.kind !== 'profiles' &&
           route.kind !== 'profile' &&
+          route.kind !== 'services' &&
+          route.kind !== 'service' &&
           route.kind !== 'legal') ||
         locale === SOURCE_LOCALE;
 
@@ -159,6 +182,15 @@ export function hasProfileCandidateRoute(
 ): boolean {
   return buildRouteManifest(snapshot).some(
     (route) => route.kind === 'profile' && route.path === `/perfiles/${slug}`,
+  );
+}
+
+export function hasServiceCandidateRoute(
+  snapshot: ContentSnapshot,
+  slug: string,
+): boolean {
+  return buildRouteManifest(snapshot).some(
+    (route) => route.kind === 'service' && route.path === `/servicios/${slug}`,
   );
 }
 

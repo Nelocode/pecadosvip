@@ -19,6 +19,7 @@ export default function PublicHeader({ currentPath, locale }: PublicHeaderProps)
     { href: '/madrid' as const, label: messages.madrid },
     { href: '/barcelona' as const, label: messages.barcelona },
     { href: '/perfiles' as const, label: messages.profiles },
+    { href: '/servicios' as const, label: messages.services },
   ];
   const hrefFor = (path: `/${string}` | '/') =>
     locale ? localizedPath(locale, path) : path;

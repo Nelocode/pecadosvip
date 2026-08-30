@@ -34,6 +34,7 @@ export default function PublicFooter({ locale }: { locale?: Locale } = {}) {
         <a href={hrefFor('/madrid')}>Madrid</a>
         <a href={hrefFor('/barcelona')}>Barcelona</a>
         <a href={hrefFor('/perfiles')}>{messages.navigation.profiles}</a>
+        <a href={hrefFor('/servicios')}>{messages.navigation.services}</a>
         <a href={hrefFor('/contacto')}>{messages.navigation.contact}</a>
         {legalLinks.map((link) => (
           <a href={hrefFor(link.href as `/${string}`)} key={link.href}>

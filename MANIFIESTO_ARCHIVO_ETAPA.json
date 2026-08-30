@@ -1,0 +1,26 @@
+{
+  "schema": "pecadosvip.sanitized-source-stage",
+  "version": 1,
+  "stage": "audits-typography-favicon",
+  "createdAtUtc": "2026-08-30T21:56:16.8919176Z",
+  "branch": "codex/design-sync-20260829",
+  "head": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9",
+  "remote": "https://github.com/Nelocode/pecadosvip.git",
+  "includesLocalChanges": true,
+  "productionActivation": false,
+  "sourceFileCount": 391,
+  "sourceBytes": 159127197,
+  "requiredFirstRead": "LEEME_PRIMERO_SUBIR_PROYECTO.md",
+  "exclusions": [
+    ".git",
+    "dependencies",
+    "builds",
+    "output",
+    "archives",
+    ".env",
+    "credentials",
+    "CMS data",
+    "backups",
+    "external project inputs"
+  ]
+}

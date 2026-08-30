@@ -96,7 +96,9 @@ export default async function ProfileDetailPage({ params }: ProfileDetailPagePro
           <h2>Servicios</h2>
           <ul>
             {profile.services.map((service) => (
-              <li key={service.slug}>{service.name}</li>
+              <li key={service.slug}>
+                <a href={`/servicios/${service.slug}`}>{service.name}</a>
+              </li>
             ))}
           </ul>
           <ContactOptions />

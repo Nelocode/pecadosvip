@@ -1,10 +1,16 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- native navigation is the verified Vinext fallback. */
 import type { Metadata } from 'next';
 // This route is runtime-guarded and must return 404 outside local development.
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import type { Availability, CitySlug } from '../../../lib/content/types';
+import type { Locale } from '../../../lib/i18n/locales';
+import {
+  getSyntheticCityMedia,
+  getSyntheticCityPresentation,
+} from '../../../lib/preview/synthetic-city-media';
+import type { SyntheticCityMediaSlug } from '../../../lib/preview/synthetic-city-media';
+import { isSyntheticServiceLocale } from '../../../lib/preview/synthetic-services';
 import {
   filterSyntheticPreviewProfiles,
   getSyntheticPreviewProfiles,
@@ -42,7 +48,7 @@ const previewCities = [
   'segovia',
 ] as const satisfies readonly CitySlug[];
 
-const cityLabels: Record<CitySlug, string> = {
+const cityLabels: Record<SyntheticCityMediaSlug, string> = {
   madrid: 'Madrid',
   barcelona: 'Barcelona',
   girona: 'Girona',
@@ -50,19 +56,20 @@ const cityLabels: Record<CitySlug, string> = {
   toledo: 'Toledo',
   guadalajara: 'Guadalajara',
   segovia: 'Segovia',
+  sitges: 'Sitges',
 };
 
 const coverageGroups: ReadonlyArray<{
-  base: string;
-  cities: readonly CitySlug[];
+  base: 'madrid' | 'barcelona';
+  cities: readonly SyntheticCityMediaSlug[];
 }> = [
   {
-    base: 'Zona Madrid',
+    base: 'madrid',
     cities: ['madrid', 'toledo', 'segovia', 'guadalajara'],
   },
   {
-    base: 'Zona Barcelona',
-    cities: ['barcelona', 'tarragona', 'girona'],
+    base: 'barcelona',
+    cities: ['barcelona', 'tarragona', 'girona', 'sitges'],
   },
 ];
 
@@ -99,31 +106,37 @@ const trustSignals = [
 const previewServices = [
   {
     number: '01',
+    category: 'company',
     title: 'Acompañamiento premium',
     detail: 'Propuesta de contenido pendiente de validación comercial y legal.',
   },
   {
     number: '02',
+    category: 'settings',
     title: 'Salidas a domicilios',
     detail: 'Categoría visual simulada; cobertura y condiciones no confirmadas.',
   },
   {
     number: '03',
+    category: 'settings',
     title: 'Hoteles',
     detail: 'Categoría visual simulada; disponibilidad real aún no publicada.',
   },
   {
     number: '04',
+    category: 'couples',
     title: 'Eventos y ocasiones especiales',
     detail: 'Concepto de servicio sujeto a definición y aprobación del cliente.',
   },
   {
     number: '05',
+    category: 'wellbeing',
     title: 'Viajes y desplazamientos',
     detail: 'Alcance ilustrativo sin promesa operativa ni territorial.',
   },
   {
     number: '06',
+    category: 'roleplay',
     title: 'Atención personalizada',
     detail: 'Experiencia propuesta; los canales permanecen desactivados.',
   },
@@ -155,6 +168,9 @@ export default async function SyntheticPreviewPage({
   }
 
   const raw = await searchParams;
+  const rawLocale = typeof raw.lang === 'string' ? raw.lang : undefined;
+  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const cityPresentation = getSyntheticCityPresentation(locale);
   const requestedCity = raw.city === '' ? undefined : raw.city;
   const requestedAvailability =
     raw.availability === '' ? undefined : raw.availability;
@@ -185,7 +201,7 @@ export default async function SyntheticPreviewPage({
           <a href="#inicio" aria-current="page">Inicio</a>
           <a href="#cobertura">Cobertura</a>
           <a href="#perfiles">Perfiles</a>
-          <a href="#servicios">Servicios</a>
+          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
           <a href="#seguridad">Controles</a>
         </nav>
         <button
@@ -204,8 +220,12 @@ export default async function SyntheticPreviewPage({
           <div className="synthetic-preview-hero-copy">
             <p className="public-eyebrow">Discreción · Exclusividad · Placer</p>
             <h1 id="preview-title">
-              El lujo de elegir
-              <span>en tu casa o en hotel</span>
+              <span className="synthetic-preview-hero-title-primary">
+                El lujo de elegir
+              </span>{' '}
+              <span className="synthetic-preview-hero-title-secondary">
+                en tu casa o en hotel
+              </span>
             </h1>
             <p className="synthetic-preview-hero-location">Madrid y Barcelona</p>
             <p className="synthetic-preview-hero-note">
@@ -246,24 +266,38 @@ export default async function SyntheticPreviewPage({
 
         <section className="public-section synthetic-preview-coverage" id="cobertura" aria-labelledby="coverage-title">
           <div className="public-section-heading synthetic-preview-section-heading">
-            <p className="public-eyebrow">Cobertura visual · simulada</p>
-            <h2 id="coverage-title">Siete ciudades en la experiencia propuesta</h2>
-            <p>
-              Esta distribución sirve para validar arquitectura y diseño. Ninguna
-              ciudad se presenta como cobertura comercial confirmada.
+            <p className="public-eyebrow">{cityPresentation.coverageEyebrow}</p>
+            <h2 id="coverage-title">{cityPresentation.coverageTitle}</h2>
+            <p>{cityPresentation.coverageBody}</p>
+            <p className="synthetic-city-disclosure">
+              {getSyntheticCityMedia('madrid', locale).disclosure}
             </p>
           </div>
           <div className="synthetic-preview-coverage-groups">
             {coverageGroups.map((group) => (
-              <article key={group.base} aria-labelledby={`coverage-${group.base.replace(' ', '-').toLowerCase()}`}>
-                <h3 id={`coverage-${group.base.replace(' ', '-').toLowerCase()}`}>{group.base}</h3>
+              <article key={group.base} aria-labelledby={`coverage-zone-${group.base}`}>
+                <h3 id={`coverage-zone-${group.base}`}>{cityPresentation.groups[group.base]}</h3>
                 <ul>
-                  {group.cities.map((citySlug) => (
-                    <li key={citySlug}>
-                      <strong>{cityLabels[citySlug]}</strong>
-                      <span>En confirmación</span>
-                    </li>
-                  ))}
+                  {group.cities.map((citySlug) => {
+                    const cityMedia = getSyntheticCityMedia(citySlug, locale);
+                    return (
+                      <li id={`city-${citySlug}`} key={citySlug}>
+                        <figure className="synthetic-preview-city-media">
+                          <PublicProfileMedia
+                            media={cityMedia}
+                            objectPosition={cityMedia.objectPosition}
+                            preserveFullImage={false}
+                            sizes="(max-width: 480px) 90vw, (max-width: 780px) 42vw, 24vw"
+                          />
+                          <figcaption>{cityMedia.shortDisclosure}</figcaption>
+                        </figure>
+                        <div className="synthetic-preview-city-copy">
+                          <strong>{cityLabels[citySlug]}</strong>
+                          <span>{cityPresentation.pendingStatus}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </article>
             ))}
@@ -294,6 +328,7 @@ export default async function SyntheticPreviewPage({
           >
             <fieldset>
               <legend>Filtrar el catálogo sintético</legend>
+              <input name="lang" type="hidden" value={locale} />
               <p className="profile-filter-help">
                 Los filtros solo reorganizan las seis identidades ficticias del preview.
               </p>
@@ -322,7 +357,7 @@ export default async function SyntheticPreviewPage({
               </label>
               <div className="synthetic-preview-filter-actions">
                 <button type="submit">Aplicar filtros</button>
-                <a href="/preview-local-sintetico#perfiles">Restablecer</a>
+                <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer</a>
               </div>
             </fieldset>
           </form>
@@ -331,7 +366,7 @@ export default async function SyntheticPreviewPage({
             <div className="public-empty-state public-empty-state-error" role="alert">
               <strong>Los filtros del preview no son válidos.</strong>
               <p>No se cargó ningún archivo. Restablece la maqueta para continuar.</p>
-              <a href="/preview-local-sintetico#perfiles">Restablecer filtros</a>
+              <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer filtros</a>
             </div>
           ) : profiles.length > 0 ? (
             <div className="profile-grid synthetic-profile-grid">
@@ -341,7 +376,7 @@ export default async function SyntheticPreviewPage({
                   key={candidate.slug}
                   preserveFullImage
                   profile={candidate}
-                  profileHref={`/preview-local-sintetico/perfiles/${candidate.slug}`}
+                  profileHref={`/preview-local-sintetico/perfiles/${candidate.slug}?lang=${locale}`}
                 />
               ))}
             </div>
@@ -349,7 +384,7 @@ export default async function SyntheticPreviewPage({
             <div className="public-empty-state" role="status">
               <strong>No hay perfiles ficticios para esta combinación.</strong>
               <p>Prueba otra ciudad o estado para continuar revisando la interfaz.</p>
-              <a href="/preview-local-sintetico#perfiles">Restablecer filtros</a>
+              <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer filtros</a>
             </div>
           ) : null}
         </section>
@@ -366,9 +401,12 @@ export default async function SyntheticPreviewPage({
           <div className="synthetic-preview-service-grid">
             {previewServices.map((service) => (
               <article key={service.number}>
-                <span aria-hidden="true">{service.number}</span>
-                <h3>{service.title}</h3>
-                <p>{service.detail}</p>
+                <a href={`/preview-local-sintetico/servicios?lang=${locale}&category=${service.category}#service-catalog`}>
+                  <span aria-hidden="true">{service.number}</span>
+                  <h3>{service.title}</h3>
+                  <p>{service.detail}</p>
+                  <strong>Explorar rutas <span aria-hidden="true">→</span></strong>
+                </a>
               </article>
             ))}
           </div>
@@ -398,7 +436,7 @@ export default async function SyntheticPreviewPage({
         <a href="#inicio" aria-current="page">Inicio</a>
         <a href="#cobertura">Ciudades</a>
         <a href="#perfiles">Perfiles</a>
-        <a href="#servicios">Servicios</a>
+        <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
         <a href="#seguridad">Control</a>
       </nav>
 
@@ -410,7 +448,7 @@ export default async function SyntheticPreviewPage({
         <nav aria-label="Enlaces internos del pie">
           <a href="#inicio">Inicio</a>
           <a href="#perfiles">Perfiles</a>
-          <a href="#servicios">Servicios</a>
+          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
           <a href="#main-content">Volver arriba</a>
         </nav>
         <span>Revisión humana, comercial y legal pendiente</span>

@@ -47,9 +47,17 @@ export default defineConfig(async () => {
 
   return {
     css: { postcss: { plugins: [tailwindcss()] } },
-    server: isCodexSeatbeltSandbox
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
+    server: {
+      watch: {
+        // Stage ZIPs can be large and temporarily locked by OneDrive while they
+        // are written. Watching them is unnecessary and can crash the Windows
+        // development server with EBUSY.
+        ignored: ['**/stage-archives/**'],
+        ...(isCodexSeatbeltSandbox
+          ? { useFsEvents: false, usePolling: true }
+          : {}),
+      },
+    },
     plugins: [
       localSyntheticMediaPlugin(),
       vinext(),

@@ -10,11 +10,11 @@ Esta evidencia no constituye certificación WCAG, dictamen legal, aceptación co
 
 | Control | Resultado observado | Evidencia y límite |
 |---|---|---|
-| Puerta completa del árbol modificado | PASS | `pnpm run release:verify`: lint, typecheck, **167/167** pruebas, build, i18n, scorecard, SBOM, dos validadores de artefacto y smoke standalone; exit code 0 tras el cierre técnico/documental final previo al commit. |
-| Artefacto worker | PASS | 122 archivos, 2.618.552 bytes, 0 violaciones; reporte local SHA-256 `97D50B6CB64DC8AD5E57A76C908BC385A87572359DF690A58CE2CDC3DF3D9D05`. |
-| Artefacto standalone Node | PASS | 2.496 archivos, 28.779.929 bytes, peers `react`, `react-dom`, `scheduler`, Vinext y su `prod-server` exigidos, 0 violaciones; reporte local SHA-256 `531BB439742B01AF2DFC80FB9636BCAC5B6BFE2E25CA6297CAB1424558069E46`. |
+| Puerta completa del árbol modificado | PASS | `pnpm run release:verify`: lint, typecheck, **204/204** pruebas, build, i18n, scorecard, SBOM, dos validadores de artefacto y smoke standalone; exit code 0 tras integrar Sitges, el favicon transparente y la corrección tipográfica del 2026-08-30. |
+| Artefacto worker | PASS | 154 archivos, 3.137.693 bytes, 0 violaciones; reporte local SHA-256 `7027A34B0A8AEB8C1E46C7F003823C99721C4DB0E116A83CD41B349518F9306A`. |
+| Artefacto standalone Node | PASS | 2.412 archivos, 28.920.664 bytes, peers `react`, `react-dom`, `scheduler`, Vinext y su `prod-server` exigidos, 0 violaciones; reporte local SHA-256 `8BC48BF74063710BED32A614CA1C025756089953548EF92017C3785029F3A0A2`. |
 | Entry point usado por Docker | PASS WITH LIMITS | `node dist/standalone/server.js` respondió en loopback: 41 rutas holding HTTP 200, headers defensivos, robots cerrado, sitemap vacío y 6 rutas negativas/legacy HTTP 404. No prueba kernel Linux, imagen o proxy. |
-| Contrato Docker/contexto remoto | PASS WITH LIMITS | Pruebas estáticas exigen etiqueta Node de versión exacta, multi-stage, usuario no-root, healthcheck, puerto 3000, copia exclusiva del standalone y deny-all/allowlist del contexto. La base no está fijada por digest inmutable y las pruebas no construyen una imagen. |
+| Contrato Docker/contexto remoto | PASS WITH LIMITS | Pruebas estáticas exigen etiqueta Node de versión exacta, multi-stage, usuario no-root, healthcheck, puerto 3000, copia exclusiva del standalone y deny-all/allowlist del contexto. La base está fijada por digest inmutable; las pruebas todavía no construyen una imagen Docker Linux. |
 | Build y ejecución de imagen Docker | NOT_TESTED | No hay `docker`, `podman` ni `nerdctl` disponibles en este equipo. Debe verificarse en EasyPanel u otro host Docker y registrarse digest, usuario, healthcheck y smoke. |
 | Deploy EasyPanel y URL externa | NOT_TESTED | No se hizo push, deploy, cambio de rama, proxy/TLS ni smoke externo en esta etapa local. El SHA remoto observado en el error (`013307a...`) no contenía `Dockerfile`. |
 

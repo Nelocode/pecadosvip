@@ -14,20 +14,39 @@ declare module 'sharp' {
     height: number;
   };
 
+  export type SharpOverlayOptions = {
+    input: SharpInput;
+    left: number;
+    top: number;
+  };
+
   export type SharpInstance = {
     metadata(): Promise<SharpMetadata>;
     rotate(): SharpInstance;
     resize(options: {
+      width?: number;
+      height?: number;
+      fit?: 'inside' | 'cover';
+      position?: 'centre' | 'center';
+      withoutEnlargement?: boolean;
+    }): SharpInstance;
+    resize(
+      width: number,
+      height: number,
+      options?: { fit?: 'inside' | 'cover'; position?: 'centre' | 'center' },
+    ): SharpInstance;
+    extract(options: {
+      left: number;
+      top: number;
       width: number;
       height: number;
-      fit: 'inside';
-      withoutEnlargement: boolean;
     }): SharpInstance;
+    composite(overlays: SharpOverlayOptions[]): SharpInstance;
     toColourspace(colourspace: 'srgb'): SharpInstance;
     webp(options: {
       quality: number;
-      effort: number;
-      smartSubsample: boolean;
+      effort?: number;
+      smartSubsample?: boolean;
     }): SharpInstance;
     jpeg(options?: { quality?: number }): SharpInstance;
     png(): SharpInstance;
@@ -38,9 +57,11 @@ declare module 'sharp' {
     toBuffer(options: {
       resolveWithObject: true;
     }): Promise<{ data: Buffer; info: SharpOutputInfo }>;
+    toFile(path: string): Promise<SharpOutputInfo>;
   };
 
   export type SharpInput =
+    | string
     | Uint8Array
     | {
         create: {

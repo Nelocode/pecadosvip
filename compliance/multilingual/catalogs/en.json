@@ -24,6 +24,14 @@
       "title": "Profiles",
       "description": "Catalogue of published and approved PecadosVip profiles."
     },
+    "services": {
+      "title": "Services",
+      "description": "Catalogue of published and approved PecadosVip services."
+    },
+    "service": {
+      "unavailableTitle": "Service unavailable",
+      "unavailableDescription": "The requested service is not published."
+    },
     "profile": {
       "unavailableTitle": "Profile unavailable",
       "unavailableDescription": "The requested profile is not published."
@@ -65,6 +73,7 @@
     "madrid": "Madrid",
     "barcelona": "Barcelona",
     "profiles": "Profiles",
+    "services": "Services",
     "privateContact": "Private contact",
     "contact": "Contact"
   },
@@ -435,6 +444,29 @@
       "kilograms": "kg"
     },
     "servicesTitle": "Services"
+  },
+  "servicesHub": {
+    "eyebrow": "Approved services",
+    "title": "Private experiences with clear conditions.",
+    "body": "This route only shows published, approved services linked to publishable profiles.",
+    "catalogTitle": "Services catalogue",
+    "cardAction": "View service",
+    "profileCount": "{count} linked profiles",
+    "faqTitle": "Before choosing",
+    "faqs": [
+      { "question": "Is availability guaranteed?", "answer": "No. It must be confirmed privately for each profile, city and time." },
+      { "question": "Can boundaries be changed?", "answer": "Only through explicit, informed and reversible agreement between adults." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Service breadcrumb",
+    "services": "Services",
+    "eyebrow": "Published service",
+    "profilesTitle": "Related profiles",
+    "profilesBody": "Approved profiles that include this service.",
+    "contactTitle": "Private confirmation",
+    "contactBody": "Check coverage, availability and conditions only through an approved channel.",
+    "back": "Back to services"
   },
   "contact": {
     "eyebrow": "Private contact",

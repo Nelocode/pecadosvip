@@ -24,6 +24,14 @@
       "title": "Profili",
       "description": "Catalogo dei profili PecadosVip pubblicati e approvati."
     },
+    "services": {
+      "title": "Servizi",
+      "description": "Catalogo dei servizi PecadosVip pubblicati e approvati."
+    },
+    "service": {
+      "unavailableTitle": "Servizio non disponibile",
+      "unavailableDescription": "Il servizio richiesto non è pubblicato."
+    },
     "profile": {
       "unavailableTitle": "Profilo non disponibile",
       "unavailableDescription": "Il profilo richiesto non è pubblicato."
@@ -65,6 +73,7 @@
     "madrid": "Madrid",
     "barcelona": "Barcelona",
     "profiles": "Profili",
+    "services": "Servizi",
     "privateContact": "Contatto privato",
     "contact": "Contatto"
   },
@@ -435,6 +444,29 @@
       "kilograms": "kg"
     },
     "servicesTitle": "Servizi"
+  },
+  "servicesHub": {
+    "eyebrow": "Servizi approvati",
+    "title": "Esperienze private con condizioni chiare.",
+    "body": "Questa rotta mostra solo servizi pubblicati, approvati e collegati a profili pubblicabili.",
+    "catalogTitle": "Catalogo dei servizi",
+    "cardAction": "Vedi servizio",
+    "profileCount": "{count} profili collegati",
+    "faqTitle": "Prima di scegliere",
+    "faqs": [
+      { "question": "La disponibilità è garantita?", "answer": "No. Deve essere confermata in privato per ogni profilo, città e momento." },
+      { "question": "I limiti possono cambiare?", "answer": "Solo tramite un accordo esplicito, informato e revocabile tra adulti." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Percorso di navigazione del servizio",
+    "services": "Servizi",
+    "eyebrow": "Servizio pubblicato",
+    "profilesTitle": "Profili correlati",
+    "profilesBody": "Profili approvati che includono questo servizio.",
+    "contactTitle": "Conferma privata",
+    "contactBody": "Verifica copertura, disponibilità e condizioni solo tramite un canale approvato.",
+    "back": "Torna ai servizi"
   },
   "contact": {
     "eyebrow": "Contatto privato",

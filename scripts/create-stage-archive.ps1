@@ -21,7 +21,7 @@ $MaximumFileBytes = 128MB
 $MaximumArchiveSourceBytes = 512MB
 $MaximumTextScanBytes = 2MB
 $ExpectedTrackedPlaywrightEvidenceCount = 25
-$ExpectedFinalEvidenceCount = 27
+$ExpectedFinalEvidenceCount = 63
 $TrackedPlaywrightEvidence = @(
     'output/playwright/contact-gate-retest.json',
     'output/playwright/final-preview/reflow-320-equivalent-400.png',
@@ -76,7 +76,43 @@ $FinalEvidence = @(
     'output/audit-20260829-revalidation/ux/07-catalog-mobile.png',
     'output/audit-20260829-revalidation/ux/08-profile-cards-mobile.png',
     'output/audit-20260829-revalidation/ue-es/applicability.json',
-    'output/audit-20260829-revalidation/ue-es/source-freshness.json'
+    'output/audit-20260829-revalidation/ue-es/source-freshness.json',
+    'output/audits/multilingual-services/audit-summary.md',
+    'output/audits/multilingual-services/catalogs-audit.json',
+    'output/audits/multilingual-services/catalogs-audit.md',
+    'output/audits/multilingual-services/preview-http-observations.json',
+    'output/audits/multilingual-services/public-site-audit.json',
+    'output/audits/multilingual-services/public-site-audit.md',
+    'output/audits/multilingual-services/site-inventory.json',
+    'output/audits/eu-spain-services/audit-report.md',
+    'output/audits/eu-spain-services/profile.json',
+    'output/audits/eu-spain-services/resolver-output.json',
+    'output/audits/eu-spain-services/retest-evidence.json',
+    'output/design-qa/services-desktop-top.png',
+    'output/design-qa/services-desktop-catalog.png',
+    'output/design-qa/services-desktop-faq.png',
+    'output/design-qa/service-detail-desktop-top.png',
+    'output/design-qa/services-mobile-top.png',
+    'output/design-qa/service-detail-mobile.png',
+    'output/design-qa/service-mobile-menu-open-final.png',
+    'output/design-qa/services-desktop-fr-locales.png',
+    'output/design-qa/services-reference-vs-implementation.png',
+    'output/design-qa/services-symbolic-desktop-top.png',
+    'output/design-qa/service-symbolic-detail-desktop.png',
+    'output/design-qa/services-symbolic-mobile-top.png',
+    'output/design-qa/services-unique-assets-contact-sheet.png',
+    'output/design-qa/services-unique-catalog-desktop.png',
+    'output/design-qa/services-unique-catalog-mobile.png',
+    'output/design-qa/services-reference-vs-implementation-unique.png',
+    'output/design-qa/cities-reference-before.png',
+    'output/design-qa/cities-reference-desktop.png',
+    'output/design-qa/cities-reference-mobile.png',
+    'output/design-qa/cities-services-desktop.png',
+    'output/design-qa/cities-services-tablet-1024.png',
+    'output/design-qa/cities-services-tablet-768.png',
+    'output/design-qa/cities-services-mobile.png',
+    'output/design-qa/cities-reference-contact-sheet.png',
+    'output/design-qa/cities-reference-comparison.png'
 )
 
 function Get-AbsolutePath {
@@ -380,7 +416,7 @@ function Assert-NoHighConfidenceSecret {
         '.bat', '.cjs', '.cmd', '.conf', '.css', '.csv', '.graphql', '.html',
         '.ini', '.js', '.json', '.jsx', '.log', '.md', '.mjs', '.patch', '.properties', '.ps1',
         '.sh', '.sha256', '.svg', '.toml', '.txt', '.ts', '.tsx', '.xml', '.yaml', '.yml',
-        '.dockerfile', '.dockerignore', '.example', '.gitignore'
+        '.dockerfile', '.dockerignore', '.example', '.gitattributes', '.gitignore'
     )
     $binaryExtensions = @(
         '.docx', '.gif', '.ico', '.jpeg', '.jpg', '.mp4', '.pdf', '.png',
@@ -390,8 +426,15 @@ function Assert-NoHighConfidenceSecret {
     if ($entry.Name.ToLowerInvariant() -eq 'dockerfile') {
         $extension = '.dockerfile'
     }
+    if ($entry.Name.ToLowerInvariant() -eq '.gitattributes') {
+        $extension = '.gitattributes'
+    }
     if ($entry.Name.ToLowerInvariant() -eq '.gitkeep') {
-        if ($entry.Length -gt 1 -or -not [string]::IsNullOrWhiteSpace([System.IO.File]::ReadAllText($entry.FullName))) {
+        $markerText = [System.IO.File]::ReadAllText($entry.FullName)
+        if (
+            $entry.Length -gt 2 -or
+            $markerText -notin @('', "`n", "`r`n")
+        ) {
             throw 'A .gitkeep marker must be empty or contain only one newline.'
         }
         return

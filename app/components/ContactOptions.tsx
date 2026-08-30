@@ -98,7 +98,7 @@ export default function ContactOptions({ locale = 'es' }: { locale?: Locale }) {
               maxLength={160}
               name="replyTo"
               required
-              type="text"
+              type="email"
             />
           </label>
           <label htmlFor="contact-city">
