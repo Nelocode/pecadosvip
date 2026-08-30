@@ -1,142 +1,158 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { getSyntheticPreviewProfile, syntheticPreviewAssetRoles, type SyntheticPreviewAssetRole } from '@/lib/preview/synthetic-preview';
+import { localizedPath } from '@/lib/i18n/locales';
+import PublicHeader from '@/app/components/PublicHeader';
+import PublicFooter from '@/app/components/PublicFooter';
+import PublicProfileMedia from '@/app/components/PublicProfileMedia';
+import { localeOrNotFound, type LocaleRouteParams } from '@/app/locale-routing';
 
-import { getPublicProfileDetail } from '../../../../lib/content/public-profiles';
-import { hasProfileCandidateRoute } from '../../../../lib/content/route-manifest';
-import { getRuntimeContentSnapshot } from '../../../../lib/content/runtime-snapshot';
-import { getRuntimeVisibilityState } from '../../../../lib/content/runtime-publication';
-import { getCatalog, interpolate } from '../../../../lib/i18n/catalog';
-import { formatDecimal } from '../../../../lib/i18n/format';
-import { localizedPath, SOURCE_LOCALE } from '../../../../lib/i18n/locales';
-import { buildLocalizedPublicMetadata } from '../../../../lib/seo';
-import ContactOptions from '../../../components/ContactOptions';
-import ProvisionalNotice from '../../../components/ProvisionalNotice';
-import PublicFooter from '../../../components/PublicFooter';
-import PublicHeader from '../../../components/PublicHeader';
-import PublicProfileMedia from '../../../components/PublicProfileMedia';
-import ReleaseHoldingPage from '../../../components/ReleaseHoldingPage';
-import { localeOrNotFound } from '../../../locale-routing';
-
-type Props = {
+type ProfilePageProps = {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const profileSlugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const profile = getSyntheticPreviewProfile(slug);
+  if (!profile) return { title: 'Perfil no encontrado' };
 
-export async function generateMetadata({ params }: Props) {
-  const { locale: rawLocale, slug } = await params;
-  const locale = localeOrNotFound(rawLocale);
-  if (!profileSlugPattern.test(slug)) notFound();
-  const snapshot = getRuntimeContentSnapshot();
-  if (!hasProfileCandidateRoute(snapshot, slug)) notFound();
-  const messages = getCatalog(locale).meta.profile;
-  const profile = locale === SOURCE_LOCALE
-    ? getPublicProfileDetail(snapshot, slug)
-    : undefined;
-
-  if (!profile) {
-    return buildLocalizedPublicMetadata({
-      locale,
-      semanticPath: `/perfiles/${slug}`,
-      title: messages.unavailableTitle,
-      description: messages.unavailableDescription,
-      forceNoIndex: true,
-    });
-  }
-
-  return buildLocalizedPublicMetadata({
-    locale,
-    semanticPath: `/perfiles/${profile.slug}`,
-    title: profile.displayName,
-    description: profile.biography,
-    imageAlt: profile.cover.alt,
-    languageAlternates: false,
-  });
+  return {
+    title: `${profile.displayName} | Acompañante VIP en ${profile.citySlugs.join(', ')} - PecadosVIP`,
+    description: `Perfil de ${profile.displayName}, ${profile.age} años. Ficha de compañía privada en ${profile.citySlugs.join(', ')}.`,
+  };
 }
 
-export default async function ProfileDetailPage({ params }: Props) {
+function selectedRole(raw: string | string[] | undefined): SyntheticPreviewAssetRole {
+  return typeof raw === 'string' && syntheticPreviewAssetRoles.includes(raw as SyntheticPreviewAssetRole)
+    ? (raw as SyntheticPreviewAssetRole)
+    : 'cover';
+}
+
+export default async function LocalizedProfileDetailPage({ params, searchParams }: ProfilePageProps) {
   const { locale: rawLocale, slug } = await params;
   const locale = localeOrNotFound(rawLocale);
-  if (!profileSlugPattern.test(slug)) notFound();
-  const snapshot = getRuntimeContentSnapshot();
-  if (!hasProfileCandidateRoute(snapshot, slug)) notFound();
-  if (!getRuntimeVisibilityState().renderPublicExperience || locale !== SOURCE_LOCALE) {
-    return (
-      <ReleaseHoldingPage
-        locale={locale}
-        semanticPath={`/perfiles/${slug}`}
-      />
-    );
+  const href = (path: `/${string}` | '/') => localizedPath(locale, path);
+  const profile = getSyntheticPreviewProfile(slug);
+
+  if (!profile) {
+    notFound();
   }
 
-  const profile = getPublicProfileDetail(snapshot, slug);
-  if (!profile) notFound();
-  const messages = getCatalog(locale).profile;
-  const measurements = Object.entries(profile.measurements).filter(
-    ([, value]) => value !== undefined,
-  );
-  const measurementPresentation: Record<string, { label: string; unit: string }> = {
-    heightCm: { label: messages.measurements.heightCm, unit: messages.units.centimeters },
-    weightKg: { label: messages.measurements.weightKg, unit: messages.units.kilograms },
-    bustCm: { label: messages.measurements.bustCm, unit: messages.units.centimeters },
-    waistCm: { label: messages.measurements.waistCm, unit: messages.units.centimeters },
-    hipsCm: { label: messages.measurements.hipsCm, unit: messages.units.centimeters },
-  };
+  const query = await searchParams;
+  const activeRole = selectedRole(query.foto);
+  const activeMedia = profile.media.find((candidate) => candidate.role === activeRole) ?? profile.cover;
 
   return (
-    <div className="public-page">
-      <PublicHeader currentPath={`/perfiles/${profile.slug}`} locale={locale} />
+    <div className="public-page synthetic-preview-page synthetic-profile-page">
+      <PublicHeader currentPath="/perfiles" locale={locale} />
+
       <main id="main-content" tabIndex={-1}>
-        <ProvisionalNotice locale={locale} />
-        <article className="profile-detail" aria-labelledby="profile-detail-title">
-          <section
-            className="profile-detail-media"
-            aria-label={interpolate(messages.galleryAria, { name: profile.displayName })}
-          >
-            {profile.media.map((media) => (
-              <div className="profile-detail-image" key={`${media.desktopUrl}-${media.order}`}>
-                <PublicProfileMedia
-                  media={media}
-                  priority={media.order === 0}
-                  sizes="(max-width: 820px) 92vw, 48vw"
-                />
-              </div>
-            ))}
-          </section>
-          <div className="profile-detail-copy">
-            <p className="public-eyebrow">{messages.publishedEyebrow}</p>
-            <h1 id="profile-detail-title">{profile.displayName}</h1>
-            <p>
-              {interpolate(messages.ageYears, { age: profile.age })} ·{' '}
-              {profile.citySlugs.join(' · ')}
-            </p>
-            <p>{profile.biography}</p>
-            {measurements.length > 0 ? (
-              <dl>
-                {measurements.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{measurementPresentation[label]?.label ?? label}</dt>
-                    <dd>
-                      {formatDecimal(Number(value), locale)}{' '}
-                      {measurementPresentation[label]?.unit}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
-            <h2>{messages.servicesTitle}</h2>
-            <ul>
-              {profile.services.map((service) => (
-                <li key={service.slug}>
-                  <a href={localizedPath(locale, `/servicios/${service.slug}`)}>
-                    {service.name}
-                  </a>
-                </li>
+        <nav className="synthetic-profile-breadcrumb px-6 py-4 text-xs" aria-label="Migas de pan">
+          <a href={href('/perfiles')} className="text-zinc-400 hover:text-amber-400">Catálogo de Perfiles</a>
+          <span className="mx-2 text-zinc-600">/</span>
+          <span className="text-amber-400 font-bold">{profile.displayName}</span>
+        </nav>
+
+        <article className="profile-detail synthetic-profile-detail" aria-labelledby="profile-detail-title">
+          {/* Main Photo Gallery */}
+          <section className="profile-detail-media synthetic-profile-media" aria-label={`Galería de ${profile.displayName}`}>
+            <div className="profile-detail-image synthetic-profile-active-image overflow-hidden rounded-2xl border border-zinc-800">
+              <PublicProfileMedia
+                media={activeMedia}
+                priority
+                sizes="(max-width: 780px) 90vw, 52vw"
+              />
+            </div>
+            
+            {/* Gallery Thumbnails */}
+            <nav className="synthetic-profile-thumbnails mt-4 flex gap-3 overflow-x-auto pb-2" aria-label="Seleccionar fotografía">
+              {profile.media.map((candidate) => (
+                <a
+                  key={candidate.role}
+                  aria-current={candidate.role === activeRole ? 'true' : undefined}
+                  href={href(`/perfiles/${profile.slug}?foto=${candidate.role}` as any)}
+                  className={`relative block h-20 w-20 overflow-hidden rounded-xl border-2 transition ${
+                    candidate.role === activeRole ? 'border-amber-400 scale-105' : 'border-zinc-800 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <PublicProfileMedia
+                    media={{ ...candidate, alt: '' }}
+                    sizes="80px"
+                    preserveFullImage={false}
+                  />
+                </a>
               ))}
-            </ul>
-            <ContactOptions locale={locale} />
+            </nav>
+          </section>
+
+          {/* Profile Bio & Details */}
+          <div className="profile-detail-copy synthetic-profile-copy space-y-6">
+            <div>
+              <p className="public-eyebrow text-amber-400">Perfil Verificado</p>
+              <h1 id="profile-detail-title" className="text-3xl font-extrabold text-zinc-100">{profile.displayName}</h1>
+              <p className="synthetic-profile-summary text-sm text-zinc-400 mt-1">
+                {profile.age} años · Cobertura en {profile.citySlugs.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(' · ')}
+              </p>
+            </div>
+
+            <p className="text-sm text-zinc-300 leading-relaxed">{profile.biography}</p>
+
+            <dl className="grid grid-cols-2 gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 text-xs">
+              <div>
+                <dt className="text-zinc-500 font-medium">Estatura & Medidas</dt>
+                <dd className="font-bold text-amber-400 mt-0.5">175 cm · 90-60-90</dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500 font-medium">Disponibilidad</dt>
+                <dd className="font-bold text-emerald-400 mt-0.5">Disponible Ahora</dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500 font-medium">Modalidad</dt>
+                <dd className="font-bold text-zinc-200 mt-0.5">Hotel y Domicilio</dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500 font-medium">Idiomas</dt>
+                <dd className="font-bold text-zinc-200 mt-0.5">Español · Inglés</dd>
+              </div>
+            </dl>
+
+            {/* Direct Contact Buttons */}
+            <div className="space-y-3 pt-2">
+              <p className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Contacto Directo Privado:</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="https://wa.me/34600000000"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-xs font-bold text-zinc-100 hover:bg-emerald-500 transition shadow-lg"
+                >
+                  <span>💬</span> Contactar por WhatsApp
+                </a>
+                <a
+                  href="https://t.me/pecadosvip"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-xs font-bold text-zinc-100 hover:bg-sky-500 transition shadow-lg"
+                >
+                  <span>✈️</span> Contactar por Telegram
+                </a>
+                <a
+                  href="tel:+34600000000"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition"
+                >
+                  <span>📞</span> Llamar
+                </a>
+              </div>
+            </div>
+
+            <a className="synthetic-profile-back block text-xs text-zinc-400 hover:text-amber-400 pt-4" href={href('/perfiles')}>
+              ← Volver a todos los perfiles
+            </a>
           </div>
         </article>
       </main>
+
       <PublicFooter locale={locale} />
     </div>
   );

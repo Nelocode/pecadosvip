@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { buildCityMetadata } from '../../../lib/seo';
-import CityLanding from '../../components/CityLanding';
-import { cities } from '../../city-data';
+import { buildCityMetadata } from '@/lib/seo';
+import CityLanding from '@/app/components/CityLanding';
+import { cities } from '@/app/city-data';
 
 export const metadata: Metadata = buildCityMetadata({
   slug: 'madrid',
