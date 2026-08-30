@@ -4,6 +4,7 @@ import type { PublicMedia } from '../../lib/content/public-profiles';
 
 type PublicProfileMediaProps = {
   media: PublicMedia;
+  objectPosition?: string;
   priority?: boolean;
   preserveFullImage?: boolean;
   sizes: string;
@@ -23,6 +24,7 @@ function mimeType(url: string, kind: PublicMedia['kind']): string {
 
 export default function PublicProfileMedia({
   media,
+  objectPosition = 'center top',
   priority = false,
   preserveFullImage = true,
   sizes,
@@ -31,6 +33,7 @@ export default function PublicProfileMedia({
     objectFit: preserveFullImage ? ('contain' as const) : ('cover' as const),
     objectPosition: 'center top',
   };
+  style.objectPosition = objectPosition;
 
   if (media.kind === 'video') {
     return (

@@ -48,6 +48,7 @@ next-env.d.ts
 /output/release/
 /output/audits/
 /output/design-qa/
+/output/imagegen/
 /output/reference-felina/
 /output/preview-services.*.log
 /work/

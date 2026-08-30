@@ -10,6 +10,7 @@ import {
   getSyntheticServiceMessages,
   isSyntheticServiceLocale,
 } from '../../../../../lib/preview/synthetic-services';
+import { getSyntheticServiceMedia } from '../../../../../lib/preview/synthetic-service-media';
 import {
   getSyntheticPreviewProfile,
   getSyntheticPreviewProfiles,
@@ -74,16 +75,14 @@ export default async function SyntheticServiceDetailPage({
   const group = messages.groups[service.group];
   const related = getRelatedSyntheticServices(service, locale, 4);
   const primaryProfile = getSyntheticPreviewProfile(service.profileSlug)!;
-  const primaryMedia = primaryProfile.media.find(
-    (candidate) => candidate.role === service.mediaRole,
-  )!;
+  const primaryMedia = getSyntheticServiceMedia(service.mediaKey, locale);
   const relatedProfiles = getSyntheticPreviewProfiles()
     .filter((profile) => profile.slug !== primaryProfile.slug)
     .slice(0, 2);
   const profiles = [primaryProfile, ...relatedProfiles];
 
   return (
-    <div className="public-page synthetic-preview-page synthetic-services-page synthetic-service-detail-page" lang={locale}>
+    <div className="public-page synthetic-preview-page synthetic-services-page synthetic-service-detail-page" id="service-top" lang={locale}>
       <SyntheticServicesHeader
         current="detail"
         documentDescription={service.teaser}
@@ -105,7 +104,8 @@ export default async function SyntheticServiceDetailPage({
           <section className="synthetic-service-detail-hero" aria-labelledby="service-detail-title">
             <div className="synthetic-service-detail-media">
               <PublicProfileMedia
-                media={{ ...primaryMedia, alt: messages.media.generatedAlt }}
+                media={primaryMedia}
+                objectPosition={primaryMedia.objectPosition}
                 preserveFullImage={false}
                 priority
                 sizes="(max-width: 780px) 100vw, 50vw"
@@ -123,7 +123,18 @@ export default async function SyntheticServiceDetailPage({
             </div>
           </section>
 
-          <section className="synthetic-service-detail-overview" aria-labelledby="service-overview-title">
+          <nav
+            aria-label={messages.detail.previewEyebrow}
+            className="synthetic-service-detail-index"
+          >
+            <a href="#service-overview">{messages.detail.overviewTitle}</a>
+            <a href="#service-process">{messages.detail.processTitle}</a>
+            <a href="#service-safeguards">{messages.detail.safeguardsTitle}</a>
+            <a href="#service-related">{messages.detail.relatedTitle}</a>
+            <a href="#service-profiles">{messages.detail.profilesTitle}</a>
+          </nav>
+
+          <section className="synthetic-service-detail-overview" id="service-overview" aria-labelledby="service-overview-title">
             <div>
               <p className="public-eyebrow">01</p>
               <h2 id="service-overview-title">{messages.detail.overviewTitle}</h2>
@@ -146,7 +157,7 @@ export default async function SyntheticServiceDetailPage({
             </ol>
           </section>
 
-          <section className="synthetic-service-safeguards" aria-labelledby="service-safeguards-title">
+          <section className="synthetic-service-safeguards" id="service-safeguards" aria-labelledby="service-safeguards-title">
             <div>
               <p className="public-eyebrow">03</p>
               <h2 id="service-safeguards-title">{messages.detail.safeguardsTitle}</h2>
@@ -156,7 +167,7 @@ export default async function SyntheticServiceDetailPage({
             </ul>
           </section>
 
-          <section className="public-section synthetic-service-related" aria-labelledby="service-related-title">
+          <section className="public-section synthetic-service-related" id="service-related" aria-labelledby="service-related-title">
             <div className="public-section-heading synthetic-preview-section-heading">
               <p className="public-eyebrow">04</p>
               <h2 id="service-related-title">{messages.detail.relatedTitle}</h2>
@@ -165,6 +176,8 @@ export default async function SyntheticServiceDetailPage({
               {related.map((candidate) => (
                 <SyntheticServiceCard
                   action={messages.hub.openService}
+                  badge={messages.media.aiShort}
+                  badgeLabel={messages.media.generatedBadge}
                   key={candidate.slug}
                   locale={locale}
                   service={candidate}
@@ -173,7 +186,7 @@ export default async function SyntheticServiceDetailPage({
             </div>
           </section>
 
-          <section className="public-section synthetic-service-profiles" aria-labelledby="service-profiles-title">
+          <section className="public-section synthetic-service-profiles" id="service-profiles" aria-labelledby="service-profiles-title">
             <div className="public-section-heading synthetic-preview-section-heading">
               <p className="public-eyebrow">05</p>
               <h2 id="service-profiles-title">{messages.detail.profilesTitle}</h2>

@@ -1,6 +1,6 @@
 # Design QA — experiencia de servicios PecadosVip
 
-Fecha de cierre local: 2026-08-29
+Fecha de cierre local: 2026-08-30
 
 ## Alcance verificado
 
@@ -26,11 +26,22 @@ Evidencia local:
 - `output/design-qa/service-detail-mobile.png`
 - `output/design-qa/service-mobile-menu-open-final.png`
 - `output/design-qa/services-desktop-fr-locales.png`
+- `output/design-qa/services-reference-vs-implementation.png`
+- `output/design-qa/services-symbolic-desktop-top.png`
+- `output/design-qa/service-symbolic-detail-desktop.png`
+- `output/design-qa/services-symbolic-mobile-top.png`
+
+La extensión del 30 de agosto sustituyó los retratos decorativos de servicios por doce bodegones originales generados con IA, sin personas, texto, marcas ni lugares identificables. Se comparó en una sola imagen la referencia gráfica del cliente y la implementación final. La nueva composición conserva el sistema negro, marfil y dorado, la jerarquía editorial, el contraste de superficies y la densidad premium de la referencia, mientras diferencia con claridad servicios y perfiles.
+
+No quedaron hallazgos P0, P1 o P2 en la muestra visual final. Los encuadres de hero, tarjeta y detalle conservan los objetos principales; las insignias no cubren el foco; no hay imágenes estiradas, placeholders, arte CSS ni controles superpuestos. La captura de página completa presentó artefactos de cosido del navegador, por lo que el dictamen visual se basó en capturas normales de viewport y en el DOM renderizado.
 
 ## Interacciones y responsive
 
 - Los enlaces del catálogo y del directorio llevan a las 34 fichas de detalle.
 - Los filtros por categoría usan navegación GET y conservan el idioma seleccionado.
+- La búsqueda dinámica ignora tildes, combina categoría y ordenación, anuncia el número de resultados y ofrece estado vacío y restablecimiento.
+- La selección temporal admite hasta tres fichas, expone `aria-pressed`, puede vaciarse y vive solo en memoria de React: no usa URL, cookies, `localStorage`, `sessionStorage`, analítica ni red.
+- Las fichas largas incorporan un índice real de anclas para resumen, proceso, límites, relacionados y perfiles.
 - La navegación principal, el logotipo, el selector de idioma, los perfiles y los enlaces relacionados conservan `?lang` en el preview.
 - El menú móvil se comporta como diálogo: abre y cierra con control explícito, atrapa el foco, responde a Escape, devuelve el foco al disparador y bloquea el desplazamiento de fondo.
 - La portada y las tarjetas usan encuadres que conservan caras completas en escritorio y móvil.
@@ -49,7 +60,7 @@ Evidencia local:
 - `pnpm run release:verify`: aprobado.
 - ESLint: aprobado sin errores ni advertencias.
 - TypeScript: aprobado.
-- Pruebas: 199/199 aprobadas.
+- Pruebas: 201/201 aprobadas.
 - Compilación Vinext y preparación standalone: aprobadas.
 - Validación i18n: `PASS_WITH_LIMITS`, 0 problemas estructurales de catálogo.
 - Artefactos worker y standalone: 0 infracciones.

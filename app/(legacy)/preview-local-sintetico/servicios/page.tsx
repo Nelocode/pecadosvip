@@ -8,15 +8,14 @@ import {
   getSyntheticServiceMessages,
   isSyntheticServiceGroup,
   isSyntheticServiceLocale,
-  syntheticServiceGroups,
 } from '../../../../lib/preview/synthetic-services';
+import { getSyntheticServiceMedia } from '../../../../lib/preview/synthetic-service-media';
 import {
-  getSyntheticPreviewProfile,
   isSyntheticPreviewRequestAllowed,
 } from '../../../../lib/preview/synthetic-preview';
 import PublicProfileMedia from '../../../components/PublicProfileMedia';
 import SyntheticPreviewNotice from '../../../components/SyntheticPreviewNotice';
-import SyntheticServiceCard from '../../../components/SyntheticServiceCard';
+import SyntheticServiceExplorer from '../../../components/SyntheticServiceExplorer';
 import SyntheticServicesHeader from '../../../components/SyntheticServicesHeader';
 
 export const metadata: Metadata = {
@@ -65,22 +64,19 @@ export default async function SyntheticServicesPage({
   const rawLocale = single(raw.lang);
   const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
   const rawGroup = single(raw.category);
-  const validGroup = rawGroup === undefined || isSyntheticServiceGroup(rawGroup);
-  const selectedGroup = validGroup ? rawGroup : undefined;
+  const validGroup =
+    rawGroup === undefined || rawGroup === 'all' || isSyntheticServiceGroup(rawGroup);
+  const selectedGroup = isSyntheticServiceGroup(rawGroup) ? rawGroup : undefined;
   const messages = getSyntheticServiceMessages(locale);
   const fullCatalog = getSyntheticServiceCatalog(locale);
-  const services = validGroup
-    ? fullCatalog.filter(
-        (service) => selectedGroup === undefined || service.group === selectedGroup,
-      )
-    : [];
-  const editorialProfile = getSyntheticPreviewProfile('sofia')!;
-  const editorialMedia = editorialProfile.media.find(
-    (candidate) => candidate.role === 'gallery-03',
-  )!;
+  const heroMedia = getSyntheticServiceMedia('company-private-lounge', locale);
+  const editorialMedia = getSyntheticServiceMedia(
+    'preferences-silk-envelope',
+    locale,
+  );
 
   return (
-    <div className="public-page synthetic-preview-page synthetic-services-page" lang={locale}>
+    <div className="public-page synthetic-preview-page synthetic-services-page" id="service-top" lang={locale}>
       <SyntheticServicesHeader
         current="services"
         documentDescription={messages.hub.lead}
@@ -112,7 +108,8 @@ export default async function SyntheticServicesPage({
           </div>
           <div className="synthetic-services-hero-media">
             <PublicProfileMedia
-              media={{ ...editorialMedia, alt: messages.media.generatedAlt }}
+              media={heroMedia}
+              objectPosition={heroMedia.objectPosition}
               preserveFullImage={false}
               priority
               sizes="(max-width: 780px) 100vw, 48vw"
@@ -141,30 +138,7 @@ export default async function SyntheticServicesPage({
               <h2 id="service-catalog-title">{messages.hub.catalogTitle}</h2>
               <p>{messages.hub.catalogLead}</p>
             </div>
-            <span className="synthetic-preview-result-count" role="status">
-              {services.length} {services.length === 1 ? messages.hub.resultSingular : messages.hub.resultPlural}
-            </span>
           </div>
-
-          <form className="synthetic-service-filters" action="/preview-local-sintetico/servicios#service-catalog" method="get">
-            <fieldset>
-              <legend>{messages.hub.filterLegend}</legend>
-              <input name="lang" type="hidden" value={locale} />
-              <label htmlFor="service-category">
-                {messages.hub.filterLabel}
-                <select id="service-category" name="category" defaultValue={selectedGroup ?? ''}>
-                  <option value="">{messages.hub.allGroups}</option>
-                  {syntheticServiceGroups.map((group) => (
-                    <option key={group} value={group}>{messages.groups[group].label}</option>
-                  ))}
-                </select>
-              </label>
-              <button type="submit">{messages.hub.applyFilter}</button>
-              <a href={`/preview-local-sintetico/servicios?lang=${locale}#service-catalog`}>
-                {messages.hub.resetFilter}
-              </a>
-            </fieldset>
-          </form>
 
           {!validGroup ? (
             <div className="public-empty-state public-empty-state-error" role="alert">
@@ -175,27 +149,23 @@ export default async function SyntheticServicesPage({
               </a>
             </div>
           ) : (
-            <div className="synthetic-services-grid">
-              {services.map((service) => (
-                <SyntheticServiceCard
-                  action={messages.hub.openService}
-                  key={service.slug}
-                  locale={locale}
-                  service={service}
-                />
-              ))}
-            </div>
+            <SyntheticServiceExplorer
+              catalog={fullCatalog}
+              initialGroup={selectedGroup}
+              locale={locale}
+            />
           )}
         </section>
 
         <section className="synthetic-services-editorial" aria-labelledby="services-editorial-title">
           <div className="synthetic-services-editorial-media">
             <PublicProfileMedia
-              media={{ ...editorialProfile.media[1]!, alt: messages.media.generatedAlt }}
+              media={editorialMedia}
+              objectPosition={editorialMedia.objectPosition}
               preserveFullImage={false}
               sizes="(max-width: 780px) 100vw, 50vw"
             />
-            <span>{messages.media.fictionalBadge}</span>
+            <span>{messages.media.generatedBadge}</span>
           </div>
           <div>
             <p className="public-eyebrow">{messages.hub.editorialEyebrow}</p>

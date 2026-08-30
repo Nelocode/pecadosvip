@@ -19,6 +19,10 @@ import {
   getSyntheticService,
   syntheticServiceGroups,
 } from '../lib/preview/synthetic-services.ts';
+import {
+  getSyntheticServiceMedia,
+  syntheticServiceMediaKeys,
+} from '../lib/preview/synthetic-service-media.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
 
 test('the local preview middleware fails closed on malformed request URLs', () => {
@@ -275,6 +279,21 @@ test('service preview exposes 34 PecadosVip routes in four complete locale proje
   assert.equal(getSyntheticService('../secret', 'es'), undefined);
 });
 
+test('service catalogue maps every route to reviewed local symbolic media', () => {
+  const catalog = getSyntheticServiceCatalog('es');
+  assert.equal(syntheticServiceMediaKeys.length, 12);
+  assert.equal(catalog.every((service) => syntheticServiceMediaKeys.includes(service.mediaKey)), true);
+
+  for (const key of syntheticServiceMediaKeys) {
+    const media = getSyntheticServiceMedia(key, 'es');
+    assert.match(media.desktopUrl, /^\/preview-local-sintetico\/service-media\//);
+    assert.equal(media.contentType, 'image/webp');
+    assert.match(media.alt, /\S/);
+    assert.equal(existsSync(resolve(media.sourcePath)), true, media.sourcePath);
+    assert.doesNotMatch(media.sourcePath, /public[\\/]/i);
+  }
+});
+
 test('service hub and detail remain local-only, noindex, contact-free and interactive', () => {
   const hub = readFileSync(
     'app/(legacy)/preview-local-sintetico/servicios/page.tsx',
@@ -288,6 +307,14 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
     'app/components/SyntheticPreviewNotice.tsx',
     'utf8',
   );
+  const explorer = readFileSync(
+    'app/components/SyntheticServiceExplorer.tsx',
+    'utf8',
+  );
+  const card = readFileSync(
+    'app/components/SyntheticServiceCard.tsx',
+    'utf8',
+  );
   const css = readFileSync('app/service-pages.css', 'utf8');
 
   for (const source of [hub, detail]) {
@@ -299,7 +326,15 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
       /ContactOptions|formActionUrl|mailto:|tel:|https?:\/\/(?:wa\.me|t\.me)/,
     );
   }
-  assert.match(hub, /name="category"/);
+  assert.match(explorer, /name="category"/);
+  assert.match(explorer, /role="search"/);
+  assert.match(explorer, /type="search"/);
+  assert.match(explorer, /aria-live="polite"/);
+  assert.match(explorer, /aria-pressed=/);
+  assert.match(explorer, /current\.length >= 3/);
+  assert.doesNotMatch(explorer, /localStorage|sessionStorage|navigator\.share/);
+  assert.match(card, /className="synthetic-service-card-select"/);
+  assert.match(card, /aria-pressed=\{selection\.selected\}/);
   assert.match(hub, /<details/);
   assert.match(hub, /SyntheticPreviewNotice/);
   assert.match(detail, /generateStaticParams/);
@@ -321,5 +356,20 @@ test('manifest keeps synthetic candidates outside public production paths', () =
   for (const row of rows) {
     const columns = row.split(',');
     assert.equal(columns[3], '', 'public_path must remain empty before approval');
+  }
+});
+
+test('service image manifest remains non-public and pending human/legal review', () => {
+  const manifest = readFileSync(
+    'assets/synthetic-services/ASSET_MANIFEST.csv',
+    'utf8',
+  );
+  const rows = manifest.trim().split(/\r?\n/).slice(1);
+  assert.equal(rows.length, 12);
+  for (const row of rows) {
+    const columns = row.split(',');
+    assert.equal(columns[4], '', 'public_path must remain empty before approval');
+    assert.equal(columns[13], 'PENDING');
+    assert.equal(columns[14], 'PENDING');
   }
 });

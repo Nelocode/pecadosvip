@@ -1,4 +1,5 @@
 import type { Locale } from '../i18n/locales.ts';
+import type { SyntheticServiceMediaKey } from './synthetic-service-media.ts';
 
 export const syntheticServiceGroups = [
   'company',
@@ -17,6 +18,7 @@ type SyntheticServiceDefinition = {
   slug: string;
   group: SyntheticServiceGroup;
   name: LocalizedName;
+  mediaKey: SyntheticServiceMediaKey;
   profileSlug: 'valeria' | 'sofia' | 'lucia' | 'julia' | 'mia' | 'alicia';
   mediaRole: 'cover' | 'gallery-01' | 'gallery-02' | 'gallery-03';
 };
@@ -76,6 +78,22 @@ export type SyntheticServiceMessages = {
     allGroups: string;
     applyFilter: string;
     resetFilter: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+    sortLabel: string;
+    sortEditorial: string;
+    sortName: string;
+    clearFilters: string;
+    noResultsTitle: string;
+    noResultsBody: string;
+    selectionTitle: string;
+    selectionBody: string;
+    selectionPrivacy: string;
+    addToSelection: string;
+    removeFromSelection: string;
+    clearSelection: string;
+    selectionLimit: string;
+    selectionEmpty: string;
     resultSingular: string;
     resultPlural: string;
     editorialEyebrow: string;
@@ -134,52 +152,52 @@ const names = (
 ): LocalizedName => ({ es, en, fr, it });
 
 const serviceDefinitions: readonly SyntheticServiceDefinition[] = [
-  { slug: 'compania-privada', group: 'company', name: names('Compañía privada', 'Private companionship', 'Accompagnement privé', 'Compagnia privata'), profileSlug: 'valeria', mediaRole: 'cover' },
-  { slug: 'preferencia-intima-personalizada', group: 'private-preferences', name: names('Preferencia íntima personalizada', 'Personalised intimate preference', 'Préférence intime personnalisée', 'Preferenza intima personalizzata'), profileSlug: 'sofia', mediaRole: 'gallery-01' },
-  { slug: 'besos-y-cercania', group: 'wellbeing', name: names('Besos y cercanía', 'Kisses and closeness', 'Baisers et proximité', 'Baci e vicinanza'), profileSlug: 'lucia', mediaRole: 'gallery-02' },
-  { slug: 'celebraciones-privadas', group: 'settings', name: names('Celebraciones privadas', 'Private celebrations', 'Célébrations privées', 'Celebrazioni private'), profileSlug: 'julia', mediaRole: 'gallery-03' },
-  { slug: 'ambientacion-tematica', group: 'roleplay', name: names('Ambientación temática', 'Themed styling', 'Mise en scène thématique', 'Ambientazione a tema'), profileSlug: 'mia', mediaRole: 'cover' },
-  { slug: 'ritual-de-ducha', group: 'wellbeing', name: names('Ritual de ducha', 'Shower ritual', 'Rituel de douche', 'Rituale doccia'), profileSlug: 'alicia', mediaRole: 'gallery-01' },
-  { slug: 'experiencia-a-duo', group: 'couples', name: names('Experiencia a dúo', 'Duo experience', 'Expérience en duo', 'Esperienza in coppia'), profileSlug: 'valeria', mediaRole: 'gallery-02' },
-  { slug: 'atencion-a-domicilio', group: 'settings', name: names('Atención a domicilio', 'At-home visit', 'Visite à domicile', 'Visita a domicilio'), profileSlug: 'sofia', mediaRole: 'gallery-03' },
-  { slug: 'encuentro-privado-de-grupo', group: 'couples', name: names('Encuentro privado de grupo', 'Private group experience', 'Rencontre privée en groupe', 'Incontro privato di gruppo'), profileSlug: 'lucia', mediaRole: 'cover' },
-  { slug: 'acompanamiento-para-mujeres', group: 'company', name: names('Acompañamiento para mujeres', 'Companionship for women', 'Accompagnement pour femmes', 'Compagnia per donne'), profileSlug: 'julia', mediaRole: 'gallery-01' },
-  { slug: 'atencion-en-hotel', group: 'settings', name: names('Atención en hotel', 'Hotel visit', 'Visite à l’hôtel', 'Visita in hotel'), profileSlug: 'mia', mediaRole: 'gallery-02' },
-  { slug: 'juego-de-rol-sumiso', group: 'roleplay', name: names('Juego de rol sumiso', 'Submissive roleplay', 'Jeu de rôle soumis', 'Gioco di ruolo sottomesso'), profileSlug: 'alicia', mediaRole: 'gallery-03' },
-  { slug: 'acompanamiento-para-parejas', group: 'couples', name: names('Acompañamiento para parejas', 'Companionship for couples', 'Accompagnement pour couples', 'Compagnia per coppie'), profileSlug: 'valeria', mediaRole: 'cover' },
-  { slug: 'preferencia-intima-acordada', group: 'private-preferences', name: names('Preferencia íntima acordada', 'Agreed intimate preference', 'Préférence intime convenue', 'Preferenza intima concordata'), profileSlug: 'sofia', mediaRole: 'gallery-01' },
-  { slug: 'preferencia-oral-final-acordado', group: 'private-preferences', name: names('Preferencia oral con final acordado', 'Oral preference with agreed ending', 'Préférence orale avec fin convenue', 'Preferenza orale con finale concordato'), profileSlug: 'lucia', mediaRole: 'gallery-02' },
-  { slug: 'fantasias-personalizadas', group: 'roleplay', name: names('Fantasías personalizadas', 'Personalised fantasies', 'Fantasmes personnalisés', 'Fantasie personalizzate'), profileSlug: 'julia', mediaRole: 'gallery-03' },
-  { slug: 'fetiches-acordados', group: 'roleplay', name: names('Fetiches acordados', 'Agreed fetishes', 'Fétiches convenus', 'Feticci concordati'), profileSlug: 'mia', mediaRole: 'cover' },
-  { slug: 'experiencia-oral-completa', group: 'private-preferences', name: names('Experiencia oral completa', 'Complete oral experience', 'Expérience orale complète', 'Esperienza orale completa'), profileSlug: 'alicia', mediaRole: 'gallery-01' },
-  { slug: 'experiencia-oral-natural', group: 'private-preferences', name: names('Experiencia oral natural', 'Natural oral experience', 'Expérience orale naturelle', 'Esperienza orale naturale'), profileSlug: 'valeria', mediaRole: 'gallery-02' },
-  { slug: 'preferencia-oral-intensa', group: 'private-preferences', name: names('Preferencia oral intensa', 'Intense oral preference', 'Préférence orale intense', 'Preferenza orale intensa'), profileSlug: 'sofia', mediaRole: 'gallery-03' },
-  { slug: 'experiencia-parejas-abiertas', group: 'couples', name: names('Experiencia para parejas abiertas', 'Open-couple experience', 'Expérience pour couples ouverts', 'Esperienza per coppie aperte'), profileSlug: 'lucia', mediaRole: 'cover' },
-  { slug: 'juegos-para-adultos', group: 'roleplay', name: names('Juegos para adultos', 'Adult games', 'Jeux pour adultes', 'Giochi per adulti'), profileSlug: 'julia', mediaRole: 'gallery-01' },
-  { slug: 'kamasutra-y-conexion', group: 'wellbeing', name: names('Kamasutra y conexión', 'Kamasutra and connection', 'Kamasutra et connexion', 'Kamasutra e connessione'), profileSlug: 'mia', mediaRole: 'gallery-02' },
-  { slug: 'juego-acuatico-consensuado', group: 'private-preferences', name: names('Juego acuático consensuado', 'Consensual water play', 'Jeu aquatique consenti', 'Gioco acquatico consensuale'), profileSlug: 'alicia', mediaRole: 'gallery-03' },
-  { slug: 'masaje-sensual', group: 'wellbeing', name: names('Masaje sensual', 'Sensual massage', 'Massage sensuel', 'Massaggio sensuale'), profileSlug: 'valeria', mediaRole: 'cover' },
-  { slug: 'experiencia-editorial-pse', group: 'roleplay', name: names('Experiencia editorial PSE', 'Editorial PSE experience', 'Expérience éditoriale PSE', 'Esperienza editoriale PSE'), profileSlug: 'sofia', mediaRole: 'gallery-01' },
-  { slug: 'sado-consensuado', group: 'roleplay', name: names('Sado erótico consensuado', 'Consensual erotic S/M', 'Sado érotique consenti', 'Sado erotico consensuale'), profileSlug: 'lucia', mediaRole: 'gallery-02' },
-  { slug: 'intimidad-oral', group: 'private-preferences', name: names('Intimidad oral', 'Oral intimacy', 'Intimité orale', 'Intimità orale'), profileSlug: 'julia', mediaRole: 'gallery-03' },
-  { slug: 'juguetes-para-adultos', group: 'roleplay', name: names('Juguetes para adultos', 'Adult toys', 'Jouets pour adultes', 'Accessori per adulti'), profileSlug: 'mia', mediaRole: 'cover' },
-  { slug: 'striptease-privado', group: 'roleplay', name: names('Striptease privado', 'Private striptease', 'Strip-tease privé', 'Spogliarello privato'), profileSlug: 'alicia', mediaRole: 'gallery-01' },
-  { slug: 'experiencia-gfe', group: 'company', name: names('Experiencia GFE', 'GFE experience', 'Expérience GFE', 'Esperienza GFE'), profileSlug: 'valeria', mediaRole: 'gallery-02' },
-  { slug: 'trio-privado', group: 'couples', name: names('Trío privado', 'Private trio', 'Trio privé', 'Trio privato'), profileSlug: 'sofia', mediaRole: 'gallery-03' },
-  { slug: 'experiencia-entre-mujeres', group: 'couples', name: names('Experiencia entre mujeres', 'Experience between women', 'Expérience entre femmes', 'Esperienza tra donne'), profileSlug: 'lucia', mediaRole: 'cover' },
-  { slug: 'juego-control-consensuado', group: 'private-preferences', name: names('Juego de control consensuado', 'Consensual control play', 'Jeu de contrôle consenti', 'Gioco di controllo consensuale'), profileSlug: 'julia', mediaRole: 'gallery-01' },
+  { slug: 'compania-privada', group: 'company', name: names('Compañía privada', 'Private companionship', 'Accompagnement privé', 'Compagnia privata'), mediaKey: 'company-private-lounge', profileSlug: 'valeria', mediaRole: 'cover' },
+  { slug: 'preferencia-intima-personalizada', group: 'private-preferences', name: names('Preferencia íntima personalizada', 'Personalised intimate preference', 'Préférence intime personnalisée', 'Preferenza intima personalizzata'), mediaKey: 'preferences-silk-envelope', profileSlug: 'sofia', mediaRole: 'gallery-01' },
+  { slug: 'besos-y-cercania', group: 'wellbeing', name: names('Besos y cercanía', 'Kisses and closeness', 'Baisers et proximité', 'Baci e vicinanza'), mediaKey: 'wellbeing-spa-ritual', profileSlug: 'lucia', mediaRole: 'gallery-02' },
+  { slug: 'celebraciones-privadas', group: 'settings', name: names('Celebraciones privadas', 'Private celebrations', 'Célébrations privées', 'Celebrazioni private'), mediaKey: 'settings-private-celebration', profileSlug: 'julia', mediaRole: 'gallery-03' },
+  { slug: 'ambientacion-tematica', group: 'roleplay', name: names('Ambientación temática', 'Themed styling', 'Mise en scène thématique', 'Ambientazione a tema'), mediaKey: 'roleplay-theatre-mask', profileSlug: 'mia', mediaRole: 'cover' },
+  { slug: 'ritual-de-ducha', group: 'wellbeing', name: names('Ritual de ducha', 'Shower ritual', 'Rituel de douche', 'Rituale doccia'), mediaKey: 'wellbeing-water-ritual', profileSlug: 'alicia', mediaRole: 'gallery-01' },
+  { slug: 'experiencia-a-duo', group: 'couples', name: names('Experiencia a dúo', 'Duo experience', 'Expérience en duo', 'Esperienza in coppia'), mediaKey: 'couples-two-settings', profileSlug: 'valeria', mediaRole: 'gallery-02' },
+  { slug: 'atencion-a-domicilio', group: 'settings', name: names('Atención a domicilio', 'At-home visit', 'Visite à domicile', 'Visita a domicilio'), mediaKey: 'settings-home-arrival', profileSlug: 'sofia', mediaRole: 'gallery-03' },
+  { slug: 'encuentro-privado-de-grupo', group: 'couples', name: names('Encuentro privado de grupo', 'Private group experience', 'Rencontre privée en groupe', 'Incontro privato di gruppo'), mediaKey: 'couples-private-gathering', profileSlug: 'lucia', mediaRole: 'cover' },
+  { slug: 'acompanamiento-para-mujeres', group: 'company', name: names('Acompañamiento para mujeres', 'Companionship for women', 'Accompagnement pour femmes', 'Compagnia per donne'), mediaKey: 'company-private-lounge', profileSlug: 'julia', mediaRole: 'gallery-01' },
+  { slug: 'atencion-en-hotel', group: 'settings', name: names('Atención en hotel', 'Hotel visit', 'Visite à l’hôtel', 'Visita in hotel'), mediaKey: 'settings-hotel-arrival', profileSlug: 'mia', mediaRole: 'gallery-02' },
+  { slug: 'juego-de-rol-sumiso', group: 'roleplay', name: names('Juego de rol sumiso', 'Submissive roleplay', 'Jeu de rôle soumis', 'Gioco di ruolo sottomesso'), mediaKey: 'roleplay-consent-accessories', profileSlug: 'alicia', mediaRole: 'gallery-03' },
+  { slug: 'acompanamiento-para-parejas', group: 'couples', name: names('Acompañamiento para parejas', 'Companionship for couples', 'Accompagnement pour couples', 'Compagnia per coppie'), mediaKey: 'couples-two-settings', profileSlug: 'valeria', mediaRole: 'cover' },
+  { slug: 'preferencia-intima-acordada', group: 'private-preferences', name: names('Preferencia íntima acordada', 'Agreed intimate preference', 'Préférence intime convenue', 'Preferenza intima concordata'), mediaKey: 'preferences-silk-envelope', profileSlug: 'sofia', mediaRole: 'gallery-01' },
+  { slug: 'preferencia-oral-final-acordado', group: 'private-preferences', name: names('Preferencia oral con final acordado', 'Oral preference with agreed ending', 'Préférence orale avec fin convenue', 'Preferenza orale con finale concordato'), mediaKey: 'preferences-choice-boxes', profileSlug: 'lucia', mediaRole: 'gallery-02' },
+  { slug: 'fantasias-personalizadas', group: 'roleplay', name: names('Fantasías personalizadas', 'Personalised fantasies', 'Fantasmes personnalisés', 'Fantasie personalizzate'), mediaKey: 'roleplay-theatre-mask', profileSlug: 'julia', mediaRole: 'gallery-03' },
+  { slug: 'fetiches-acordados', group: 'roleplay', name: names('Fetiches acordados', 'Agreed fetishes', 'Fétiches convenus', 'Feticci concordati'), mediaKey: 'roleplay-consent-accessories', profileSlug: 'mia', mediaRole: 'cover' },
+  { slug: 'experiencia-oral-completa', group: 'private-preferences', name: names('Experiencia oral completa', 'Complete oral experience', 'Expérience orale complète', 'Esperienza orale completa'), mediaKey: 'preferences-choice-boxes', profileSlug: 'alicia', mediaRole: 'gallery-01' },
+  { slug: 'experiencia-oral-natural', group: 'private-preferences', name: names('Experiencia oral natural', 'Natural oral experience', 'Expérience orale naturelle', 'Esperienza orale naturale'), mediaKey: 'preferences-choice-boxes', profileSlug: 'valeria', mediaRole: 'gallery-02' },
+  { slug: 'preferencia-oral-intensa', group: 'private-preferences', name: names('Preferencia oral intensa', 'Intense oral preference', 'Préférence orale intense', 'Preferenza orale intensa'), mediaKey: 'preferences-choice-boxes', profileSlug: 'sofia', mediaRole: 'gallery-03' },
+  { slug: 'experiencia-parejas-abiertas', group: 'couples', name: names('Experiencia para parejas abiertas', 'Open-couple experience', 'Expérience pour couples ouverts', 'Esperienza per coppie aperte'), mediaKey: 'couples-private-gathering', profileSlug: 'lucia', mediaRole: 'cover' },
+  { slug: 'juegos-para-adultos', group: 'roleplay', name: names('Juegos para adultos', 'Adult games', 'Jeux pour adultes', 'Giochi per adulti'), mediaKey: 'roleplay-consent-accessories', profileSlug: 'julia', mediaRole: 'gallery-01' },
+  { slug: 'kamasutra-y-conexion', group: 'wellbeing', name: names('Kamasutra y conexión', 'Kamasutra and connection', 'Kamasutra et connexion', 'Kamasutra e connessione'), mediaKey: 'wellbeing-spa-ritual', profileSlug: 'mia', mediaRole: 'gallery-02' },
+  { slug: 'juego-acuatico-consensuado', group: 'private-preferences', name: names('Juego acuático consensuado', 'Consensual water play', 'Jeu aquatique consenti', 'Gioco acquatico consensuale'), mediaKey: 'wellbeing-water-ritual', profileSlug: 'alicia', mediaRole: 'gallery-03' },
+  { slug: 'masaje-sensual', group: 'wellbeing', name: names('Masaje sensual', 'Sensual massage', 'Massage sensuel', 'Massaggio sensuale'), mediaKey: 'wellbeing-spa-ritual', profileSlug: 'valeria', mediaRole: 'cover' },
+  { slug: 'experiencia-editorial-pse', group: 'roleplay', name: names('Experiencia editorial PSE', 'Editorial PSE experience', 'Expérience éditoriale PSE', 'Esperienza editoriale PSE'), mediaKey: 'roleplay-theatre-mask', profileSlug: 'sofia', mediaRole: 'gallery-01' },
+  { slug: 'sado-consensuado', group: 'roleplay', name: names('Sado erótico consensuado', 'Consensual erotic S/M', 'Sado érotique consenti', 'Sado erotico consensuale'), mediaKey: 'roleplay-consent-accessories', profileSlug: 'lucia', mediaRole: 'gallery-02' },
+  { slug: 'intimidad-oral', group: 'private-preferences', name: names('Intimidad oral', 'Oral intimacy', 'Intimité orale', 'Intimità orale'), mediaKey: 'preferences-choice-boxes', profileSlug: 'julia', mediaRole: 'gallery-03' },
+  { slug: 'juguetes-para-adultos', group: 'roleplay', name: names('Juguetes para adultos', 'Adult toys', 'Jouets pour adultes', 'Accessori per adulti'), mediaKey: 'roleplay-consent-accessories', profileSlug: 'mia', mediaRole: 'cover' },
+  { slug: 'striptease-privado', group: 'roleplay', name: names('Striptease privado', 'Private striptease', 'Strip-tease privé', 'Spogliarello privato'), mediaKey: 'roleplay-theatre-mask', profileSlug: 'alicia', mediaRole: 'gallery-01' },
+  { slug: 'experiencia-gfe', group: 'company', name: names('Experiencia GFE', 'GFE experience', 'Expérience GFE', 'Esperienza GFE'), mediaKey: 'company-private-lounge', profileSlug: 'valeria', mediaRole: 'gallery-02' },
+  { slug: 'trio-privado', group: 'couples', name: names('Trío privado', 'Private trio', 'Trio privé', 'Trio privato'), mediaKey: 'couples-private-gathering', profileSlug: 'sofia', mediaRole: 'gallery-03' },
+  { slug: 'experiencia-entre-mujeres', group: 'couples', name: names('Experiencia entre mujeres', 'Experience between women', 'Expérience entre femmes', 'Esperienza tra donne'), mediaKey: 'couples-two-settings', profileSlug: 'lucia', mediaRole: 'cover' },
+  { slug: 'juego-control-consensuado', group: 'private-preferences', name: names('Juego de control consensuado', 'Consensual control play', 'Jeu de contrôle consenti', 'Gioco di controllo consensuale'), mediaKey: 'preferences-choice-boxes', profileSlug: 'julia', mediaRole: 'gallery-01' },
 ] as const;
 
 const copy: Readonly<Record<Locale, SyntheticServiceMessages>> = {
   es: {
     languageName: 'Español',
     navigation: { home: 'Inicio', profiles: 'Perfiles', services: 'Servicios', coverage: 'Cobertura', controls: 'Controles', menu: 'Menú', close: 'Cerrar', privateBooking: 'Reserva desactivada', previewLabel: 'Vista previa local', primaryAria: 'Navegación principal', languageAria: 'Idioma', mobileAria: 'Navegación móvil', footerAria: 'Navegación del pie', breadcrumbAria: 'Ruta de navegación', skipLink: 'Saltar al contenido principal' },
-    media: { aiShort: 'IA', generatedBadge: 'IMAGEN GENERADA CON IA', fictionalBadge: 'IDENTIDAD FICTICIA · IA', generatedAlt: 'Retrato editorial de una identidad adulta ficticia generada con IA' },
+    media: { aiShort: 'IA', generatedBadge: 'IMAGEN SIMBÓLICA GENERADA CON IA', fictionalBadge: 'IDENTIDAD FICTICIA · IA', generatedAlt: 'Retrato editorial de una identidad adulta ficticia generada con IA' },
     hub: {
       eyebrow: 'Servicios exclusivos · maqueta local', title: 'Experiencias pensadas alrededor de tus límites', lead: 'Explora una arquitectura editorial completa para servicios privados. Cada ficha es una propuesta sintética, no una oferta comercial activa.', breadcrumb: 'Inicio / Servicios',
       introExperienceTitle: 'Una experiencia que empieza antes del encuentro', introExperienceBody: 'El diseño reúne contexto, preferencias, escenario y acompañamiento para que cada opción sea fácil de entender y comparar.',
       introSafetyTitle: 'Consentimiento, discreción y claridad', introSafetyBody: 'Nada se presume: los límites, la identidad adulta, la cobertura y la disponibilidad deberán confirmarse antes de activar cualquier canal.',
-      catalogEyebrow: 'Catálogo editorial', catalogTitle: '34 rutas de servicio preparadas', catalogLead: 'Organizadas por intención para que la navegación siga siendo clara incluso con un catálogo amplio.', filterLegend: 'Filtrar servicios', filterLabel: 'Tipo de experiencia', allGroups: 'Todas', applyFilter: 'Aplicar filtro', resetFilter: 'Restablecer', resultSingular: 'servicio', resultPlural: 'servicios',
+      catalogEyebrow: 'Catálogo editorial', catalogTitle: '34 rutas de servicio preparadas', catalogLead: 'Organizadas por intención para que la navegación siga siendo clara incluso con un catálogo amplio.', filterLegend: 'Explorar servicios', filterLabel: 'Tipo de experiencia', allGroups: 'Todas', applyFilter: 'Aplicar filtro', resetFilter: 'Restablecer', searchLabel: 'Buscar en el catálogo', searchPlaceholder: 'Nombre, intención o ambiente', sortLabel: 'Ordenar', sortEditorial: 'Orden editorial', sortName: 'Nombre A–Z', clearFilters: 'Limpiar búsqueda y filtros', noResultsTitle: 'No encontramos coincidencias', noResultsBody: 'Prueba otra palabra o vuelve a mostrar todas las categorías.', selectionTitle: 'Selección temporal', selectionBody: 'Reúne hasta tres fichas para revisarlas durante esta visita.', selectionPrivacy: 'No se guarda ni se envía.', addToSelection: 'Añadir a la selección', removeFromSelection: 'Quitar de la selección', clearSelection: 'Vaciar selección', selectionLimit: 'Puedes seleccionar un máximo de tres servicios.', selectionEmpty: 'Aún no has añadido ninguna ficha.', resultSingular: 'servicio', resultPlural: 'servicios',
       editorialEyebrow: 'Atención personalizada', editorialTitle: 'Tu ritmo define la experiencia', editorialBody: 'La propuesta visual prioriza información útil, conversación previa y límites explícitos. El contenido final dependerá de aprobación comercial, lingüística y legal.',
       ratesEyebrow: 'Tarifas y condiciones', ratesTitle: 'Sin precios inventados ni promesas prematuras', ratesBody: 'Duración, desplazamiento, suplementos y medios de pago permanecerán ocultos hasta contar con una tabla aprobada y verificable.', ratesCta: 'Tarifas pendientes',
       independenceTitle: 'Colaboración independiente', independenceBody: 'La futura publicación deberá explicar con precisión la relación entre la plataforma y cada profesional, junto con obligaciones, derechos y canales de reclamación.',
@@ -207,12 +225,12 @@ const copy: Readonly<Record<Locale, SyntheticServiceMessages>> = {
   en: {
     languageName: 'English',
     navigation: { home: 'Home', profiles: 'Profiles', services: 'Services', coverage: 'Coverage', controls: 'Controls', menu: 'Menu', close: 'Close', privateBooking: 'Booking disabled', previewLabel: 'Local preview', primaryAria: 'Primary navigation', languageAria: 'Language', mobileAria: 'Mobile navigation', footerAria: 'Footer navigation', breadcrumbAria: 'Breadcrumb', skipLink: 'Skip to main content' },
-    media: { aiShort: 'AI', generatedBadge: 'AI-GENERATED IMAGE', fictionalBadge: 'FICTIONAL IDENTITY · AI', generatedAlt: 'Editorial portrait of a fictional adult identity generated with AI' },
+    media: { aiShort: 'AI', generatedBadge: 'SYMBOLIC IMAGE GENERATED WITH AI', fictionalBadge: 'FICTIONAL IDENTITY · AI', generatedAlt: 'Editorial portrait of a fictional adult identity generated with AI' },
     hub: {
       eyebrow: 'Exclusive services · local prototype', title: 'Experiences designed around your boundaries', lead: 'Explore a complete editorial architecture for private services. Every page is a synthetic proposal, not an active commercial offer.', breadcrumb: 'Home / Services',
       introExperienceTitle: 'The experience starts before the meeting', introExperienceBody: 'The design brings together context, preferences, setting and companionship so each option is easy to understand and compare.',
       introSafetyTitle: 'Consent, discretion and clarity', introSafetyBody: 'Nothing is assumed: boundaries, adult identity, coverage and availability must be confirmed before any channel can be activated.',
-      catalogEyebrow: 'Editorial catalogue', catalogTitle: '34 service routes prepared', catalogLead: 'Organised by intent so navigation remains clear even with a broad catalogue.', filterLegend: 'Filter services', filterLabel: 'Experience type', allGroups: 'All', applyFilter: 'Apply filter', resetFilter: 'Reset', resultSingular: 'service', resultPlural: 'services',
+      catalogEyebrow: 'Editorial catalogue', catalogTitle: '34 service routes prepared', catalogLead: 'Organised by intent so navigation remains clear even with a broad catalogue.', filterLegend: 'Explore services', filterLabel: 'Experience type', allGroups: 'All', applyFilter: 'Apply filter', resetFilter: 'Reset', searchLabel: 'Search the catalogue', searchPlaceholder: 'Name, intention or setting', sortLabel: 'Sort', sortEditorial: 'Editorial order', sortName: 'Name A–Z', clearFilters: 'Clear search and filters', noResultsTitle: 'No matches found', noResultsBody: 'Try another term or show every category again.', selectionTitle: 'Temporary selection', selectionBody: 'Collect up to three pages to review during this visit.', selectionPrivacy: 'Not saved or sent.', addToSelection: 'Add to selection', removeFromSelection: 'Remove from selection', clearSelection: 'Clear selection', selectionLimit: 'You can select up to three services.', selectionEmpty: 'You have not added any pages yet.', resultSingular: 'service', resultPlural: 'services',
       editorialEyebrow: 'Personal attention', editorialTitle: 'Your pace defines the experience', editorialBody: 'The visual proposal prioritises useful information, prior conversation and explicit boundaries. Final content depends on commercial, linguistic and legal approval.',
       ratesEyebrow: 'Rates and conditions', ratesTitle: 'No invented prices or premature promises', ratesBody: 'Duration, travel, supplements and payment methods remain hidden until an approved, verifiable table is available.', ratesCta: 'Rates pending',
       independenceTitle: 'Independent collaboration', independenceBody: 'A future release must clearly explain the relationship between the platform and each professional, including duties, rights and complaint channels.',
@@ -240,12 +258,12 @@ const copy: Readonly<Record<Locale, SyntheticServiceMessages>> = {
   fr: {
     languageName: 'Français',
     navigation: { home: 'Accueil', profiles: 'Profils', services: 'Services', coverage: 'Couverture', controls: 'Contrôles', menu: 'Menu', close: 'Fermer', privateBooking: 'Réservation désactivée', previewLabel: 'Aperçu local', primaryAria: 'Navigation principale', languageAria: 'Langue', mobileAria: 'Navigation mobile', footerAria: 'Navigation de pied de page', breadcrumbAria: 'Fil d’Ariane', skipLink: 'Aller au contenu principal' },
-    media: { aiShort: 'IA', generatedBadge: 'IMAGE GÉNÉRÉE PAR IA', fictionalBadge: 'IDENTITÉ FICTIVE · IA', generatedAlt: 'Portrait éditorial d’une identité adulte fictive générée par IA' },
+    media: { aiShort: 'IA', generatedBadge: 'IMAGE SYMBOLIQUE GÉNÉRÉE PAR IA', fictionalBadge: 'IDENTITÉ FICTIVE · IA', generatedAlt: 'Portrait éditorial d’une identité adulte fictive générée par IA' },
     hub: {
       eyebrow: 'Services exclusifs · maquette locale', title: 'Des expériences pensées autour de vos limites', lead: 'Découvrez une architecture éditoriale complète pour des services privés. Chaque page est une proposition synthétique, pas une offre commerciale active.', breadcrumb: 'Accueil / Services',
       introExperienceTitle: 'L’expérience commence avant la rencontre', introExperienceBody: 'Le design réunit contexte, préférences, cadre et accompagnement pour rendre chaque option facile à comprendre et à comparer.',
       introSafetyTitle: 'Consentement, discrétion et clarté', introSafetyBody: 'Rien n’est présumé : limites, majorité, couverture et disponibilité devront être confirmées avant l’activation de tout canal.',
-      catalogEyebrow: 'Catalogue éditorial', catalogTitle: '34 routes de service préparées', catalogLead: 'Classées par intention afin de conserver une navigation claire malgré un catalogue étendu.', filterLegend: 'Filtrer les services', filterLabel: 'Type d’expérience', allGroups: 'Tous', applyFilter: 'Appliquer', resetFilter: 'Réinitialiser', resultSingular: 'service', resultPlural: 'services',
+      catalogEyebrow: 'Catalogue éditorial', catalogTitle: '34 routes de service préparées', catalogLead: 'Classées par intention afin de conserver une navigation claire malgré un catalogue étendu.', filterLegend: 'Explorer les services', filterLabel: 'Type d’expérience', allGroups: 'Tous', applyFilter: 'Appliquer', resetFilter: 'Réinitialiser', searchLabel: 'Rechercher dans le catalogue', searchPlaceholder: 'Nom, intention ou cadre', sortLabel: 'Trier', sortEditorial: 'Ordre éditorial', sortName: 'Nom A–Z', clearFilters: 'Effacer recherche et filtres', noResultsTitle: 'Aucune correspondance', noResultsBody: 'Essayez un autre terme ou affichez à nouveau toutes les catégories.', selectionTitle: 'Sélection temporaire', selectionBody: 'Réunissez jusqu’à trois fiches à consulter pendant cette visite.', selectionPrivacy: 'Ni enregistrée ni envoyée.', addToSelection: 'Ajouter à la sélection', removeFromSelection: 'Retirer de la sélection', clearSelection: 'Vider la sélection', selectionLimit: 'Vous pouvez sélectionner trois services au maximum.', selectionEmpty: 'Vous n’avez encore ajouté aucune fiche.', resultSingular: 'service', resultPlural: 'services',
       editorialEyebrow: 'Attention personnalisée', editorialTitle: 'Votre rythme définit l’expérience', editorialBody: 'La proposition visuelle privilégie l’information utile, l’échange préalable et les limites explicites. Le contenu final dépend d’une validation commerciale, linguistique et juridique.',
       ratesEyebrow: 'Tarifs et conditions', ratesTitle: 'Ni prix inventés ni promesses prématurées', ratesBody: 'Durée, déplacement, suppléments et moyens de paiement restent masqués jusqu’à disposer d’une grille approuvée et vérifiable.', ratesCta: 'Tarifs en attente',
       independenceTitle: 'Collaboration indépendante', independenceBody: 'Une future publication devra expliquer clairement la relation entre la plateforme et chaque professionnelle, ainsi que les obligations, droits et voies de réclamation.',
@@ -273,12 +291,12 @@ const copy: Readonly<Record<Locale, SyntheticServiceMessages>> = {
   it: {
     languageName: 'Italiano',
     navigation: { home: 'Home', profiles: 'Profili', services: 'Servizi', coverage: 'Copertura', controls: 'Controlli', menu: 'Menu', close: 'Chiudi', privateBooking: 'Prenotazione disattivata', previewLabel: 'Anteprima locale', primaryAria: 'Navigazione principale', languageAria: 'Lingua', mobileAria: 'Navigazione mobile', footerAria: 'Navigazione del piè di pagina', breadcrumbAria: 'Percorso di navigazione', skipLink: 'Vai al contenuto principale' },
-    media: { aiShort: 'IA', generatedBadge: 'IMMAGINE GENERATA CON IA', fictionalBadge: 'IDENTITÀ FITTIZIA · IA', generatedAlt: 'Ritratto editoriale di un’identità adulta fittizia generata con IA' },
+    media: { aiShort: 'IA', generatedBadge: 'IMMAGINE SIMBOLICA GENERATA CON IA', fictionalBadge: 'IDENTITÀ FITTIZIA · IA', generatedAlt: 'Ritratto editoriale di un’identità adulta fittizia generata con IA' },
     hub: {
       eyebrow: 'Servizi esclusivi · prototipo locale', title: 'Esperienze pensate intorno ai tuoi limiti', lead: 'Esplora un’architettura editoriale completa per servizi privati. Ogni pagina è una proposta sintetica, non un’offerta commerciale attiva.', breadcrumb: 'Home / Servizi',
       introExperienceTitle: 'L’esperienza inizia prima dell’incontro', introExperienceBody: 'Il design riunisce contesto, preferenze, ambiente e compagnia per rendere ogni opzione facile da capire e confrontare.',
       introSafetyTitle: 'Consenso, discrezione e chiarezza', introSafetyBody: 'Nulla è presunto: limiti, maggiore età, copertura e disponibilità devono essere confermati prima di attivare qualsiasi canale.',
-      catalogEyebrow: 'Catalogo editoriale', catalogTitle: '34 percorsi di servizio preparati', catalogLead: 'Organizzati per intenzione affinché la navigazione resti chiara anche con un catalogo ampio.', filterLegend: 'Filtra i servizi', filterLabel: 'Tipo di esperienza', allGroups: 'Tutti', applyFilter: 'Applica filtro', resetFilter: 'Reimposta', resultSingular: 'servizio', resultPlural: 'servizi',
+      catalogEyebrow: 'Catalogo editoriale', catalogTitle: '34 percorsi di servizio preparati', catalogLead: 'Organizzati per intenzione affinché la navigazione resti chiara anche con un catalogo ampio.', filterLegend: 'Esplora i servizi', filterLabel: 'Tipo di esperienza', allGroups: 'Tutti', applyFilter: 'Applica filtro', resetFilter: 'Reimposta', searchLabel: 'Cerca nel catalogo', searchPlaceholder: 'Nome, intenzione o ambiente', sortLabel: 'Ordina', sortEditorial: 'Ordine editoriale', sortName: 'Nome A–Z', clearFilters: 'Cancella ricerca e filtri', noResultsTitle: 'Nessuna corrispondenza', noResultsBody: 'Prova un altro termine o mostra di nuovo tutte le categorie.', selectionTitle: 'Selezione temporanea', selectionBody: 'Raccogli fino a tre schede da rivedere durante questa visita.', selectionPrivacy: 'Non viene salvata né inviata.', addToSelection: 'Aggiungi alla selezione', removeFromSelection: 'Rimuovi dalla selezione', clearSelection: 'Svuota selezione', selectionLimit: 'Puoi selezionare al massimo tre servizi.', selectionEmpty: 'Non hai ancora aggiunto alcuna scheda.', resultSingular: 'servizio', resultPlural: 'servizi',
       editorialEyebrow: 'Attenzione personalizzata', editorialTitle: 'Il tuo ritmo definisce l’esperienza', editorialBody: 'La proposta visiva privilegia informazioni utili, conversazione preliminare e limiti espliciti. Il contenuto finale dipende da approvazione commerciale, linguistica e legale.',
       ratesEyebrow: 'Tariffe e condizioni', ratesTitle: 'Nessun prezzo inventato o promessa prematura', ratesBody: 'Durata, spostamenti, supplementi e metodi di pagamento restano nascosti finché non esiste una tabella approvata e verificabile.', ratesCta: 'Tariffe in attesa',
       independenceTitle: 'Collaborazione indipendente', independenceBody: 'Una futura pubblicazione dovrà spiegare chiaramente il rapporto tra piattaforma e ogni professionista, inclusi obblighi, diritti e canali di reclamo.',
