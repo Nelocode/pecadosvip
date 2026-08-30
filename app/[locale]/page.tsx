@@ -1,14 +1,13 @@
-import { queryPublicProfiles } from '../../lib/content/public-profiles';
-import { getRuntimeContentSnapshot } from '../../lib/content/runtime-snapshot';
-import { getRuntimeVisibilityState } from '../../lib/content/runtime-publication';
+import Link from 'next/link';
 import { getCatalog } from '../../lib/i18n/catalog';
-import { localizedPath, SOURCE_LOCALE } from '../../lib/i18n/locales';
+import { localizedPath } from '../../lib/i18n/locales';
 import { buildLocalizedPublicMetadata } from '../../lib/seo';
 import ProfileCard from '../components/ProfileCard';
-import ProvisionalNotice from '../components/ProvisionalNotice';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
-import ReleaseHoldingPage from '../components/ReleaseHoldingPage';
+import PublicProfileMedia from '../components/PublicProfileMedia';
+import { getSyntheticCityMedia } from '../../lib/preview/synthetic-city-media';
+import { getSyntheticPreviewProfiles } from '../../lib/preview/synthetic-preview';
 import { localeOrNotFound, type LocaleRouteParams } from '../locale-routing';
 
 type LocalePageProps = { params: LocaleRouteParams };
@@ -24,104 +23,176 @@ export async function generateMetadata({ params }: LocalePageProps) {
   });
 }
 
+const trustSignals = [
+  { code: '01', title: 'Solo mayores de 18 años', detail: 'Verificación de mayoría de edad y privacidad cuidada.' },
+  { code: '02', title: 'Atención discreta y privada', detail: 'Desplazamiento directo a hoteles de lujo y domicilios.' },
+  { code: '03', title: 'Sin local abierto al público', detail: 'Coordinación 100% privada sin intermediarios expositivos.' },
+  { code: '04', title: 'Contacto directo seguro', detail: 'Canales directos de WhatsApp, Telegram y llamada telefónica.' },
+];
+
+const coverageCities = [
+  { slug: 'madrid', name: 'Madrid', label: 'Cobertura VIP Madrid' },
+  { slug: 'barcelona', name: 'Barcelona', label: 'Cobertura VIP Barcelona' },
+  { slug: 'girona', name: 'Girona', label: 'Zona Cataluña' },
+  { slug: 'tarragona', name: 'Tarragona', label: 'Zona Costa' },
+  { slug: 'toledo', name: 'Toledo', label: 'Zona Centro' },
+  { slug: 'guadalajara', name: 'Guadalajara', label: 'Zona Centro' },
+] as const;
+
+const servicesList = [
+  { number: '01', title: 'Acompañamiento Premium', detail: 'Cenas de lujo, eventos sociales y cenas corporativas de alto nivel.' },
+  { number: '02', title: 'Salidas a Domicilios', detail: 'Atención exclusiva en la comodidad y privacidad de tu residencia.' },
+  { number: '03', title: 'Hoteles de Lujo', detail: 'Desplazamiento a los principales hoteles de 5 estrellas y suites.' },
+  { number: '04', title: 'Eventos Especiales', detail: 'Compañía sofisticada para veladas, galas y celebraciones privadas.' },
+  { number: '05', title: 'Viajes y Escapadas', detail: 'Acompañamiento en viajes de negocios y vacaciones de descanso.' },
+  { number: '06', title: 'Atención Personalizada', detail: 'Experiencias a medida coordinadas con la mayor confidencialidad.' },
+];
+
 export default async function LocalizedHome({ params }: LocalePageProps) {
   const locale = localeOrNotFound((await params).locale);
-  const messages = getCatalog(locale).home;
-  if (!getRuntimeVisibilityState().renderPublicExperience) {
-    return <ReleaseHoldingPage locale={locale} semanticPath="/" />;
-  }
-
-  const profiles = locale === SOURCE_LOCALE
-    ? queryPublicProfiles(getRuntimeContentSnapshot(), {
-        page: 1,
-        pageSize: 4,
-      })
-    : undefined;
   const href = (path: `/${string}` | '/') => localizedPath(locale, path);
 
-  return (
-    <div className="public-page">
-      <PublicHeader currentPath="/" locale={locale} />
-      <main id="main-content" tabIndex={-1}>
-        <ProvisionalNotice locale={locale} />
+  const profiles = getSyntheticPreviewProfiles();
+  const heroProfile = profiles[0]; // Valeria
+  const heroMedia = heroProfile.media.find((asset) => asset.role === 'gallery-03') || heroProfile.media[0];
 
-        <section className="public-hero" aria-labelledby="home-title">
-          <div className="public-hero-copy">
-            <p className="public-eyebrow">{messages.hero.eyebrow}</p>
+  return (
+    <div className="public-page synthetic-preview-page">
+      <PublicHeader currentPath="/" locale={locale} />
+
+      <main id="main-content" tabIndex={-1}>
+        {/* Luxury Hero Section matching Screenshot 1 */}
+        <section className="synthetic-preview-hero" aria-labelledby="home-title">
+          <div className="synthetic-preview-hero-copy">
+            <p className="public-eyebrow">Discreción · Exclusividad · Placer</p>
             <h1 id="home-title">
-              {messages.hero.title}
-              <span>{messages.hero.titleAccent}</span>
+              <span className="synthetic-preview-hero-title-primary">
+                El lujo de elegir
+              </span>{' '}
+              <span className="synthetic-preview-hero-title-secondary">
+                en tu casa o en hotel
+              </span>
             </h1>
-            <p>{messages.hero.body}</p>
+            <p className="synthetic-preview-hero-location">Madrid y Barcelona</p>
+            <p className="synthetic-preview-hero-note">
+              Servicio exclusivo de compañía privada de alto nivel. Atención personalizada con la máxima discreción y profesionalidad.
+            </p>
             <div className="public-actions">
               <a className="public-primary-action" href={href('/perfiles')}>
-                {messages.hero.profilesCta}
+                Ver perfiles
               </a>
               <a className="public-secondary-action" href={href('/contacto')}>
-                {messages.hero.contactCta}
+                Contacto privado
               </a>
             </div>
           </div>
-          <div className="public-hero-art" aria-hidden="true">
-            <span className="public-apple public-apple-large"><span /></span>
-            <p>{messages.hero.artLabel}</p>
+
+          <div className="synthetic-preview-hero-media">
+            <PublicProfileMedia
+              media={heroMedia}
+              priority
+              preserveFullImage
+              sizes="(max-width: 780px) 100vw, 48vw"
+            />
+            <span>{heroProfile.displayName} · Perfil Destacado</span>
           </div>
         </section>
 
-        <section className="public-trust-strip" aria-label={messages.trust.ariaLabel}>
-          {messages.trust.items.map((item) => (
-            <article key={item.code}><span>{item.code}</span><strong>{item.text}</strong></article>
+        {/* Trust Signals Strip */}
+        <section className="public-trust-strip synthetic-preview-trust" aria-label="Principios de atención">
+          {trustSignals.map((signal) => (
+            <article key={signal.code}>
+              <span aria-hidden="true">{signal.code}</span>
+              <div>
+                <strong>{signal.title}</strong>
+                <small>{signal.detail}</small>
+              </div>
+            </article>
           ))}
         </section>
 
-        <section className="public-section" aria-labelledby="cities-title">
-          <div className="public-section-heading">
-            <p className="public-eyebrow">{messages.cities.eyebrow}</p>
-            <h2 id="cities-title">{messages.cities.title}</h2>
-            <p>{messages.cities.body}</p>
+        {/* Coverage Section with City Media */}
+        <section className="public-section synthetic-preview-coverage" id="cobertura" aria-labelledby="coverage-title">
+          <div className="public-section-heading synthetic-preview-section-heading">
+            <p className="public-eyebrow">Cobertura geográfica VIP</p>
+            <h2 id="coverage-title">Ciudades y Zonas de Cobertura</h2>
+            <p>Atención prioritaria en Madrid y Barcelona, con desplazamientos disponibles a zonas metropolitanas.</p>
           </div>
-          <div className="public-city-grid">
-            <a href={href('/madrid')}>
-              <span>{messages.cities.madridCode}</span>
-              <strong>Madrid</strong>
-              <small>{messages.cities.cardCta}</small>
-            </a>
-            <a href={href('/barcelona')}>
-              <span>{messages.cities.barcelonaCode}</span>
-              <strong>Barcelona</strong>
-              <small>{messages.cities.cardCta}</small>
-            </a>
+
+          <div className="synthetic-preview-coverage-groups">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
+              {coverageCities.map((city) => {
+                const cityMedia = getSyntheticCityMedia(city.slug as any, locale);
+                return (
+                  <Link href={href(`/${city.slug}` as any)} key={city.slug} className="group block overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 hover:border-amber-500/50 transition">
+                    <figure className="synthetic-preview-city-media mb-2 h-36 overflow-hidden rounded-lg">
+                      <PublicProfileMedia
+                        media={cityMedia}
+                        objectPosition={cityMedia.objectPosition}
+                        preserveFullImage={false}
+                        sizes="24vw"
+                      />
+                    </figure>
+                    <div className="synthetic-preview-city-copy">
+                      <strong className="text-amber-400 group-hover:text-amber-300">{city.name}</strong>
+                      <span className="text-xs text-zinc-400 block">{city.label}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section className="public-section public-profile-section" aria-labelledby="profiles-title">
-          <div className="public-section-heading public-section-heading-inline">
+        {/* Profile Catalog Section */}
+        <section className="public-section public-profile-section synthetic-preview-catalog" id="perfiles" aria-labelledby="profiles-title">
+          <div className="public-section-heading public-section-heading-inline synthetic-preview-section-heading">
             <div>
-              <p className="public-eyebrow">{messages.profiles.eyebrow}</p>
-              <h2 id="profiles-title">{messages.profiles.title}</h2>
+              <p className="public-eyebrow">Catálogo Exclusivo</p>
+              <h2 id="profiles-title">Modelos Destacadas</h2>
+              <p>Perfiles verificados disponibles para reservaciones privadas en hotel o domicilio.</p>
             </div>
-            <a href={href('/perfiles')}>{messages.profiles.openCatalog}</a>
+            <a href={href('/perfiles')} className="text-xs font-bold uppercase text-amber-400 hover:underline">
+              Ver todos los perfiles →
+            </a>
           </div>
-          {profiles?.ok && profiles.items.length > 0 ? (
-            <div className="profile-grid">
-              {profiles.items.map((profile) => (
-                <ProfileCard profile={profile} locale={locale} key={profile.slug} />
-              ))}
-            </div>
-          ) : (
-            <div className="public-empty-state" role="status">
-              <strong>{messages.profiles.emptyTitle}</strong>
-              <p>{messages.profiles.emptyBody}</p>
-            </div>
-          )}
+
+          <div className="profile-grid synthetic-profile-grid">
+            {profiles.map((profile) => (
+              <ProfileCard
+                key={profile.slug}
+                profile={profile}
+                locale={locale}
+                preserveFullImage
+                profileHref={href(`/perfiles/${profile.slug}` as any)}
+              />
+            ))}
+          </div>
         </section>
 
-        <section className="public-final-cta" aria-labelledby="contact-title">
-          <p className="public-eyebrow">{messages.finalContact.eyebrow}</p>
-          <h2 id="contact-title">{messages.finalContact.title}</h2>
-          <a href={href('/contacto')}>{messages.finalContact.cta}</a>
+        {/* Services Section */}
+        <section className="public-section synthetic-preview-services" id="servicios" aria-labelledby="services-title">
+          <div className="public-section-heading synthetic-preview-section-heading">
+            <p className="public-eyebrow">Servicios VIP</p>
+            <h2 id="services-title">Experiencias de Compañía Exclusivas</h2>
+            <p>Servicios diseñados para satisfacer las expectativas más exigentes con total discreción.</p>
+          </div>
+
+          <div className="synthetic-preview-service-grid">
+            {servicesList.map((service) => (
+              <article key={service.number}>
+                <a href={href('/servicios')}>
+                  <span aria-hidden="true">{service.number}</span>
+                  <h3>{service.title}</h3>
+                  <p>{service.detail}</p>
+                  <strong>Ver detalles <span aria-hidden="true">→</span></strong>
+                </a>
+              </article>
+            ))}
+          </div>
         </section>
       </main>
+
       <PublicFooter locale={locale} />
     </div>
   );
