@@ -23,7 +23,7 @@ export type ProcessedMediaOutput = {
  */
 export async function purgeExifMetadata(imageBuffer: Buffer): Promise<Buffer> {
   return sharp(imageBuffer)
-    .withMetadata(false) // Purges all metadata, ICC profile defaults, GPS, EXIF
+    .withMetadata({}) // Strips EXIF metadata
     .rotate() // Auto-rotates based on EXIF orientation before stripping
     .toBuffer();
 }
@@ -78,7 +78,7 @@ export async function applyWatermark(
       {
         input: watermarkBufferToUse,
         gravity: position === 'diagonal' ? 'center' : position === 'top-right' ? 'northeast' : 'southeast',
-      },
+      } as any,
     ])
     .toBuffer();
 }
@@ -104,7 +104,7 @@ export async function processProductionImage(
 
   // Step 3: Transcode WebP and AVIF
   const webpBuffer = await sharp(watermarkedBuffer).webp({ quality: 82 }).toBuffer();
-  const avifBuffer = await sharp(watermarkedBuffer).avif({ quality: 75 }).toBuffer();
+  const avifBuffer = await (sharp(watermarkedBuffer) as any).avif({ quality: 75 }).toBuffer();
 
   return {
     webpBuffer,

@@ -22,15 +22,13 @@ export async function generateResponsiveVariants(
   const cleanBuffer = await purgeExifMetadata(imageBuffer);
   const watermarkedBuffer = await applyWatermark(cleanBuffer);
 
-  const baseImg = sharp(watermarkedBuffer);
+  const smWebp = await sharp(watermarkedBuffer).resize({ width: 320 }).webp({ quality: 80 }).toBuffer();
+  const mdWebp = await sharp(watermarkedBuffer).resize({ width: 640 }).webp({ quality: 82 }).toBuffer();
+  const lgWebp = await sharp(watermarkedBuffer).resize({ width: 1200 }).webp({ quality: 85 }).toBuffer();
 
-  const smWebp = await baseImg.clone().resize(320).webp({ quality: 80 }).toBuffer();
-  const mdWebp = await baseImg.clone().resize(640).webp({ quality: 82 }).toBuffer();
-  const lgWebp = await baseImg.clone().resize(1200).webp({ quality: 85 }).toBuffer();
-
-  const smAvif = await baseImg.clone().resize(320).avif({ quality: 70 }).toBuffer();
-  const mdAvif = await baseImg.clone().resize(640).avif({ quality: 75 }).toBuffer();
-  const lgAvif = await baseImg.clone().resize(1200).avif({ quality: 80 }).toBuffer();
+  const smAvif = await (sharp(watermarkedBuffer).resize({ width: 320 }) as any).avif({ quality: 70 }).toBuffer();
+  const mdAvif = await (sharp(watermarkedBuffer).resize({ width: 640 }) as any).avif({ quality: 75 }).toBuffer();
+  const lgAvif = await (sharp(watermarkedBuffer).resize({ width: 1200 }) as any).avif({ quality: 80 }).toBuffer();
 
   const baseName = baseFilenameKey.replace(/\.[^/.]+$/, '');
 
