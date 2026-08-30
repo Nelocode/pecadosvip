@@ -1,19 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CmsRole } from '@/lib/content/types';
-import '../globals.css';
-import '../theme.css';
-import '../public-site.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string>('admin@pecadosvip.com');
-  const [activeRole, setActiveRole] = useState<CmsRole>('super_admin');
+  const [userEmail] = useState<string>('admin@pecadosvip.com');
+  const [activeRole] = useState<CmsRole>('super_admin');
 
-  const roleLabels: Record<CmsRole, string> = {
+  const roleLabels: Record<string, string> = {
     super_admin: 'Super Administrador',
     booking_agent: 'Agente de Cuentas (Booking)',
     seo_specialist: 'Especialista SEO / Redactor',
@@ -26,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     try {
       await fetch('/api/admin/auth/logout', { method: 'POST' });
     } catch {
-      // Ignore network errors on logout
+      // Ignore network errors
     }
     router.push('/admin/login');
     router.refresh();
@@ -38,6 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <title>PecadosVIP — CMS Admin B2B</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
+        <script src="https://cdn.tailwindcss.com"></script>
       </head>
       <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased">
         <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
@@ -58,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <span className="text-zinc-400">Usuario:</span>
                 <span className="font-semibold text-zinc-200">{userEmail}</span>
                 <span className="rounded-md bg-amber-500/10 px-2 py-0.5 font-bold text-amber-400 border border-amber-500/20">
-                  {roleLabels[activeRole]}
+                  {roleLabels[activeRole] || activeRole}
                 </span>
               </div>
 
@@ -115,6 +113,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                 {activeRole === 'super_admin' && (
                   <Link
+                    href="/admin/analytics"
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 font-medium text-zinc-300 hover:bg-zinc-800 hover:text-amber-400 transition"
+                  >
+                    <span>📈</span> Analítica Comercial
+                  </Link>
+                )}
+
+                {activeRole === 'super_admin' && (
+                  <Link
                     href="/admin/audit"
                     className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 font-medium text-zinc-300 hover:bg-zinc-800 hover:text-amber-400 transition"
                   >
@@ -124,7 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </nav>
 
               <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-xs text-zinc-400">
-                <p className="font-semibold text-zinc-300">Rol Autenticado: {roleLabels[activeRole]}</p>
+                <p className="font-semibold text-zinc-300">Rol Autenticado: {roleLabels[activeRole] || activeRole}</p>
                 <p className="mt-1 text-[11px] text-zinc-500">
                   Base de Datos SQLite activa. Acceso cifrado y registrado por IP.
                 </p>
