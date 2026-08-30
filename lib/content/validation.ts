@@ -140,6 +140,53 @@ export function isProfilePublicationReady(profile: Profile): boolean {
   );
 }
 
+export function isServicePublicationReady(service: Service): boolean {
+  return Boolean(
+    hasText(service.id) &&
+      slugPattern.test(service.slug) &&
+      hasText(service.name) &&
+      hasText(service.description) &&
+      service.status === 'published' &&
+      isApproved(service.approval),
+  );
+}
+
+function validateService(
+  service: Service,
+  index: number,
+  issues: ValidationIssue[],
+): void {
+  const path = `services[${index}]`;
+  if (!hasText(service.id)) {
+    issues.push({
+      code: 'SERVICE_ID_INVALID',
+      path: `${path}.id`,
+      message: 'Service id is required.',
+    });
+  }
+  if (!slugPattern.test(service.slug)) {
+    issues.push({
+      code: 'SERVICE_SLUG_INVALID',
+      path: `${path}.slug`,
+      message: 'Service slug must be lowercase and URL-safe.',
+    });
+  }
+  if (!hasText(service.name) || !hasText(service.description)) {
+    issues.push({
+      code: 'SERVICE_CONTENT_MISSING',
+      path,
+      message: 'Service name and description are required.',
+    });
+  }
+  if (service.status === 'published' && !isServicePublicationReady(service)) {
+    issues.push({
+      code: 'SERVICE_PUBLICATION_EVIDENCE_MISSING',
+      path,
+      message: 'A published service requires complete content and traceable approval evidence.',
+    });
+  }
+}
+
 function validateLegalDocument(
   document: LegalDocument,
   path: string,
@@ -451,6 +498,7 @@ export function validateContentSnapshot(
   validateUnique(snapshot.profiles.map((profile) => profile.id), 'profiles', 'PROFILE_ID_DUPLICATE', issues);
   validateUnique(snapshot.profiles.map((profile) => profile.slug), 'profiles', 'PROFILE_SLUG_DUPLICATE', issues);
   validateUnique(snapshot.services.map((service) => service.id), 'services', 'SERVICE_ID_DUPLICATE', issues);
+  validateUnique(snapshot.services.map((service) => service.slug), 'services', 'SERVICE_SLUG_DUPLICATE', issues);
 
   const profileSlugs = new Set(snapshot.profiles.map((profile) => profile.slug));
   const servicesById = new Map(
@@ -463,6 +511,9 @@ export function validateContentSnapshot(
   snapshot.cities.forEach((city, index) => validateCity(city, index, profileSlugs, issues));
   snapshot.profiles.forEach((profile, index) =>
     validateProfile(profile, index, servicesById, citiesBySlug, issues),
+  );
+  snapshot.services.forEach((service, index) =>
+    validateService(service, index, issues),
   );
 
   if (mode === 'release') {

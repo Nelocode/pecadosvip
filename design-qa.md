@@ -1,34 +1,59 @@
-# Design QA — PecadosVip
+# Design QA — experiencia de servicios PecadosVip
 
-Fecha: 2026-08-27
+Fecha de cierre local: 2026-08-29
 
-## Alcance observado
+## Alcance verificado
 
-- Referencia 1: `WhatsApp Image 2026-08-26 at 5.19.36 PM.jpeg` (portada, listado y ficha).
-- Referencia 2: `WhatsApp Image 2026-08-26 at 5.33.18 PM.jpeg` (portada responsive alternativa).
-- Referencia 3: `WhatsApp Image 2026-08-26 at 5.38.50 PM.jpeg` (portada responsive y servicios alternativa).
-- Render verificado: holding productivo fail-closed en 320 y 1920 px.
-- Harness verificado: preview sintético local en 320 px; no es un candidato visual para publicación.
+- Referencia visual y funcional capturada desde la página de servicios de Felina BCN en escritorio y móvil.
+- Inventario de referencia conservado en `docs/reference/felina-route-inventory.json`: 751 rutas únicas observadas (732 en sitemaps y 19 solo en la navegación renderizada).
+- Mapa de patrones adaptables y exclusiones conservado en `docs/reference/felina-functional-map.md`.
+- Implementación original de PecadosVip con 34 rutas de servicios propias y sin reutilizar los slugs de servicios de la referencia.
+- Cuatro proyecciones completas de contenido del preview: español, inglés, francés e italiano.
+- Rutas públicas preparadas bajo `/servicios` y `/{locale}/servicios`, sujetas a los controles de publicación existentes.
+- Las 751 rutas del referente quedaron inventariadas como evidencia arquitectónica; no se copiaron ni se presentan como 751 rutas ya implementadas. En esta etapa se adaptó la experiencia de servicios y sus 34 detalles propios. Blog, guía, tarifas, contacto y demás familias requieren contenido y alcance originales antes de desarrollarse.
 
-## Decisión de comparación
+## Comparación visual
 
-Las tres referencias son materialmente distintas y ninguna fuente suministrada contiene una selección inequívoca del cliente. La documentación del proyecto recomienda provisionalmente 5:38:50 para portada y 5:19:36 para listado/ficha, pero conserva esa combinación como decisión pendiente.
+La referencia y la implementación fueron abiertas a la vez con el mismo estado y viewport. Se compararon el encabezado, la portada, el catálogo, la jerarquía tipográfica, las tarjetas, las secciones editoriales, las tarifas, las preguntas frecuentes, el directorio y el pie de página. La implementación conserva el patrón editorial observado —cabecera oscura, acento dorado, transición a contenido claro y catálogo denso— dentro de la identidad visual y los tokens existentes de PecadosVip.
 
-No se ejecutó una comparación de fidelidad ni se ajustó la interfaz para aparentar conformidad con una opción no aprobada. El holding y el harness sintético prueban seguridad, reflow y estados; no sustituyen la portada final ni autorizan activos visibles.
+Evidencia local:
 
-## Evidencia técnica que sí cerró
+- `output/design-qa/services-desktop-top.png`
+- `output/design-qa/services-desktop-catalog.png`
+- `output/design-qa/services-desktop-faq.png`
+- `output/design-qa/service-detail-desktop-top.png`
+- `output/design-qa/services-mobile-top.png`
+- `output/design-qa/service-detail-mobile.png`
+- `output/design-qa/service-mobile-menu-open-final.png`
+- `output/design-qa/services-desktop-fr-locales.png`
 
-- Holding sin desbordamiento horizontal a 320 y 1920 px.
-- Preview sintético con cuatro estados, vacío y error sin desbordamiento a 320 px.
-- Enlace de salto operable por teclado y foco transferido a `main-content`.
-- Consola sin errores o advertencias de aplicación.
-- Solicitudes del holding limitadas al origen local.
+## Interacciones y responsive
 
-## Para desbloquear
+- Los enlaces del catálogo y del directorio llevan a las 34 fichas de detalle.
+- Los filtros por categoría usan navegación GET y conservan el idioma seleccionado.
+- La navegación principal, el logotipo, el selector de idioma, los perfiles y los enlaces relacionados conservan `?lang` en el preview.
+- El menú móvil se comporta como diálogo: abre y cierra con control explícito, atrapa el foco, responde a Escape, devuelve el foco al disparador y bloquea el desplazamiento de fondo.
+- La portada y las tarjetas usan encuadres que conservan caras completas en escritorio y móvil.
+- La nota del preview puede aceptarse y restaurarse; permanece separada de cualquier consentimiento real.
+- Los destinos de contacto, reserva, pagos, analítica e indexación permanecen desactivados en esta etapa local.
 
-1. Seleccionar por nombre de archivo una referencia principal o aprobar explícitamente la combinación recomendada.
-2. Confirmar logo, tipografías, fotografías y derechos de uso.
-3. Proporcionar el estado y viewport exactos que constituirán la referencia de aceptación.
-4. Comparar referencia y render juntos, corregir diferencias visibles y repetir la captura.
+## Accesibilidad, idiomas y seguridad de publicación
 
-Final result: **blocked**
+- Existe enlace de salto al contenido, foco visible, nombres accesibles localizados, endónimos de idioma, blancos táctiles y reglas para movimiento reducido y colores forzados.
+- El DOM hidratado actualiza `html[lang]`, título y descripción en el preview para ES, EN, FR e IT.
+- La envoltura heredada responde inicialmente en español antes de la hidratación; por tratarse de una ruta local, no indexable y no publicable, se documenta como límite del preview. Las rutas públicas localizadas resuelven el idioma del servidor, pero continúan bajo estado de espera.
+- La revisión lingüística humana independiente y la revisión jurídica siguen siendo requisitos externos; este QA no constituye certificación legal ni aprobación editorial.
+
+## Verificación técnica final
+
+- `pnpm run release:verify`: aprobado.
+- ESLint: aprobado sin errores ni advertencias.
+- TypeScript: aprobado.
+- Pruebas: 199/199 aprobadas.
+- Compilación Vinext y preparación standalone: aprobadas.
+- Validación i18n: `PASS_WITH_LIMITS`, 0 problemas estructurales de catálogo.
+- Artefactos worker y standalone: 0 infracciones.
+- Smoke test standalone: aprobado con publicación desactivada, `robots` bloqueado y sitemap vacío.
+- Navegador local final: 0 errores de consola; `noindex, nofollow, nocache` confirmado.
+
+final result: passed

@@ -1,0 +1,287 @@
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
+
+import type { Locale } from '../../../../lib/i18n/locales';
+import {
+  getSyntheticServiceCatalog,
+  getSyntheticServiceMessages,
+  isSyntheticServiceGroup,
+  isSyntheticServiceLocale,
+  syntheticServiceGroups,
+} from '../../../../lib/preview/synthetic-services';
+import {
+  getSyntheticPreviewProfile,
+  isSyntheticPreviewRequestAllowed,
+} from '../../../../lib/preview/synthetic-preview';
+import PublicProfileMedia from '../../../components/PublicProfileMedia';
+import SyntheticPreviewNotice from '../../../components/SyntheticPreviewNotice';
+import SyntheticServiceCard from '../../../components/SyntheticServiceCard';
+import SyntheticServicesHeader from '../../../components/SyntheticServicesHeader';
+
+export const metadata: Metadata = {
+  title: 'Servicios sintéticos · Previsualización local',
+  description: 'Arquitectura local de servicios ficticios para validar diseño, rutas y estados sin habilitar conversión.',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: { index: false, follow: false, noimageindex: true },
+  },
+};
+
+export const dynamic = 'force-dynamic';
+
+type RawSearchParams = Record<string, string | string[] | undefined>;
+
+function single(value: string | string[] | undefined): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function previewEnvironment() {
+  return {
+    NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
+    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
+      import.meta.env.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
+  };
+}
+
+export default async function SyntheticServicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<RawSearchParams>;
+}) {
+  const requestHeaders = await headers();
+  if (
+    !isSyntheticPreviewRequestAllowed(
+      requestHeaders.get('host'),
+      previewEnvironment(),
+    )
+  ) {
+    notFound();
+  }
+
+  const raw = await searchParams;
+  const rawLocale = single(raw.lang);
+  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const rawGroup = single(raw.category);
+  const validGroup = rawGroup === undefined || isSyntheticServiceGroup(rawGroup);
+  const selectedGroup = validGroup ? rawGroup : undefined;
+  const messages = getSyntheticServiceMessages(locale);
+  const fullCatalog = getSyntheticServiceCatalog(locale);
+  const services = validGroup
+    ? fullCatalog.filter(
+        (service) => selectedGroup === undefined || service.group === selectedGroup,
+      )
+    : [];
+  const editorialProfile = getSyntheticPreviewProfile('sofia')!;
+  const editorialMedia = editorialProfile.media.find(
+    (candidate) => candidate.role === 'gallery-03',
+  )!;
+
+  return (
+    <div className="public-page synthetic-preview-page synthetic-services-page" lang={locale}>
+      <SyntheticServicesHeader
+        current="services"
+        documentDescription={messages.hub.lead}
+        documentTitle={`${messages.hub.title} | PecadosVip`}
+        languagePath="/preview-local-sintetico/servicios"
+        locale={locale}
+      />
+
+      <main id="main-content" tabIndex={-1}>
+        <nav className="synthetic-service-breadcrumb" aria-label={messages.navigation.breadcrumbAria}>
+          <a href={`/preview-local-sintetico?lang=${locale}#inicio`}>{messages.navigation.home}</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{messages.navigation.services}</span>
+        </nav>
+
+        <section className="synthetic-services-hero" aria-labelledby="services-preview-title">
+          <div>
+            <p className="public-eyebrow">{messages.hub.eyebrow}</p>
+            <h1 id="services-preview-title">{messages.hub.title}</h1>
+            <p>{messages.hub.lead}</p>
+            <div className="public-actions">
+              <a className="public-primary-action" href="#service-catalog">
+                {messages.hub.catalogTitle}
+              </a>
+              <a className="public-secondary-action" href="#service-faq">
+                {messages.hub.faqTitle}
+              </a>
+            </div>
+          </div>
+          <div className="synthetic-services-hero-media">
+            <PublicProfileMedia
+              media={{ ...editorialMedia, alt: messages.media.generatedAlt }}
+              preserveFullImage={false}
+              priority
+              sizes="(max-width: 780px) 100vw, 48vw"
+            />
+            <span>{messages.media.generatedBadge}</span>
+          </div>
+        </section>
+
+        <section className="synthetic-services-intro" aria-label={messages.hub.introExperienceTitle}>
+          <article>
+            <span aria-hidden="true">01</span>
+            <h2>{messages.hub.introExperienceTitle}</h2>
+            <p>{messages.hub.introExperienceBody}</p>
+          </article>
+          <article>
+            <span aria-hidden="true">02</span>
+            <h2>{messages.hub.introSafetyTitle}</h2>
+            <p>{messages.hub.introSafetyBody}</p>
+          </article>
+        </section>
+
+        <section className="public-section synthetic-services-catalog" id="service-catalog" aria-labelledby="service-catalog-title">
+          <div className="public-section-heading public-section-heading-inline synthetic-preview-section-heading">
+            <div>
+              <p className="public-eyebrow">{messages.hub.catalogEyebrow}</p>
+              <h2 id="service-catalog-title">{messages.hub.catalogTitle}</h2>
+              <p>{messages.hub.catalogLead}</p>
+            </div>
+            <span className="synthetic-preview-result-count" role="status">
+              {services.length} {services.length === 1 ? messages.hub.resultSingular : messages.hub.resultPlural}
+            </span>
+          </div>
+
+          <form className="synthetic-service-filters" action="/preview-local-sintetico/servicios#service-catalog" method="get">
+            <fieldset>
+              <legend>{messages.hub.filterLegend}</legend>
+              <input name="lang" type="hidden" value={locale} />
+              <label htmlFor="service-category">
+                {messages.hub.filterLabel}
+                <select id="service-category" name="category" defaultValue={selectedGroup ?? ''}>
+                  <option value="">{messages.hub.allGroups}</option>
+                  {syntheticServiceGroups.map((group) => (
+                    <option key={group} value={group}>{messages.groups[group].label}</option>
+                  ))}
+                </select>
+              </label>
+              <button type="submit">{messages.hub.applyFilter}</button>
+              <a href={`/preview-local-sintetico/servicios?lang=${locale}#service-catalog`}>
+                {messages.hub.resetFilter}
+              </a>
+            </fieldset>
+          </form>
+
+          {!validGroup ? (
+            <div className="public-empty-state public-empty-state-error" role="alert">
+              <strong>{messages.hub.filterLegend}</strong>
+              <p>{messages.hub.catalogLead}</p>
+              <a href={`/preview-local-sintetico/servicios?lang=${locale}#service-catalog`}>
+                {messages.hub.resetFilter}
+              </a>
+            </div>
+          ) : (
+            <div className="synthetic-services-grid">
+              {services.map((service) => (
+                <SyntheticServiceCard
+                  action={messages.hub.openService}
+                  key={service.slug}
+                  locale={locale}
+                  service={service}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="synthetic-services-editorial" aria-labelledby="services-editorial-title">
+          <div className="synthetic-services-editorial-media">
+            <PublicProfileMedia
+              media={{ ...editorialProfile.media[1]!, alt: messages.media.generatedAlt }}
+              preserveFullImage={false}
+              sizes="(max-width: 780px) 100vw, 50vw"
+            />
+            <span>{messages.media.fictionalBadge}</span>
+          </div>
+          <div>
+            <p className="public-eyebrow">{messages.hub.editorialEyebrow}</p>
+            <h2 id="services-editorial-title">{messages.hub.editorialTitle}</h2>
+            <p>{messages.hub.editorialBody}</p>
+            <a className="public-secondary-action" href={`/preview-local-sintetico?lang=${locale}#perfiles`}>
+              {messages.navigation.profiles}
+            </a>
+          </div>
+        </section>
+
+        <section className="synthetic-services-rates" aria-labelledby="services-rates-title">
+          <div>
+            <p className="public-eyebrow">{messages.hub.ratesEyebrow}</p>
+            <h2 id="services-rates-title">{messages.hub.ratesTitle}</h2>
+            <p>{messages.hub.ratesBody}</p>
+          </div>
+          <button disabled type="button">{messages.hub.ratesCta}</button>
+        </section>
+
+        <section className="synthetic-services-independent" aria-labelledby="services-independent-title">
+          <span aria-hidden="true">18+</span>
+          <div>
+            <h2 id="services-independent-title">{messages.hub.independenceTitle}</h2>
+            <p>{messages.hub.independenceBody}</p>
+          </div>
+        </section>
+
+        <section className="public-section synthetic-services-coverage" id="service-coverage" aria-labelledby="services-coverage-title">
+          <div className="public-section-heading synthetic-preview-section-heading">
+            <p className="public-eyebrow">{messages.hub.coverageEyebrow}</p>
+            <h2 id="services-coverage-title">{messages.hub.coverageTitle}</h2>
+            <p>{messages.hub.coverageBody}</p>
+          </div>
+          <div className="synthetic-services-city-directory">
+            {['Madrid', 'Barcelona', 'Girona', 'Tarragona', 'Toledo', 'Guadalajara', 'Segovia'].map((city, index) => (
+              <a href={`/preview-local-sintetico?lang=${locale}#cobertura`} key={city}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{city}</strong>
+                  <small>{messages.hub.pendingStatus}</small>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="public-section synthetic-services-faq" id="service-faq" aria-labelledby="services-faq-title">
+          <div className="public-section-heading synthetic-preview-section-heading">
+            <p className="public-eyebrow">{messages.hub.faqEyebrow}</p>
+            <h2 id="services-faq-title">{messages.hub.faqTitle}</h2>
+          </div>
+          <div className="synthetic-services-faq-list">
+            {messages.faqs.map((faq, index) => (
+              <details key={faq.question} open={index === 0}>
+                <summary>{faq.question}</summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="synthetic-services-directory" aria-labelledby="services-directory-title">
+          <h2 id="services-directory-title">{messages.hub.directoryTitle}</h2>
+          <div>
+            {fullCatalog.map((service) => (
+              <a href={`/preview-local-sintetico/servicios/${service.slug}?lang=${locale}`} key={service.slug}>
+                {service.name}
+              </a>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <footer className="public-footer synthetic-preview-footer synthetic-services-footer">
+        <div>
+          <p className="synthetic-preview-footer-brand">PecadosVip</p>
+          <p>{messages.footer.tagline}</p>
+        </div>
+        <nav aria-label={messages.navigation.footerAria}>
+          <a href={`/preview-local-sintetico?lang=${locale}#inicio`}>{messages.navigation.home}</a>
+          <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>{messages.navigation.profiles}</a>
+          <a href="#service-top">{messages.footer.top}</a>
+        </nav>
+        <span>{messages.footer.status}</span>
+      </footer>
+
+      <SyntheticPreviewNotice {...messages.notice} />
+    </div>
+  );
+}

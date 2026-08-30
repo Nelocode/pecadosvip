@@ -24,6 +24,14 @@
       "title": "Profils",
       "description": "Catalogue des profils PecadosVip publiés et approuvés."
     },
+    "services": {
+      "title": "Services",
+      "description": "Catalogue des services PecadosVip publiés et approuvés."
+    },
+    "service": {
+      "unavailableTitle": "Service indisponible",
+      "unavailableDescription": "Le service demandé n'est pas publié."
+    },
     "profile": {
       "unavailableTitle": "Profil indisponible",
       "unavailableDescription": "Le profil demandé n'est pas publié."
@@ -65,6 +73,7 @@
     "madrid": "Madrid",
     "barcelona": "Barcelona",
     "profiles": "Profils",
+    "services": "Services",
     "privateContact": "Contact privé",
     "contact": "Contact"
   },
@@ -435,6 +444,29 @@
       "kilograms": "kg"
     },
     "servicesTitle": "Services"
+  },
+  "servicesHub": {
+    "eyebrow": "Services approuvés",
+    "title": "Des expériences privées aux conditions claires.",
+    "body": "Cette route affiche uniquement des services publiés, approuvés et liés à des profils publiables.",
+    "catalogTitle": "Catalogue des services",
+    "cardAction": "Voir le service",
+    "profileCount": "{count} profils associés",
+    "faqTitle": "Avant de choisir",
+    "faqs": [
+      { "question": "La disponibilité est-elle garantie ?", "answer": "Non. Elle doit être confirmée en privé pour chaque profil, ville et moment." },
+      { "question": "Les limites peuvent-elles changer ?", "answer": "Uniquement par un accord explicite, éclairé et réversible entre adultes." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Fil d'Ariane du service",
+    "services": "Services",
+    "eyebrow": "Service publié",
+    "profilesTitle": "Profils associés",
+    "profilesBody": "Profils approuvés qui incluent ce service.",
+    "contactTitle": "Confirmation privée",
+    "contactBody": "Vérifiez la couverture, la disponibilité et les conditions uniquement via un canal approuvé.",
+    "back": "Retour aux services"
   },
   "contact": {
     "eyebrow": "Contact privé",

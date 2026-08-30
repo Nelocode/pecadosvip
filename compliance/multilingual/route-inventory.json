@@ -95,6 +95,24 @@
       }
     },
     {
+      "path": "/servicios",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
+      "path": "/servicios/{slug}",
+      "locales": {
+        "es": { "status": "required" },
+        "en": { "status": "required" },
+        "fr": { "status": "required" },
+        "it": { "status": "required" }
+      }
+    },
+    {
       "path": "/contacto",
       "locales": {
         "es": { "status": "required" },

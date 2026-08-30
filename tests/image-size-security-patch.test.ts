@@ -35,7 +35,9 @@ function runIsolatedCase(source: string): void {
       cwd: process.cwd(),
       encoding: 'utf8',
       env: { ...process.env, IMAGE_SIZE_EXPORT: exportMode },
-      timeout: 1_500,
+      // The full suite runs many worker processes in parallel on Windows. Keep
+      // this bounded while allowing for scheduler delay before the parser starts.
+      timeout: 5_000,
     });
 
     assert.notEqual(

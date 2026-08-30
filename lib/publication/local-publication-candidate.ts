@@ -60,7 +60,15 @@ export type PublicationCandidateReferencesEnvelope = {
 
 export type PublicCandidateRoute = {
   path: string;
-  kind: 'home' | 'city' | 'profiles' | 'profile' | 'contact' | 'legal';
+  kind:
+    | 'home'
+    | 'city'
+    | 'profiles'
+    | 'profile'
+    | 'services'
+    | 'service'
+    | 'contact'
+    | 'legal';
   indexable: true;
   lastModified?: string;
 };

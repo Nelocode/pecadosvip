@@ -52,7 +52,7 @@ test('runtime publication, route indexability and sitemap fail closed', () => {
   assert.equal(state.release.blockerCodes.includes('PUBLICATION_DISABLED'), true);
   assert.equal(state.release.blockerCodes.includes('LEGAL_CONTENT_MISSING'), true);
   assert.equal(state.release.blockerCodes.includes('INITIAL_PROFILE_LOAD_INCOMPLETE'), true);
-  assert.equal(state.manifest.length, 12);
+  assert.equal(state.manifest.length, 16);
   assert.equal(state.manifest.every((route) => route.indexable === false), true);
   assert.deepEqual(
     state.manifest.filter((route) => route.kind === 'home').map((route) => route.path),
@@ -60,6 +60,7 @@ test('runtime publication, route indexability and sitemap fail closed', () => {
   );
   assert.equal(isRuntimeRouteIndexable('/'), false);
   assert.equal(isRuntimeRouteIndexable('/es/madrid'), false);
+  assert.equal(isRuntimeRouteIndexable('/es/servicios'), false);
   assert.deepEqual(getRuntimeSitemapRoutes(), []);
 });
 

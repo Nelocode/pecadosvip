@@ -13,6 +13,12 @@ import {
   SYNTHETIC_PREVIEW_PATH,
   syntheticPreviewAssetRoles,
 } from '../lib/preview/synthetic-preview.ts';
+import {
+  getSyntheticServiceCatalog,
+  getSyntheticServiceMessages,
+  getSyntheticService,
+  syntheticServiceGroups,
+} from '../lib/preview/synthetic-services.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
 
 test('the local preview middleware fails closed on malformed request URLs', () => {
@@ -159,6 +165,9 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(pageSource, /disclosure=\{candidate\.syntheticNotice\}/);
   assert.match(pageSource, /preserveFullImage/);
   assert.match(pageSource, /profileHref=\{`\/preview-local-sintetico\/perfiles\//);
+  assert.match(pageSource, /name="lang" type="hidden" value=\{locale\}/);
+  assert.match(pageSource, /servicios\?lang=\$\{locale\}/);
+  assert.match(detailSource, /\?lang=\$\{locale\}&foto=\$\{candidate\.role\}/);
   assert.match(detailSource, /Contactar · no disponible en preview/);
   assert.match(detailSource, /button type="button" disabled/);
   assert.match(detailSource, /<PublicProfileMedia/);
@@ -190,9 +199,14 @@ test('local preview exposes the complete internal home flow without enabling con
   );
   const publicCssSource = readFileSync('app/public-site.css', 'utf8');
 
-  for (const anchor of ['inicio', 'cobertura', 'perfiles', 'servicios', 'seguridad']) {
+  for (const anchor of ['inicio', 'cobertura', 'perfiles', 'seguridad']) {
     assert.match(pageSource, new RegExp(`href="#${anchor}"`));
   }
+  assert.match(pageSource, /id="servicios"/);
+  assert.match(
+    pageSource,
+    /href=\{`\/preview-local-sintetico\/servicios\?lang=\$\{locale\}`\}/,
+  );
   for (const [slug, city] of [
     ['madrid', 'Madrid'],
     ['barcelona', 'Barcelona'],
@@ -222,6 +236,79 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(publicCssSource, /\.synthetic-preview-service-grid\s*\{/);
   assert.match(publicCssSource, /@media \(max-width: 480px\)/);
   assert.match(publicCssSource, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test('service preview exposes 34 PecadosVip routes in four complete locale projections', () => {
+  const slugs = getSyntheticServiceCatalog('es').map((service) => service.slug);
+  const referenceInventory = JSON.parse(
+    readFileSync('docs/reference/felina-route-inventory.json', 'utf8'),
+  ) as { routes: Array<{ family: string; locale: string; path: string; routeType: string }> };
+  const referenceServiceSlugs = new Set(
+    referenceInventory.routes
+      .filter(
+        (route) =>
+          route.family === 'services' &&
+          route.locale === 'es' &&
+          route.routeType === 'detail',
+      )
+      .map((route) => route.path.split('/').at(-1)),
+  );
+  assert.equal(slugs.length, 34);
+  assert.equal(new Set(slugs).size, slugs.length);
+  assert.deepEqual(
+    slugs.filter((slug) => referenceServiceSlugs.has(slug)),
+    [],
+    'PecadosVip route slugs must remain distinct from the reference inventory',
+  );
+  assert.equal(syntheticServiceGroups.length, 6);
+
+  for (const locale of ['es', 'en', 'fr', 'it'] as const) {
+    const catalog = getSyntheticServiceCatalog(locale);
+    const messages = getSyntheticServiceMessages(locale);
+    assert.equal(catalog.length, 34);
+    assert.equal(catalog.every((service) => service.name.trim() && service.teaser.trim()), true);
+    assert.equal(messages.faqs.length, 4);
+    const knownService = getSyntheticService('compania-privada', locale);
+    assert.ok(knownService);
+    assert.equal(knownService.name.trim().length > 0, true);
+  }
+  assert.equal(getSyntheticService('../secret', 'es'), undefined);
+});
+
+test('service hub and detail remain local-only, noindex, contact-free and interactive', () => {
+  const hub = readFileSync(
+    'app/(legacy)/preview-local-sintetico/servicios/page.tsx',
+    'utf8',
+  );
+  const detail = readFileSync(
+    'app/(legacy)/preview-local-sintetico/servicios/[slug]/page.tsx',
+    'utf8',
+  );
+  const notice = readFileSync(
+    'app/components/SyntheticPreviewNotice.tsx',
+    'utf8',
+  );
+  const css = readFileSync('app/service-pages.css', 'utf8');
+
+  for (const source of [hub, detail]) {
+    assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
+    assert.match(source, /isSyntheticPreviewRequestAllowed/);
+    assert.match(source, /VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW/);
+    assert.doesNotMatch(
+      source,
+      /ContactOptions|formActionUrl|mailto:|tel:|https?:\/\/(?:wa\.me|t\.me)/,
+    );
+  }
+  assert.match(hub, /name="category"/);
+  assert.match(hub, /<details/);
+  assert.match(hub, /SyntheticPreviewNotice/);
+  assert.match(detail, /generateStaticParams/);
+  assert.match(detail, /getRelatedSyntheticServices/);
+  assert.match(notice, /window\.localStorage/);
+  assert.match(css, /\.synthetic-services-grid\s*\{/);
+  assert.match(css, /grid-template-columns:\s*repeat\(4/);
+  assert.match(css, /@media \(max-width: 780px\)/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
 test('manifest keeps synthetic candidates outside public production paths', () => {

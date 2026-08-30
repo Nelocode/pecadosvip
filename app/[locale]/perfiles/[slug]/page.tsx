@@ -6,7 +6,7 @@ import { getRuntimeContentSnapshot } from '../../../../lib/content/runtime-snaps
 import { getRuntimeVisibilityState } from '../../../../lib/content/runtime-publication';
 import { getCatalog, interpolate } from '../../../../lib/i18n/catalog';
 import { formatDecimal } from '../../../../lib/i18n/format';
-import { SOURCE_LOCALE } from '../../../../lib/i18n/locales';
+import { localizedPath, SOURCE_LOCALE } from '../../../../lib/i18n/locales';
 import { buildLocalizedPublicMetadata } from '../../../../lib/seo';
 import ContactOptions from '../../../components/ContactOptions';
 import ProvisionalNotice from '../../../components/ProvisionalNotice';
@@ -126,7 +126,11 @@ export default async function ProfileDetailPage({ params }: Props) {
             <h2>{messages.servicesTitle}</h2>
             <ul>
               {profile.services.map((service) => (
-                <li key={service.slug}>{service.name}</li>
+                <li key={service.slug}>
+                  <a href={localizedPath(locale, `/servicios/${service.slug}`)}>
+                    {service.name}
+                  </a>
+                </li>
               ))}
             </ul>
             <ContactOptions locale={locale} />

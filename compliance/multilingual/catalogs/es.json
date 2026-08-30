@@ -24,6 +24,14 @@
       "title": "Perfiles",
       "description": "Catálogo de perfiles publicados y aprobados de PecadosVip."
     },
+    "services": {
+      "title": "Servicios",
+      "description": "Catálogo de servicios publicados y aprobados de PecadosVip."
+    },
+    "service": {
+      "unavailableTitle": "Servicio no disponible",
+      "unavailableDescription": "El servicio solicitado no está publicado."
+    },
     "profile": {
       "unavailableTitle": "Perfil no disponible",
       "unavailableDescription": "El perfil solicitado no está publicado."
@@ -65,6 +73,7 @@
     "madrid": "Madrid",
     "barcelona": "Barcelona",
     "profiles": "Perfiles",
+    "services": "Servicios",
     "privateContact": "Contacto privado",
     "contact": "Contacto"
   },
@@ -435,6 +444,29 @@
       "kilograms": "kg"
     },
     "servicesTitle": "Servicios"
+  },
+  "servicesHub": {
+    "eyebrow": "Servicios aprobados",
+    "title": "Experiencias privadas con condiciones claras.",
+    "body": "Esta ruta solo muestra servicios publicados, aprobados y vinculados a perfiles publicables.",
+    "catalogTitle": "Catálogo de servicios",
+    "cardAction": "Ver servicio",
+    "profileCount": "{count} perfiles vinculados",
+    "faqTitle": "Antes de elegir",
+    "faqs": [
+      { "question": "¿La disponibilidad está garantizada?", "answer": "No. Debe confirmarse de forma privada para cada perfil, ciudad y momento." },
+      { "question": "¿Los límites se pueden cambiar?", "answer": "Solo mediante acuerdo explícito, informado y reversible entre personas adultas." }
+    ]
+  },
+  "serviceDetail": {
+    "breadcrumbAria": "Migas de pan del servicio",
+    "services": "Servicios",
+    "eyebrow": "Servicio publicado",
+    "profilesTitle": "Perfiles relacionados",
+    "profilesBody": "Perfiles aprobados que incluyen este servicio.",
+    "contactTitle": "Confirmación privada",
+    "contactBody": "Consulta cobertura, disponibilidad y condiciones únicamente mediante un canal aprobado.",
+    "back": "Volver a servicios"
   },
   "contact": {
     "eyebrow": "Contacto privado",

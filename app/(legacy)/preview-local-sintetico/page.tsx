@@ -1,10 +1,11 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- native navigation is the verified Vinext fallback. */
 import type { Metadata } from 'next';
 // This route is runtime-guarded and must return 404 outside local development.
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import type { Availability, CitySlug } from '../../../lib/content/types';
+import type { Locale } from '../../../lib/i18n/locales';
+import { isSyntheticServiceLocale } from '../../../lib/preview/synthetic-services';
 import {
   filterSyntheticPreviewProfiles,
   getSyntheticPreviewProfiles,
@@ -99,31 +100,37 @@ const trustSignals = [
 const previewServices = [
   {
     number: '01',
+    category: 'company',
     title: 'Acompañamiento premium',
     detail: 'Propuesta de contenido pendiente de validación comercial y legal.',
   },
   {
     number: '02',
+    category: 'settings',
     title: 'Salidas a domicilios',
     detail: 'Categoría visual simulada; cobertura y condiciones no confirmadas.',
   },
   {
     number: '03',
+    category: 'settings',
     title: 'Hoteles',
     detail: 'Categoría visual simulada; disponibilidad real aún no publicada.',
   },
   {
     number: '04',
+    category: 'couples',
     title: 'Eventos y ocasiones especiales',
     detail: 'Concepto de servicio sujeto a definición y aprobación del cliente.',
   },
   {
     number: '05',
+    category: 'wellbeing',
     title: 'Viajes y desplazamientos',
     detail: 'Alcance ilustrativo sin promesa operativa ni territorial.',
   },
   {
     number: '06',
+    category: 'roleplay',
     title: 'Atención personalizada',
     detail: 'Experiencia propuesta; los canales permanecen desactivados.',
   },
@@ -155,6 +162,8 @@ export default async function SyntheticPreviewPage({
   }
 
   const raw = await searchParams;
+  const rawLocale = typeof raw.lang === 'string' ? raw.lang : undefined;
+  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
   const requestedCity = raw.city === '' ? undefined : raw.city;
   const requestedAvailability =
     raw.availability === '' ? undefined : raw.availability;
@@ -185,7 +194,7 @@ export default async function SyntheticPreviewPage({
           <a href="#inicio" aria-current="page">Inicio</a>
           <a href="#cobertura">Cobertura</a>
           <a href="#perfiles">Perfiles</a>
-          <a href="#servicios">Servicios</a>
+          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
           <a href="#seguridad">Controles</a>
         </nav>
         <button
@@ -294,6 +303,7 @@ export default async function SyntheticPreviewPage({
           >
             <fieldset>
               <legend>Filtrar el catálogo sintético</legend>
+              <input name="lang" type="hidden" value={locale} />
               <p className="profile-filter-help">
                 Los filtros solo reorganizan las seis identidades ficticias del preview.
               </p>
@@ -322,7 +332,7 @@ export default async function SyntheticPreviewPage({
               </label>
               <div className="synthetic-preview-filter-actions">
                 <button type="submit">Aplicar filtros</button>
-                <a href="/preview-local-sintetico#perfiles">Restablecer</a>
+                <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer</a>
               </div>
             </fieldset>
           </form>
@@ -331,7 +341,7 @@ export default async function SyntheticPreviewPage({
             <div className="public-empty-state public-empty-state-error" role="alert">
               <strong>Los filtros del preview no son válidos.</strong>
               <p>No se cargó ningún archivo. Restablece la maqueta para continuar.</p>
-              <a href="/preview-local-sintetico#perfiles">Restablecer filtros</a>
+              <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer filtros</a>
             </div>
           ) : profiles.length > 0 ? (
             <div className="profile-grid synthetic-profile-grid">
@@ -341,7 +351,7 @@ export default async function SyntheticPreviewPage({
                   key={candidate.slug}
                   preserveFullImage
                   profile={candidate}
-                  profileHref={`/preview-local-sintetico/perfiles/${candidate.slug}`}
+                  profileHref={`/preview-local-sintetico/perfiles/${candidate.slug}?lang=${locale}`}
                 />
               ))}
             </div>
@@ -349,7 +359,7 @@ export default async function SyntheticPreviewPage({
             <div className="public-empty-state" role="status">
               <strong>No hay perfiles ficticios para esta combinación.</strong>
               <p>Prueba otra ciudad o estado para continuar revisando la interfaz.</p>
-              <a href="/preview-local-sintetico#perfiles">Restablecer filtros</a>
+              <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Restablecer filtros</a>
             </div>
           ) : null}
         </section>
@@ -366,9 +376,12 @@ export default async function SyntheticPreviewPage({
           <div className="synthetic-preview-service-grid">
             {previewServices.map((service) => (
               <article key={service.number}>
-                <span aria-hidden="true">{service.number}</span>
-                <h3>{service.title}</h3>
-                <p>{service.detail}</p>
+                <a href={`/preview-local-sintetico/servicios?lang=${locale}&category=${service.category}#service-catalog`}>
+                  <span aria-hidden="true">{service.number}</span>
+                  <h3>{service.title}</h3>
+                  <p>{service.detail}</p>
+                  <strong>Explorar rutas <span aria-hidden="true">→</span></strong>
+                </a>
               </article>
             ))}
           </div>
@@ -398,7 +411,7 @@ export default async function SyntheticPreviewPage({
         <a href="#inicio" aria-current="page">Inicio</a>
         <a href="#cobertura">Ciudades</a>
         <a href="#perfiles">Perfiles</a>
-        <a href="#servicios">Servicios</a>
+        <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
         <a href="#seguridad">Control</a>
       </nav>
 
@@ -410,7 +423,7 @@ export default async function SyntheticPreviewPage({
         <nav aria-label="Enlaces internos del pie">
           <a href="#inicio">Inicio</a>
           <a href="#perfiles">Perfiles</a>
-          <a href="#servicios">Servicios</a>
+          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>Servicios</a>
           <a href="#main-content">Volver arriba</a>
         </nav>
         <span>Revisión humana, comercial y legal pendiente</span>

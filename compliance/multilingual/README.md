@@ -18,6 +18,7 @@ La aprobación lingüística exige para cada versión: fuente aprobada y con has
 - `allowlist.txt`: marca, endónimos, canales, unidades, ciudades, distritos, municipios y códigos que pueden permanecer sin traducir.
 - `content-contracts.json`: invariantes numéricas actuales —mayoría de edad y coordenadas— para el comparador determinista.
 - `route-inventory.json`: grupos equivalentes obligatorios. Con la estrategia `locale-prefix`, la ruta `/madrid` representa `/{locale}/madrid`.
+- Las familias `/servicios` y `/servicios/{slug}` existen en los cuatro prefijos. El contenido dinámico de detalle sigue cerrado fuera de ES hasta contar con traducción y aprobación trazables; la paridad de ruta no autoriza un fallback silencioso.
 - `audit.json` y `audit-report.md`: evidencia de la comparación determinista del paquete; no sustituyen auditoría DOM, revisión humana o especialista legal.
 
 ## Dictámenes vigentes

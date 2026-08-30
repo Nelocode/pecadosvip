@@ -21,7 +21,7 @@ $MaximumFileBytes = 128MB
 $MaximumArchiveSourceBytes = 512MB
 $MaximumTextScanBytes = 2MB
 $ExpectedTrackedPlaywrightEvidenceCount = 25
-$ExpectedFinalEvidenceCount = 27
+$ExpectedFinalEvidenceCount = 46
 $TrackedPlaywrightEvidence = @(
     'output/playwright/contact-gate-retest.json',
     'output/playwright/final-preview/reflow-320-equivalent-400.png',
@@ -76,7 +76,26 @@ $FinalEvidence = @(
     'output/audit-20260829-revalidation/ux/07-catalog-mobile.png',
     'output/audit-20260829-revalidation/ux/08-profile-cards-mobile.png',
     'output/audit-20260829-revalidation/ue-es/applicability.json',
-    'output/audit-20260829-revalidation/ue-es/source-freshness.json'
+    'output/audit-20260829-revalidation/ue-es/source-freshness.json',
+    'output/audits/multilingual-services/audit-summary.md',
+    'output/audits/multilingual-services/catalogs-audit.json',
+    'output/audits/multilingual-services/catalogs-audit.md',
+    'output/audits/multilingual-services/preview-http-observations.json',
+    'output/audits/multilingual-services/public-site-audit.json',
+    'output/audits/multilingual-services/public-site-audit.md',
+    'output/audits/multilingual-services/site-inventory.json',
+    'output/audits/eu-spain-services/audit-report.md',
+    'output/audits/eu-spain-services/profile.json',
+    'output/audits/eu-spain-services/resolver-output.json',
+    'output/audits/eu-spain-services/retest-evidence.json',
+    'output/design-qa/services-desktop-top.png',
+    'output/design-qa/services-desktop-catalog.png',
+    'output/design-qa/services-desktop-faq.png',
+    'output/design-qa/service-detail-desktop-top.png',
+    'output/design-qa/services-mobile-top.png',
+    'output/design-qa/service-detail-mobile.png',
+    'output/design-qa/service-mobile-menu-open-final.png',
+    'output/design-qa/services-desktop-fr-locales.png'
 )
 
 function Get-AbsolutePath {

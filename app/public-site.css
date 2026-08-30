@@ -1,3 +1,5 @@
+@import './service-pages.css';
+
 :root {
   --public-bg: #050505;
   --public-surface: #0d0c0a;
@@ -977,6 +979,21 @@
   border-bottom: 1px solid var(--public-border);
   background: var(--public-surface);
   padding: clamp(1.2rem, 3vw, 2rem);
+}
+
+.synthetic-preview-service-grid article > a {
+  display: block;
+  height: 100%;
+}
+
+.synthetic-preview-service-grid article > a > strong {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+  color: var(--public-gold-strong);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .synthetic-preview-service-grid article > span {

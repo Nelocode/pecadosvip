@@ -595,7 +595,16 @@ function isCandidateContent(value: unknown): boolean {
       isRecord(route) &&
       hasOnlyKeys(route, ['path', 'kind', 'indexable', 'lastModified']) &&
       isNonEmptyString(route.path) &&
-      ['home', 'city', 'profiles', 'profile', 'contact', 'legal'].includes(
+      [
+        'home',
+        'city',
+        'profiles',
+        'profile',
+        'services',
+        'service',
+        'contact',
+        'legal',
+      ].includes(
         String(route.kind),
       ) &&
       route.indexable === true &&

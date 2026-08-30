@@ -46,6 +46,10 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /output/release/
+/output/audits/
+/output/design-qa/
+/output/reference-felina/
+/output/preview-services.*.log
 /work/
 /tsconfig.tsbuildinfo
 /.firecrawl/

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-html-link-for-pages -- native navigation is the verified Vinext fallback. */
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -9,6 +8,8 @@ import {
   syntheticPreviewAssetRoles,
   type SyntheticPreviewAssetRole,
 } from '../../../../../lib/preview/synthetic-preview';
+import type { Locale } from '../../../../../lib/i18n/locales';
+import { isSyntheticServiceLocale } from '../../../../../lib/preview/synthetic-services';
 import PublicProfileMedia from '../../../../components/PublicProfileMedia';
 
 export const metadata: Metadata = {
@@ -69,6 +70,8 @@ export default async function SyntheticProfilePage({
   if (!profile) notFound();
 
   const query = await searchParams;
+  const rawLocale = typeof query.lang === 'string' ? query.lang : undefined;
+  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
   const activeRole = selectedRole(query.foto);
   const activeMedia =
     profile.media.find((candidate) => candidate.role === activeRole) ??
@@ -77,14 +80,14 @@ export default async function SyntheticProfilePage({
   return (
     <div className="public-page synthetic-preview-page synthetic-profile-page">
       <header className="public-header synthetic-preview-header">
-        <a className="public-brand" href="/preview-local-sintetico">
+        <a className="public-brand" href={`/preview-local-sintetico?lang=${locale}#inicio`}>
           PecadosVip
         </a>
         <strong>PREVIEW LOCAL · NO PUBLICAR</strong>
       </header>
       <main id="main-content" tabIndex={-1}>
         <nav className="synthetic-profile-breadcrumb" aria-label="Migas de pan">
-          <a href="/preview-local-sintetico">Perfiles sintéticos</a>
+          <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Perfiles sintéticos</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{profile.displayName}</span>
         </nav>
@@ -107,7 +110,7 @@ export default async function SyntheticProfilePage({
                 <a
                   aria-current={candidate.role === activeRole ? 'true' : undefined}
                   aria-label={`Mostrar ${candidate.label.toLowerCase()} de ${profile.displayName}`}
-                  href={`/preview-local-sintetico/perfiles/${profile.slug}?foto=${candidate.role}`}
+                  href={`/preview-local-sintetico/perfiles/${profile.slug}?lang=${locale}&foto=${candidate.role}`}
                   key={candidate.role}
                 >
                   <PublicProfileMedia
@@ -167,7 +170,7 @@ export default async function SyntheticProfilePage({
                 Contactar · no disponible en preview
               </button>
             </div>
-            <a className="synthetic-profile-back" href="/preview-local-sintetico">
+            <a className="synthetic-profile-back" href={`/preview-local-sintetico?lang=${locale}#perfiles`}>
               ← Volver a todos los perfiles
             </a>
           </div>
@@ -175,7 +178,7 @@ export default async function SyntheticProfilePage({
       </main>
       <footer className="public-footer synthetic-preview-footer">
         <p>Harness local no indexable · sin canales externos</p>
-        <a href="/preview-local-sintetico">Ver catálogo</a>
+        <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Ver catálogo</a>
         <span>Revisión humana y legal pendiente</span>
       </footer>
     </div>

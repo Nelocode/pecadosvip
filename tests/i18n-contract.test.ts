@@ -90,7 +90,7 @@ test('interpolation and CLDR plural selection are deterministic for every locale
 
 test('runtime manifest expands every fail-closed semantic route into four locales', () => {
   const manifest = buildLocalizedRouteManifest(getRuntimeContentSnapshot());
-  assert.equal(manifest.length, 12);
+  assert.equal(manifest.length, 16);
   assert.equal(manifest.every((route) => route.indexable === false), true);
   assert.deepEqual(
     manifest.filter((route) => route.semanticPath === '/').map((route) => route.path),
@@ -104,6 +104,8 @@ test('localized manifest never indexes untranslated dynamic profile or legal bod
     (route) =>
       route.kind === 'profiles' ||
       route.kind === 'profile' ||
+      route.kind === 'services' ||
+      route.kind === 'service' ||
       route.kind === 'legal',
   );
   assert.ok(dynamicRoutes.length > 0);
