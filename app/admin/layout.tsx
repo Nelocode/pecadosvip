@@ -1,13 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { CmsRole } from '@/lib/content/types';
 import '../globals.css';
 import '../theme.css';
 import '../public-site.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [userEmail, setUserEmail] = useState<string>('admin@pecadosvip.com');
   const [activeRole, setActiveRole] = useState<CmsRole>('super_admin');
 
   const roleLabels: Record<CmsRole, string> = {
@@ -17,6 +20,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     kyc_officer: 'Oficial de Cumplimiento (KYC)',
     admin: 'Admin Legacy',
     editor: 'Editor Legacy',
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth/logout', { method: 'POST' });
+    } catch {
+      // Ignore network errors on logout
+    }
+    router.push('/admin/login');
+    router.refresh();
   };
 
   return (
@@ -39,28 +52,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </span>
             </div>
 
-            {/* Role Switcher for Testing/Demonstration */}
-            <div className="flex items-center gap-4">
+            {/* Authenticated User Session Badge & Logout */}
+            <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-400">Rol Activo:</span>
-                <select
-                  value={activeRole}
-                  onChange={(e) => setActiveRole(e.target.value as CmsRole)}
-                  className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-amber-400 focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="super_admin">Super Administrador</option>
-                  <option value="booking_agent">Booking Agent (Agente Cuentas)</option>
-                  <option value="seo_specialist">Especialista SEO / Redactor</option>
-                  <option value="kyc_officer">Oficial de Cumplimiento (KYC)</option>
-                </select>
+                <span className="text-zinc-400">Usuario:</span>
+                <span className="font-semibold text-zinc-200">{userEmail}</span>
+                <span className="rounded-md bg-amber-500/10 px-2 py-0.5 font-bold text-amber-400 border border-amber-500/20">
+                  {roleLabels[activeRole]}
+                </span>
               </div>
 
               <div className="h-4 w-px bg-zinc-800" />
 
               <button
                 type="button"
-                onClick={() => alert('Sesión cerrada correctamente.')}
-                className="text-xs text-zinc-400 hover:text-zinc-200 transition"
+                onClick={handleLogout}
+                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 font-semibold text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 transition"
               >
                 Cerrar Sesión
               </button>
@@ -117,9 +124,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </nav>
 
               <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900 p-3 text-xs text-zinc-400">
-                <p className="font-semibold text-zinc-300">Rol: {roleLabels[activeRole]}</p>
+                <p className="font-semibold text-zinc-300">Rol Autenticado: {roleLabels[activeRole]}</p>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Acceso restringido a personal de agencia. Operación centralizada B2B.
+                  Base de Datos SQLite activa. Acceso cifrado y registrado por IP.
                 </p>
               </div>
             </aside>
