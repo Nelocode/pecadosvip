@@ -26,6 +26,11 @@ import {
   getSyntheticServiceMedia,
   syntheticServiceMediaKeys,
 } from '../lib/preview/synthetic-service-media.ts';
+import {
+  getSyntheticCityMedia,
+  getSyntheticCityPresentation,
+  syntheticCityMediaSlugs,
+} from '../lib/preview/synthetic-city-media.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
 
 function fileSha256(path: string): string {
@@ -187,6 +192,9 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(detailSource, /<PublicProfileMedia/);
   assert.match(mediaMiddlewareSource, /apply: 'serve'/);
   assert.match(mediaMiddlewareSource, /isSyntheticPreviewRequestAllowed/);
+  assert.match(mediaMiddlewareSource, /syntheticCityMediaPattern/);
+  assert.match(mediaMiddlewareSource, /isSyntheticCityMediaSlug/);
+  assert.match(mediaMiddlewareSource, /'synthetic-cities'/);
   assert.match(mediaMiddlewareSource, /assetRoot/);
   assert.match(mediaMiddlewareSource, /private, no-store/);
   assert.match(mediaMiddlewareSource, /noimageindex/);
@@ -235,7 +243,10 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(pageSource, /getSyntheticPreviewProfiles/);
   assert.match(pageSource, /<PublicProfileMedia/);
   assert.match(pageSource, /Imagen generada con IA/);
-  assert.match(pageSource, /Siete ciudades en la experiencia propuesta/);
+  assert.match(pageSource, /cityPresentation\.coverageTitle/);
+  assert.match(pageSource, /getSyntheticCityMedia/);
+  assert.match(pageSource, /cityMedia\.shortDisclosure/);
+  assert.match(pageSource, /id=\{`city-\$\{citySlug\}`\}/);
   assert.match(pageSource, /Servicios exclusivos · propuesta/);
   assert.match(pageSource, /Reserva desactivada/);
   assert.match(pageSource, /Contactar · no disponible/);
@@ -311,6 +322,47 @@ test('service catalogue maps every route to reviewed local symbolic media', () =
   }
 });
 
+test('seven unique city references are localized and remain local-only', () => {
+  assert.deepEqual(
+    [...syntheticCityMediaSlugs],
+    ['madrid', 'barcelona', 'girona', 'tarragona', 'toledo', 'guadalajara', 'segovia'],
+  );
+  assert.equal(new Set(syntheticCityMediaSlugs).size, 7);
+
+  const expectedDisclosure = {
+    es: 'Imagen de referencia generada con IA · cobertura no confirmada',
+    en: 'AI-generated reference image · coverage not confirmed',
+    fr: 'Image de référence générée par IA · couverture non confirmée',
+    it: 'Immagine di riferimento generata con IA · copertura non confermata',
+  } as const;
+  const expectedShortDisclosure = {
+    es: 'Generada con IA',
+    en: 'AI-generated',
+    fr: 'Générée par IA',
+    it: 'Generata con IA',
+  } as const;
+
+  for (const locale of ['es', 'en', 'fr', 'it'] as const) {
+    const presentation = getSyntheticCityPresentation(locale);
+    assert.match(presentation.coverageTitle, /\S/);
+    assert.match(presentation.pendingStatus, /\S/);
+    for (const citySlug of syntheticCityMediaSlugs) {
+      const media = getSyntheticCityMedia(citySlug, locale);
+      assert.equal(media.citySlug, citySlug);
+      assert.equal(media.contentType, 'image/webp');
+      assert.equal(media.disclosure, expectedDisclosure[locale]);
+      assert.equal(media.shortDisclosure, expectedShortDisclosure[locale]);
+      assert.match(media.alt, /\S/);
+      assert.match(
+        media.desktopUrl,
+        new RegExp(`^/preview-local-sintetico/city-media/${citySlug}$`, 'u'),
+      );
+      assert.equal(existsSync(resolve(media.sourcePath)), true, media.sourcePath);
+      assert.doesNotMatch(media.sourcePath, /public[\\/]/i);
+    }
+  }
+});
+
 test('service hub and detail remain local-only, noindex, contact-free and interactive', () => {
   const hub = readFileSync(
     'app/(legacy)/preview-local-sintetico/servicios/page.tsx',
@@ -354,6 +406,8 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
   assert.match(card, /aria-pressed=\{selection\.selected\}/);
   assert.match(hub, /<details/);
   assert.match(hub, /SyntheticPreviewNotice/);
+  assert.match(hub, /#city-\$\{citySlug\}/);
+  assert.match(hub, /cityMedia\.shortDisclosure/);
   assert.match(detail, /generateStaticParams/);
   assert.match(detail, /getRelatedSyntheticServices/);
   assert.match(notice, /window\.localStorage/);
@@ -429,5 +483,48 @@ test('service image manifest remains non-public and pending human/legal review',
     assert.equal(row[12], 'PASS_HASH_DIMENSION_FORMAT_UNIQUE');
     assert.equal(row[13], 'PENDING');
     assert.equal(row[14], 'PENDING');
+  }
+});
+
+test('city image manifest validates seven unique 4:3 WebP derivatives', async () => {
+  const manifest = readFileSync(
+    'assets/synthetic-cities/ASSET_MANIFEST.csv',
+    'utf8',
+  );
+  const rows = manifest.trim().split(/\r?\n/).slice(1);
+  const columns = rows.map((row) => row.split(','));
+  assert.equal(rows.length, 7);
+  assert.deepEqual(columns.map((row) => row[0]), [...syntheticCityMediaSlugs]);
+  assert.equal(new Set(columns.map((row) => row[9])).size, 7);
+  assert.equal(new Set(columns.map((row) => row[10])).size, 7);
+
+  for (const row of columns) {
+    assert.equal(row[1], 'reference');
+    assert.equal(row[4], '', 'public_path must remain empty before approval');
+    assert.equal(row[5], 'v1');
+    assert.equal(row[8], 'UNKNOWN');
+    assert.equal(row[13], 'image/png');
+    assert.equal(row[14], 'image/webp');
+    assert.equal(row[15], 'true');
+    assert.equal(row[16], 'PASS_HASH_DIMENSION_FORMAT_UNIQUE');
+    assert.equal(row[17], 'PENDING');
+    assert.equal(row[18], 'PENDING');
+    assert.equal(row[19], 'PENDING');
+    assert.equal(row[20], 'PENDING');
+    assert.equal(existsSync(resolve(row[2]!)), true, row[2]);
+    assert.equal(existsSync(resolve(row[3]!)), true, row[3]);
+    assert.equal(fileSha256(row[2]!), row[9], `${row[0]} master hash`);
+    assert.equal(fileSha256(row[3]!), row[10], `${row[0]} selected hash`);
+
+    const [masterMetadata, selectedMetadata] = await Promise.all([
+      sharp(resolve(row[2]!)).metadata(),
+      sharp(resolve(row[3]!)).metadata(),
+    ]);
+    assert.equal(masterMetadata.format, 'png');
+    assert.equal(selectedMetadata.format, 'webp');
+    assert.equal(selectedMetadata.width, 1200);
+    assert.equal(selectedMetadata.height, 900);
+    assert.equal(`${masterMetadata.width}x${masterMetadata.height}`, row[11]);
+    assert.equal(`${selectedMetadata.width}x${selectedMetadata.height}`, row[12]);
   }
 });

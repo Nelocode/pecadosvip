@@ -5,6 +5,10 @@ import { notFound } from 'next/navigation';
 
 import type { Availability, CitySlug } from '../../../lib/content/types';
 import type { Locale } from '../../../lib/i18n/locales';
+import {
+  getSyntheticCityMedia,
+  getSyntheticCityPresentation,
+} from '../../../lib/preview/synthetic-city-media';
 import { isSyntheticServiceLocale } from '../../../lib/preview/synthetic-services';
 import {
   filterSyntheticPreviewProfiles,
@@ -54,15 +58,15 @@ const cityLabels: Record<CitySlug, string> = {
 };
 
 const coverageGroups: ReadonlyArray<{
-  base: string;
+  base: 'madrid' | 'barcelona';
   cities: readonly CitySlug[];
 }> = [
   {
-    base: 'Zona Madrid',
+    base: 'madrid',
     cities: ['madrid', 'toledo', 'segovia', 'guadalajara'],
   },
   {
-    base: 'Zona Barcelona',
+    base: 'barcelona',
     cities: ['barcelona', 'tarragona', 'girona'],
   },
 ];
@@ -164,6 +168,7 @@ export default async function SyntheticPreviewPage({
   const raw = await searchParams;
   const rawLocale = typeof raw.lang === 'string' ? raw.lang : undefined;
   const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const cityPresentation = getSyntheticCityPresentation(locale);
   const requestedCity = raw.city === '' ? undefined : raw.city;
   const requestedAvailability =
     raw.availability === '' ? undefined : raw.availability;
@@ -255,24 +260,38 @@ export default async function SyntheticPreviewPage({
 
         <section className="public-section synthetic-preview-coverage" id="cobertura" aria-labelledby="coverage-title">
           <div className="public-section-heading synthetic-preview-section-heading">
-            <p className="public-eyebrow">Cobertura visual · simulada</p>
-            <h2 id="coverage-title">Siete ciudades en la experiencia propuesta</h2>
-            <p>
-              Esta distribución sirve para validar arquitectura y diseño. Ninguna
-              ciudad se presenta como cobertura comercial confirmada.
+            <p className="public-eyebrow">{cityPresentation.coverageEyebrow}</p>
+            <h2 id="coverage-title">{cityPresentation.coverageTitle}</h2>
+            <p>{cityPresentation.coverageBody}</p>
+            <p className="synthetic-city-disclosure">
+              {getSyntheticCityMedia('madrid', locale).disclosure}
             </p>
           </div>
           <div className="synthetic-preview-coverage-groups">
             {coverageGroups.map((group) => (
-              <article key={group.base} aria-labelledby={`coverage-${group.base.replace(' ', '-').toLowerCase()}`}>
-                <h3 id={`coverage-${group.base.replace(' ', '-').toLowerCase()}`}>{group.base}</h3>
+              <article key={group.base} aria-labelledby={`coverage-zone-${group.base}`}>
+                <h3 id={`coverage-zone-${group.base}`}>{cityPresentation.groups[group.base]}</h3>
                 <ul>
-                  {group.cities.map((citySlug) => (
-                    <li key={citySlug}>
-                      <strong>{cityLabels[citySlug]}</strong>
-                      <span>En confirmación</span>
-                    </li>
-                  ))}
+                  {group.cities.map((citySlug) => {
+                    const cityMedia = getSyntheticCityMedia(citySlug, locale);
+                    return (
+                      <li id={`city-${citySlug}`} key={citySlug}>
+                        <figure className="synthetic-preview-city-media">
+                          <PublicProfileMedia
+                            media={cityMedia}
+                            objectPosition={cityMedia.objectPosition}
+                            preserveFullImage={false}
+                            sizes="(max-width: 480px) 90vw, (max-width: 780px) 42vw, 24vw"
+                          />
+                          <figcaption>{cityMedia.shortDisclosure}</figcaption>
+                        </figure>
+                        <div className="synthetic-preview-city-copy">
+                          <strong>{cityLabels[citySlug]}</strong>
+                          <span>{cityPresentation.pendingStatus}</span>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </article>
             ))}

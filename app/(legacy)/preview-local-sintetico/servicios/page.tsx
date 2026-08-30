@@ -4,6 +4,10 @@ import { notFound } from 'next/navigation';
 
 import type { Locale } from '../../../../lib/i18n/locales';
 import {
+  getSyntheticCityMedia,
+  syntheticCityMediaSlugs,
+} from '../../../../lib/preview/synthetic-city-media';
+import {
   getSyntheticServiceCatalog,
   getSyntheticServiceMessages,
   isSyntheticServiceGroup,
@@ -17,6 +21,16 @@ import PublicProfileMedia from '../../../components/PublicProfileMedia';
 import SyntheticPreviewNotice from '../../../components/SyntheticPreviewNotice';
 import SyntheticServiceExplorer from '../../../components/SyntheticServiceExplorer';
 import SyntheticServicesHeader from '../../../components/SyntheticServicesHeader';
+
+const cityLabels = {
+  madrid: 'Madrid',
+  barcelona: 'Barcelona',
+  girona: 'Girona',
+  tarragona: 'Tarragona',
+  toledo: 'Toledo',
+  guadalajara: 'Guadalajara',
+  segovia: 'Segovia',
+} as const;
 
 export const metadata: Metadata = {
   title: 'Servicios sintéticos · Previsualización local',
@@ -199,15 +213,32 @@ export default async function SyntheticServicesPage({
             <p className="public-eyebrow">{messages.hub.coverageEyebrow}</p>
             <h2 id="services-coverage-title">{messages.hub.coverageTitle}</h2>
             <p>{messages.hub.coverageBody}</p>
+            <p className="synthetic-city-disclosure">
+              {getSyntheticCityMedia('madrid', locale).disclosure}
+            </p>
           </div>
           <div className="synthetic-services-city-directory">
-            {['Madrid', 'Barcelona', 'Girona', 'Tarragona', 'Toledo', 'Guadalajara', 'Segovia'].map((city, index) => (
-              <a href={`/preview-local-sintetico?lang=${locale}#cobertura`} key={city}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <strong>{city}</strong>
-                  <small>{messages.hub.pendingStatus}</small>
-              </a>
-            ))}
+            {syntheticCityMediaSlugs.map((citySlug, index) => {
+              const cityMedia = getSyntheticCityMedia(citySlug, locale);
+              return (
+                <a href={`/preview-local-sintetico?lang=${locale}#city-${citySlug}`} key={citySlug}>
+                  <figure className="synthetic-services-city-media">
+                    <PublicProfileMedia
+                      media={cityMedia}
+                      objectPosition={cityMedia.objectPosition}
+                      preserveFullImage={false}
+                      sizes="(max-width: 480px) 90vw, (max-width: 780px) 45vw, 15vw"
+                    />
+                    <figcaption>{cityMedia.shortDisclosure}</figcaption>
+                  </figure>
+                  <div className="synthetic-services-city-copy">
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <strong>{cityLabels[citySlug]}</strong>
+                    <small>{messages.hub.pendingStatus}</small>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </section>
 

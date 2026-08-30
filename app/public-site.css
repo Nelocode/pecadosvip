@@ -902,6 +902,19 @@
   gap: 1.25rem;
 }
 
+.synthetic-city-disclosure {
+  display: inline-flex;
+  width: fit-content;
+  margin: 1rem 0 0 !important;
+  border: 1px solid rgb(216 173 98 / 30%);
+  background: rgb(216 173 98 / 6%);
+  padding: 0.55rem 0.7rem;
+  color: var(--public-gold-strong) !important;
+  font-size: 0.75rem !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0.035em;
+}
+
 .synthetic-preview-coverage-groups > article {
   border: 1px solid var(--public-border);
   background: var(--public-surface);
@@ -927,12 +940,59 @@
 
 .synthetic-preview-coverage-groups li {
   display: grid;
-  gap: 0.5rem;
-  min-height: 92px;
-  align-content: end;
+  min-width: 0;
+  overflow: hidden;
   border: 1px solid rgb(216 173 98 / 22%);
   background: #080705;
-  padding: 1rem;
+}
+
+.synthetic-preview-city-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(216 173 98 / 22%);
+  background: #050403;
+}
+
+.synthetic-preview-city-media img {
+  transition: transform 240ms ease, filter 240ms ease;
+  filter: saturate(0.86) contrast(1.04);
+}
+
+.synthetic-preview-coverage-groups li:hover .synthetic-preview-city-media img {
+  transform: scale(1.025);
+  filter: saturate(1) contrast(1.05);
+}
+
+.synthetic-preview-city-media::after {
+  position: absolute;
+  inset: 45% 0 0;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 82%));
+  content: '';
+  pointer-events: none;
+}
+
+.synthetic-preview-city-media figcaption {
+  position: absolute;
+  right: auto;
+  bottom: 0.6rem;
+  left: 0.65rem;
+  z-index: 2;
+  border: 1px solid rgb(216 173 98 / 35%);
+  background: rgb(5 4 3 / 86%);
+  padding: 0.3rem 0.45rem;
+  color: #eee7dc;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-shadow: 0 1px 4px #000;
+}
+
+.synthetic-preview-city-copy {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem 1rem;
 }
 
 .synthetic-preview-coverage-groups li strong {
@@ -2080,6 +2140,10 @@
 
   .synthetic-preview-coverage-groups ul {
     grid-template-columns: 1fr;
+  }
+
+  .synthetic-preview-city-media figcaption {
+    font-size: 0.75rem;
   }
 
   .synthetic-preview-section-heading h2 {

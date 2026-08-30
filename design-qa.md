@@ -66,11 +66,23 @@ No quedaron hallazgos P0, P1 o P2 en la muestra visual final relacionada con dup
 - `pnpm run release:verify`: aprobado.
 - ESLint: aprobado sin errores ni advertencias.
 - TypeScript: aprobado.
-- Pruebas: 201/201 aprobadas.
+- Pruebas: 203/203 aprobadas.
 - Compilación Vinext y preparación standalone: aprobadas.
 - Validación i18n: `PASS_WITH_LIMITS`, 0 problemas estructurales de catálogo.
 - Artefactos worker y standalone: 0 infracciones.
 - Smoke test standalone: aprobado con publicación desactivada, `robots` bloqueado y sitemap vacío.
 - Navegador local final: 0 errores de consola; `noindex, nofollow, nocache` confirmado.
+
+## Extensión visual · siete ciudades
+
+- Madrid, Barcelona, Girona, Tarragona, Toledo, Guadalajara y Segovia cuentan ahora con una referencia horizontal única en la home sintética y el directorio de servicios.
+- Los maestros PNG y derivados WebP 1200 × 900 permanecen fuera de `public/`; la ruta local está confinada por slug y por directorio.
+- El mosaico `output/design-qa/cities-reference-contact-sheet.png` confirma siete composiciones distintas. `cities-reference-comparison.png` conserva ambos contextos sin recorte; es una comparación contextual, no una comparación píxel a píxel porque las capturas de origen tienen dimensiones distintas.
+- Capturas normales de viewport: `cities-reference-desktop.png`, `cities-reference-mobile.png`, `cities-services-desktop.png`, `cities-services-tablet-1024.png`, `cities-services-tablet-768.png` y `cities-services-mobile.png`. Se evitó basar el dictamen en el cosido de página completa.
+- El DOM mostró siete `src`, siete alt específicos, un aviso compartido, siete etiquetas IA visibles y dimensiones naturales 1200 × 900. Antes de cada captura se comprobaron `complete` y `naturalWidth > 0` en las siete imágenes. Las secciones no desbordaron a 1440, 1024, 768 ni 390 px; a 320 px se conserva el mínimo global heredado de 320 px y la validación se considera equivalente, no una promesa para un ancho útil menor por scrollbar clásica.
+- Las etiquetas por tarjeta tienen 0.75 rem y el aviso completo conserva “cobertura no confirmada”. El control para restaurar el aviso queda en el flujo del documento y no tapa imágenes ni objetivos táctiles.
+- ES/EN/FR/IT muestran alt y disclosure localizados sin mojibake. La home legacy mantiene el límite conocido de `html lang=es` para EN/FR/IT; el hub de servicios sí sincroniza el idioma del documento.
+- La inspección del navegador no registró errores ni advertencias de aplicación. El contenido sigue siendo local, sintético, no indexable y sin afirmación de cobertura comercial.
+- La revisión de derechos, lingüística independiente, jurídica, lector de pantalla, contraste medido y dispositivos físicos sigue pendiente; este cierre visual no autoriza producción.
 
 final result: passed

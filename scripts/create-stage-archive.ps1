@@ -21,7 +21,7 @@ $MaximumFileBytes = 128MB
 $MaximumArchiveSourceBytes = 512MB
 $MaximumTextScanBytes = 2MB
 $ExpectedTrackedPlaywrightEvidenceCount = 25
-$ExpectedFinalEvidenceCount = 54
+$ExpectedFinalEvidenceCount = 63
 $TrackedPlaywrightEvidence = @(
     'output/playwright/contact-gate-retest.json',
     'output/playwright/final-preview/reflow-320-equivalent-400.png',
@@ -103,7 +103,16 @@ $FinalEvidence = @(
     'output/design-qa/services-unique-assets-contact-sheet.png',
     'output/design-qa/services-unique-catalog-desktop.png',
     'output/design-qa/services-unique-catalog-mobile.png',
-    'output/design-qa/services-reference-vs-implementation-unique.png'
+    'output/design-qa/services-reference-vs-implementation-unique.png',
+    'output/design-qa/cities-reference-before.png',
+    'output/design-qa/cities-reference-desktop.png',
+    'output/design-qa/cities-reference-mobile.png',
+    'output/design-qa/cities-services-desktop.png',
+    'output/design-qa/cities-services-tablet-1024.png',
+    'output/design-qa/cities-services-tablet-768.png',
+    'output/design-qa/cities-services-mobile.png',
+    'output/design-qa/cities-reference-contact-sheet.png',
+    'output/design-qa/cities-reference-comparison.png'
 )
 
 function Get-AbsolutePath {
