@@ -94,7 +94,8 @@ const languages = metadata.alternates && 'languages' in metadata.alternates
 if (
   metadata.alternates?.canonical !== 'https://www.pecadosvip.com/fr/madrid' ||
   !languages ||
-  Object.keys(languages).sort().join(',') !== 'en,es,fr,it'
+  Object.keys(languages).sort().join(',') !== 'en,es,fr,it,x-default' ||
+  languages['x-default'] !== 'https://www.pecadosvip.com/es/madrid'
 ) {
   fail('localized canonical/hreflang contract is incomplete');
 }

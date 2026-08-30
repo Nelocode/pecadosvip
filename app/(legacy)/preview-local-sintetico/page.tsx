@@ -9,6 +9,7 @@ import {
   getSyntheticCityMedia,
   getSyntheticCityPresentation,
 } from '../../../lib/preview/synthetic-city-media';
+import type { SyntheticCityMediaSlug } from '../../../lib/preview/synthetic-city-media';
 import { isSyntheticServiceLocale } from '../../../lib/preview/synthetic-services';
 import {
   filterSyntheticPreviewProfiles,
@@ -47,7 +48,7 @@ const previewCities = [
   'segovia',
 ] as const satisfies readonly CitySlug[];
 
-const cityLabels: Record<CitySlug, string> = {
+const cityLabels: Record<SyntheticCityMediaSlug, string> = {
   madrid: 'Madrid',
   barcelona: 'Barcelona',
   girona: 'Girona',
@@ -55,11 +56,12 @@ const cityLabels: Record<CitySlug, string> = {
   toledo: 'Toledo',
   guadalajara: 'Guadalajara',
   segovia: 'Segovia',
+  sitges: 'Sitges',
 };
 
 const coverageGroups: ReadonlyArray<{
   base: 'madrid' | 'barcelona';
-  cities: readonly CitySlug[];
+  cities: readonly SyntheticCityMediaSlug[];
 }> = [
   {
     base: 'madrid',
@@ -67,7 +69,7 @@ const coverageGroups: ReadonlyArray<{
   },
   {
     base: 'barcelona',
-    cities: ['barcelona', 'tarragona', 'girona'],
+    cities: ['barcelona', 'tarragona', 'girona', 'sitges'],
   },
 ];
 
@@ -218,8 +220,12 @@ export default async function SyntheticPreviewPage({
           <div className="synthetic-preview-hero-copy">
             <p className="public-eyebrow">Discreción · Exclusividad · Placer</p>
             <h1 id="preview-title">
-              El lujo de elegir
-              <span>en tu casa o en hotel</span>
+              <span className="synthetic-preview-hero-title-primary">
+                El lujo de elegir
+              </span>{' '}
+              <span className="synthetic-preview-hero-title-secondary">
+                en tu casa o en hotel
+              </span>
             </h1>
             <p className="synthetic-preview-hero-location">Madrid y Barcelona</p>
             <p className="synthetic-preview-hero-note">

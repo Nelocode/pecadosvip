@@ -1,0 +1,84 @@
+{
+  "finding_id": "F-184b6e6ef073d33e",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "deployed-technology-inventory-and-consent-states",
+  "url_or_path": "app/components/SyntheticPreviewNotice.tsx",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "privacy-cookies",
+  "control_id": "COOKIE-LSSI-CONSENT-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The loopback preview stores one first-party acknowledgement value, while the deployed hosting/CDN/logging/analytics inventory and exemption analysis are unavailable.",
+  "expected": "Classify every terminal technology by purpose and exemption and, where non-exempt technology exists, evidence prior consent and all relevant consent states.",
+  "observed": "Source review found localStorage only for restoring/dismissing a synthetic-preview notice and analytics code remains gated, but no four-state deployed inventory exists. The notice is not represented as a cookie consent mechanism.",
+  "method": "Static source search and component review; attempted passive loopback GET collection; official LSSI review.",
+  "limitations": [
+    "The HTTP collector could not reach the browser-owned loopback server from the audit execution context.",
+    "No deployed origin or browser network/storage capture in four consent states was available to this sub-audit."
+  ],
+  "tool_status": "FAILED",
+  "tool_error": "Three authorised single-GET attempts to 127.0.0.1:3000 failed with WinError 10061; fixture hashing of existing browser screenshots succeeded as an evidence fallback.",
+  "result": "NOT_TESTED",
+  "not_tested_reason": "A complete deployed technology inventory and four-state consent observation could not be performed from this execution context.",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "app/components/SyntheticPreviewNotice.tsx",
+      "sha256": "2df1ddde60ce1d60fe5fd833fb45721f20b6dd2acf3d8a9893563e0a7e6e5996",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    }
+  ],
+  "impact": "Unknown deployed technologies could make the consent and transparency design incomplete despite safe local source defaults.",
+  "prevalence": "All deployed routes and third-party infrastructure.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "MEDIUM",
+  "confidence": "MEDIUM",
+  "priority": "P0 before enabling analytics or third parties; P1 for authorised staging inventory",
+  "legal_relevance": "POSSIBLE",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish rule for storage/access on terminal equipment, subject to its strictly-necessary exception.",
+      "instrument_id": "ES-LSSI-34-2002",
+      "instrument": "Ley 34/2002 de servicios de la sociedad de la información y de comercio electrónico",
+      "identifier": "BOE-A-2002-13758",
+      "provision": "art. 22.2",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+      "applicability_reason": "A first-party localStorage value is observed; exemption and deployed third-party inventory require factual verification.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text and source inspection."
+    },
+    {
+      "class": "INTERPRETIVE_AUTHORITY",
+      "legal_effect": "Official authority guidance on cookie information, consent design and withdrawal; not independent statutory text.",
+      "instrument_id": "ES-AEPD-COOKIE-GUIDE-2024",
+      "instrument": "Guía sobre el uso de las cookies de la AEPD, mayo 2024",
+      "identifier": "AEPD cookie guide 2024",
+      "version": "May 2024 official guide",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.aepd.es/guias/guia-cookies.pdf",
+      "applicability_reason": "Relevant only if non-exempt terminal technology is confirmed.",
+      "verified_at": "2026-08-26",
+      "verification_method": "Skill legal register freshness check; no change interpretation performed."
+    }
+  ],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "Remembering a user-requested preview-notice choice may be technically necessary for that requested UI function; this audit does not classify it as requiring consent.",
+  "counterevidence": [
+    "No third-party analytics or advertising request was identified in static source.",
+    "The preview remains loopback-only and non-production."
+  ],
+  "remediation_minimum": "Before staging/public activation, capture network, cookies and storage at first load, rejection, granular acceptance and withdrawal; document every purpose/provider/retention and exemption decision.",
+  "additional_hardening": "Add an automated deployment inventory diff and require CMP/configuration approval when any non-exempt provider appears.",
+  "suggested_owner": "Privacy lead and frontend/platform engineering",
+  "effort": "One authorised staging review plus provider documentation",
+  "retest": "Repeat the four consent states on the exact deployed build and preserve a redacted manifest.",
+  "residual_risk": "Unknown until the deployed stack is inventoried; no non-exempt tracker was proven in the local source snapshot."
+}

@@ -199,6 +199,7 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(mediaMiddlewareSource, /private, no-store/);
   assert.match(mediaMiddlewareSource, /noimageindex/);
   assert.match(viteConfigSource, /localSyntheticMediaPlugin\(\)/);
+  assert.match(viteConfigSource, /ignored:\s*\['\*\*\/stage-archives\/\*\*'\]/);
   assert.match(profileCardSource, /disclosure\?: string/);
   assert.match(profileCardSource, /preserveFullImage\?: boolean/);
   assert.match(profileCardSource, /<PublicProfileMedia/);
@@ -237,6 +238,7 @@ test('local preview exposes the complete internal home flow without enabling con
     ['toledo', 'Toledo'],
     ['guadalajara', 'Guadalajara'],
     ['segovia', 'Segovia'],
+    ['sitges', 'Sitges'],
   ]) {
     assert.match(pageSource, new RegExp(`${slug}: '${city}'`));
   }
@@ -248,6 +250,8 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(pageSource, /cityMedia\.shortDisclosure/);
   assert.match(pageSource, /id=\{`city-\$\{citySlug\}`\}/);
   assert.match(pageSource, /Servicios exclusivos · propuesta/);
+  assert.match(pageSource, /synthetic-preview-hero-title-primary/);
+  assert.match(pageSource, /synthetic-preview-hero-title-secondary/);
   assert.match(pageSource, /Reserva desactivada/);
   assert.match(pageSource, /Contactar · no disponible/);
   assert.match(pageSource, /type="button"\s+disabled/);
@@ -257,6 +261,14 @@ test('local preview exposes the complete internal home flow without enabling con
   );
 
   assert.match(publicCssSource, /\.synthetic-preview-hero\s*\{/);
+  assert.match(
+    publicCssSource,
+    /\.synthetic-preview-hero-title-primary\s*\{[\s\S]*?line-height:\s*1\.15/,
+  );
+  assert.match(
+    publicCssSource,
+    /\.synthetic-preview-hero-title-secondary\s*\{[\s\S]*?line-height:\s*1\.15/,
+  );
   assert.match(publicCssSource, /\.synthetic-preview-coverage-groups\s*\{/);
   assert.match(publicCssSource, /\.synthetic-preview-service-grid\s*\{/);
   assert.match(publicCssSource, /@media \(max-width: 480px\)/);
@@ -322,12 +334,12 @@ test('service catalogue maps every route to reviewed local symbolic media', () =
   }
 });
 
-test('seven unique city references are localized and remain local-only', () => {
+test('eight unique city references are localized and remain local-only', () => {
   assert.deepEqual(
     [...syntheticCityMediaSlugs],
-    ['madrid', 'barcelona', 'girona', 'tarragona', 'toledo', 'guadalajara', 'segovia'],
+    ['madrid', 'barcelona', 'girona', 'tarragona', 'toledo', 'guadalajara', 'segovia', 'sitges'],
   );
-  assert.equal(new Set(syntheticCityMediaSlugs).size, 7);
+  assert.equal(new Set(syntheticCityMediaSlugs).size, 8);
 
   const expectedDisclosure = {
     es: 'Imagen de referencia generada con IA · cobertura no confirmada',
@@ -408,12 +420,42 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
   assert.match(hub, /SyntheticPreviewNotice/);
   assert.match(hub, /#city-\$\{citySlug\}/);
   assert.match(hub, /cityMedia\.shortDisclosure/);
+  assert.match(hub, /syntheticCityMediaSlugs\.map/);
+  assert.match(hub, /<PublicProfileMedia/);
+  assert.match(hub, /media=\{cityMedia\}/);
+  assert.match(hub, /preserveFullImage=\{false\}/);
   assert.match(detail, /generateStaticParams/);
   assert.match(detail, /getRelatedSyntheticServices/);
   assert.match(notice, /window\.localStorage/);
   assert.match(css, /\.synthetic-services-grid\s*\{/);
+  assert.match(
+    css,
+    /\.synthetic-services-hero h1\s*\{[\s\S]*?line-height:\s*1\.15/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-service-detail-copy h1\s*\{[\s\S]*?line-height:\s*1\.15/,
+  );
   assert.match(css, /grid-template-columns:\s*repeat\(4/);
   assert.match(css, /@media \(max-width: 780px\)/);
+  assert.match(
+    css,
+    /\.synthetic-services-page \.synthetic-services-catalog\s*\{\s*width:\s*100%;\s*max-width:\s*none;\s*margin:\s*0;/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-services-catalog \.synthetic-services-grid\s*\{\s*grid-template-columns:\s*repeat\(12/,
+  );
+  assert.match(css, /last-child:nth-child\(4n \+ 2\)/);
+  assert.match(css, /last-child:nth-child\(3n \+ 2\)/);
+  assert.match(css, /last-child:nth-child\(2n \+ 1\)/);
+  assert.match(css, /aspect-ratio:\s*8 \/ 5/);
+  assert.match(css, /\.synthetic-services-city-directory\s*\{[\s\S]*?repeat\(8/);
+  assert.match(css, /@media \(min-width: 781px\) and \(max-width: 1180px\)/);
+  assert.match(
+    css,
+    /@media \(min-width: 781px\) and \(max-width: 1180px\)[\s\S]*?\.synthetic-services-city-directory\s*\{\s*grid-template-columns:\s*repeat\(4/,
+  );
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
@@ -486,17 +528,17 @@ test('service image manifest remains non-public and pending human/legal review',
   }
 });
 
-test('city image manifest validates seven unique 4:3 WebP derivatives', async () => {
+test('city image manifest validates eight unique 4:3 WebP derivatives', async () => {
   const manifest = readFileSync(
     'assets/synthetic-cities/ASSET_MANIFEST.csv',
     'utf8',
   );
   const rows = manifest.trim().split(/\r?\n/).slice(1);
   const columns = rows.map((row) => row.split(','));
-  assert.equal(rows.length, 7);
+  assert.equal(rows.length, 8);
   assert.deepEqual(columns.map((row) => row[0]), [...syntheticCityMediaSlugs]);
-  assert.equal(new Set(columns.map((row) => row[9])).size, 7);
-  assert.equal(new Set(columns.map((row) => row[10])).size, 7);
+  assert.equal(new Set(columns.map((row) => row[9])).size, 8);
+  assert.equal(new Set(columns.map((row) => row[10])).size, 8);
 
   for (const row of columns) {
     assert.equal(row[1], 'reference');

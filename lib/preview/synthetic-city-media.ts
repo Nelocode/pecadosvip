@@ -3,7 +3,12 @@ import { citySlugs } from '../content/types.ts';
 import type { CitySlug } from '../content/types.ts';
 import type { Locale } from '../i18n/locales.ts';
 
-export const syntheticCityMediaSlugs = citySlugs;
+export type SyntheticCityMediaSlug = CitySlug | 'sitges';
+
+export const syntheticCityMediaSlugs = [
+  ...citySlugs,
+  'sitges',
+] as const satisfies readonly SyntheticCityMediaSlug[];
 
 type LocalizedText = Readonly<Record<Locale, string>>;
 
@@ -14,7 +19,7 @@ type SyntheticCityMediaDefinition = {
 };
 
 export type SyntheticCityMedia = PublicMedia & {
-  citySlug: CitySlug;
+  citySlug: SyntheticCityMediaSlug;
   sourcePath: string;
   contentType: 'image/webp';
   objectPosition: string;
@@ -51,7 +56,7 @@ const shortDisclosures: LocalizedText = localized(
   'Generata con IA',
 );
 
-const mediaDefinitions: Readonly<Record<CitySlug, SyntheticCityMediaDefinition>> = {
+const mediaDefinitions: Readonly<Record<SyntheticCityMediaSlug, SyntheticCityMediaDefinition>> = {
   madrid: {
     filename: 'madrid-reference-v01.webp',
     objectPosition: '50% 48%',
@@ -92,6 +97,16 @@ const mediaDefinitions: Readonly<Record<CitySlug, SyntheticCityMediaDefinition>>
       'Composizione editoriale generata con IA ispirata all’anfiteatro romano di Tarragona e al Mediterraneo.',
     ),
   },
+  sitges: {
+    filename: 'sitges-reference-v01.webp',
+    objectPosition: '50% 50%',
+    alt: localized(
+      'Composición editorial generada con IA inspirada en la iglesia de Sant Bartomeu i Santa Tecla y el litoral de Sitges al anochecer.',
+      'AI-generated editorial composition inspired by the Church of Sant Bartomeu i Santa Tecla and the Sitges coastline at dusk.',
+      'Composition éditoriale générée par IA, inspirée de l’église Sant Bartomeu i Santa Tecla et du littoral de Sitges au crépuscule.',
+      'Composizione editoriale generata con IA ispirata alla chiesa di Sant Bartomeu i Santa Tecla e al litorale di Sitges al tramonto.',
+    ),
+  },
   toledo: {
     filename: 'toledo-reference-v01.webp',
     objectPosition: '50% 46%',
@@ -127,40 +142,40 @@ const mediaDefinitions: Readonly<Record<CitySlug, SyntheticCityMediaDefinition>>
 const presentations: Readonly<Record<Locale, SyntheticCityPresentation>> = {
   es: {
     coverageEyebrow: 'Cobertura visual · simulada',
-    coverageTitle: 'Siete ciudades en la experiencia propuesta',
+    coverageTitle: 'Ocho destinos en la experiencia propuesta',
     coverageBody: 'Estas referencias permiten validar arquitectura y diseño. Ninguna ciudad se presenta como cobertura comercial confirmada.',
     pendingStatus: 'En confirmación',
     groups: { madrid: 'Zona Madrid', barcelona: 'Zona Barcelona' },
   },
   en: {
     coverageEyebrow: 'Visual coverage · simulated',
-    coverageTitle: 'Seven cities in the proposed experience',
+    coverageTitle: 'Eight destinations in the proposed experience',
     coverageBody: 'These references support architecture and design review. No city is presented as confirmed commercial coverage.',
     pendingStatus: 'Pending confirmation',
     groups: { madrid: 'Madrid area', barcelona: 'Barcelona area' },
   },
   fr: {
     coverageEyebrow: 'Couverture visuelle · simulée',
-    coverageTitle: 'Sept villes dans l’expérience proposée',
+    coverageTitle: 'Huit destinations dans l’expérience proposée',
     coverageBody: 'Ces références permettent de valider l’architecture et le design. Aucune ville n’est présentée comme une couverture commerciale confirmée.',
     pendingStatus: 'À confirmer',
     groups: { madrid: 'Zone de Madrid', barcelona: 'Zone de Barcelone' },
   },
   it: {
     coverageEyebrow: 'Copertura visiva · simulata',
-    coverageTitle: 'Sette città nell’esperienza proposta',
+    coverageTitle: 'Otto destinazioni nell’esperienza proposta',
     coverageBody: 'Questi riferimenti consentono di validare architettura e design. Nessuna città è presentata come copertura commerciale confermata.',
     pendingStatus: 'Da confermare',
     groups: { madrid: 'Area di Madrid', barcelona: 'Area di Barcellona' },
   },
 };
 
-export function isSyntheticCityMediaSlug(value: unknown): value is CitySlug {
-  return syntheticCityMediaSlugs.includes(value as CitySlug);
+export function isSyntheticCityMediaSlug(value: unknown): value is SyntheticCityMediaSlug {
+  return syntheticCityMediaSlugs.includes(value as SyntheticCityMediaSlug);
 }
 
 export function getSyntheticCityMedia(
-  citySlug: CitySlug,
+  citySlug: SyntheticCityMediaSlug,
   locale: Locale,
 ): SyntheticCityMedia {
   const definition = mediaDefinitions[citySlug];

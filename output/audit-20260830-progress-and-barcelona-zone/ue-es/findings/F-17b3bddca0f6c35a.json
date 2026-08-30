@@ -1,0 +1,91 @@
+{
+  "finding_id": "F-17b3bddca0f6c35a",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "public-service-accessibility-scope-and-full-manual-evidence",
+  "url_or_path": "tests/accessibility-contract.test.ts",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "accessibility",
+  "control_id": "A11Y-EAA-SERVICE-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "Ley 11/2023 covers specified consumer services including e-commerce, but the final service, distance-contracting function and microenterprise status are not established. RD 193/2023 readiness is also time- and ownership-dependent.",
+  "expected": "Resolve the covered-service and microenterprise questions, then test the complete applicable user flows with automation, keyboard, zoom/reflow and at least one relevant assistive technology.",
+  "observed": "Sixteen focused accessibility/contact/legal contract tests pass and current screenshots show responsive layouts. No named screen-reader, 200/400 percent zoom, full keyboard, error-state or production-flow evidence was available in this sub-audit.",
+  "method": "Focused local test execution, source review and visual screenshot inspection; official BOE verification of Ley 11/2023 and RD 193/2023.",
+  "limitations": [
+    "No assistive-technology session or deployed production flow was tested.",
+    "The legal service category and microenterprise exception remain unresolved."
+  ],
+  "tool_status": "SUCCEEDED",
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "TEST",
+      "path_or_url": "tests/accessibility-contract.test.ts",
+      "sha256": "c31ae88a8c561311fd68eb79b70dcc9d55fc5a341849477db870aff2b68d286f",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "SCREENSHOT",
+      "path_or_url": "output/audit-20260830-progress-and-barcelona-zone/product-design/after/03-servicios-ciudades-1440.jpg",
+      "sha256": "db1ea0fdc0c8b538fffbc9b9cd68fe13c64e490713a4113d54813592830d29d5",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:17:45Z"
+    }
+  ],
+  "impact": "Users of assistive technologies may encounter unobserved barriers, and legal scope cannot be closed from automated contracts alone.",
+  "prevalence": "All locales and critical navigation/contact flows.",
+  "reproducibility": "REPRODUCED_ONCE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P1 before public UAT; P0 if covered-service applicability is confirmed",
+  "legal_relevance": "POSSIBLE",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish transposition establishing accessibility requirements for covered products and consumer services, subject to scope, exclusions and transition rules.",
+      "instrument_id": "ES-LAW-11-2023-T1",
+      "instrument": "Ley 11/2023, título I",
+      "identifier": "BOE-A-2023-11022",
+      "provision": "arts. 2-3, 13-17 and annex I",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/l/2023/05/08/11/con",
+      "applicability_reason": "Potentially applies if the final site provides a covered consumer e-commerce service and no service microenterprise exception applies.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text, definition and microenterprise provision review."
+    },
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish basic accessibility conditions for goods and services to the public with staged dates.",
+      "instrument_id": "ES-RD-193-2023",
+      "instrument": "Real Decreto 193/2023",
+      "identifier": "BOE-A-2023-7417",
+      "provision": "arts. 2-6, 14-15 and disposición final sexta",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/rd/2023/03/21/193/con",
+      "applicability_reason": "Readiness is relevant to a private service offered to the public, but ownership, new/existing status and transition dates require confirmation.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text and final-sixth schedule review."
+    }
+  ],
+  "review_status": "REQUIRES_HUMAN_REVIEW",
+  "false_positive_analysis": "Passing source-contract tests and responsive screenshots are valuable counterevidence but do not demonstrate end-to-end accessibility or legal conformity.",
+  "counterevidence": [
+    "Focused accessibility, contact and legal tests passed 16/16.",
+    "Responsive screenshot evidence exists for 1440, 1180, 780 and 390 pixel viewports in the product-design audit."
+  ],
+  "remediation_minimum": "Resolve legal scope and run documented keyboard, zoom/reflow and screen-reader tests over every critical locale and contact/error state in an authorised staging build.",
+  "additional_hardening": "Add accessibility acceptance evidence and defect retest IDs to the release gate rather than relying only on static contracts.",
+  "suggested_owner": "Accessibility specialist, product owner and frontend engineering",
+  "effort": "Manual accessibility audit and UAT",
+  "retest": "Use the same flow/locale matrix and preserve browser, viewport, assistive-technology version and evidence.",
+  "residual_risk": "Moderate until manual assistive-technology and full-flow evidence exists."
+}

@@ -1,0 +1,99 @@
+{
+  "finding_id": "F-57c5d62f5d2e98b8",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "planned-profile-and-contact-processing",
+  "url_or_path": "lib/content/validation.ts",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "privacy",
+  "control_id": "PRIV-RGPD-BASES-001",
+  "control_version": "1.0.0",
+  "applicability_status": "APPLICABLE",
+  "applicability_reason": "The planned public product models identifiable profiles, media, adult-age evidence, rights evidence and contact data for a Spain-targeted service.",
+  "expected": "The production design should document controller/processor roles, purposes, lawful bases, transparency, minimisation, retention, recipients/transfers, rights, security and any Article 9 or DPIA decision before processing real data.",
+  "observed": "The repository has strong fail-closed release, rights-evidence and contact/privacy gates, but the substantive privacy decisions and approved notices remain missing. The local preview uses fictitious identities and does not submit contact data.",
+  "method": "Static review of release validation, contact state and legal intake; official GDPR and LOPDGDD source verification.",
+  "limitations": [
+    "No production data map, provider contracts, retention schedule, record of processing, DPIA screening or rights procedure was available."
+  ],
+  "tool_status": "SUCCEEDED",
+  "result": "PARTIAL",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "lib/content/validation.ts",
+      "sha256": "9dff2848f778d2bcc6d85fed911e016930ffd7760d2d7f61ac5a73007c5ecdd6",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "lib/content/runtime-publication.ts",
+      "sha256": "7fd9f1f7526e692b70a124e1892a60baafee908a08ac2161a8d0241683d0c86e",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "LEGAL_INPUTS_REQUIRED.md",
+      "sha256": "61874a4a251077882f9e6a5ea6fd2d2ccac22c7c5105e035243ea666ec7aea5b",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    }
+  ],
+  "impact": "Premature activation could process profile, media and contact data without demonstrable governance or complete transparency.",
+  "prevalence": "Profiles, media lifecycle, contact flow and all approved legal content.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "HIGH",
+  "confidence": "HIGH",
+  "priority": "P0 before real data or publication",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Directly applicable personal-data framework within material and territorial scope.",
+      "instrument_id": "EU-GDPR-2016-679",
+      "instrument": "Reglamento (UE) 2016/679 (RGPD)",
+      "identifier": "CELEX:02016R0679-20160504",
+      "provision": "arts. 2-9, 12-25, 32 and 35",
+      "version": "EUR-Lex consolidated text, current version displayed 2016-05-04",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02016R0679-20160504",
+      "applicability_reason": "Planned identifiable profiles, media and contact processing are personal-data processing targeted to Spain/EU users.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official EUR-Lex consolidated text, legal status and scope/provision review."
+    },
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Spanish complement to GDPR within its scope.",
+      "instrument_id": "ES-LOPDGDD-3-2018",
+      "instrument": "Ley Orgánica 3/2018",
+      "identifier": "BOE-A-2018-16673",
+      "provision": "arts. 6-11 and 12-19",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/lo/2018/12/05/3/con",
+      "applicability_reason": "Spanish-targeted personal-data processing and rights procedures.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "The current loopback preview has no real profiles and no enabled submission, so the observed gap concerns the planned production processing, not an assertion of active unlawful processing.",
+  "counterevidence": [
+    "Release requires adult-age, consent, rights and content evidence.",
+    "Contact requires release, contact approval, privacy approval and exact destination match.",
+    "The synthetic preview visibly states that profiles are fictitious and contact is disabled."
+  ],
+  "remediation_minimum": "Complete and approve the controller/provider inventory, purposes and bases, retention, rights procedure, privacy notices, processor/transfer terms, special-category analysis and Article 35 screening before any real profile/contact data enters production.",
+  "additional_hardening": "Bind a privacy-design version and DPIA decision reference into the release snapshot and reopen approval when schema, provider or purpose changes.",
+  "suggested_owner": "Controller, privacy lead and engineering owner",
+  "effort": "Cross-functional legal/privacy and architecture work",
+  "retest": "Trace each real data field and destination against the approved record and test rights/contact flows in authorised staging.",
+  "residual_risk": "High until substantive governance and production-provider evidence exist; low for the current fictitious local preview."
+}

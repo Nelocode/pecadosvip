@@ -1,6 +1,6 @@
 # Referencias visuales sintéticas de ciudades
 
-Esta carpeta conserva siete composiciones editoriales generadas con IA para validar, solo en el preview local, la presentación de Madrid, Barcelona, Girona, Tarragona, Toledo, Guadalajara y Segovia.
+Esta carpeta conserva ocho composiciones editoriales generadas con IA para validar, solo en el preview local, la presentación de Madrid, Barcelona, Girona, Tarragona, Sitges, Toledo, Guadalajara y Segovia.
 
 - `master/`: PNG originales generados para esta etapa.
 - `selected/`: derivados WebP de 1200 × 900 usados por el preview local.

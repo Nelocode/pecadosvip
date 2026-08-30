@@ -317,7 +317,7 @@
   max-width: 750px;
   color: var(--public-gold-strong);
   font-size: clamp(3.4rem, 7vw, 7.2rem);
-  line-height: 0.92;
+  line-height: 1.08;
   text-shadow: 0 4px 24px rgb(0 0 0 / 60%);
 }
 
@@ -327,6 +327,7 @@
   color: var(--public-text);
   font-size: 0.7em;
   font-style: italic;
+  line-height: 1.12;
 }
 
 .public-hero-copy > p:last-of-type {
@@ -521,7 +522,9 @@
 .public-final-cta h2 {
   color: var(--public-text);
   font-size: clamp(2.5rem, 5vw, 5rem);
-  line-height: 1;
+  hyphens: none;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .public-section-heading > p:last-child {
@@ -814,20 +817,34 @@
 .synthetic-preview-hero h1 {
   max-width: 760px;
   margin: 1rem 0 0;
-  color: var(--public-gold-strong);
   font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(3.8rem, 6.7vw, 6.8rem);
   font-weight: 400;
-  letter-spacing: -0.055em;
-  line-height: 0.9;
+  font-kerning: normal;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-rendering: optimizeLegibility;
 }
 
-.synthetic-preview-hero h1 span {
+.synthetic-preview-hero-title-primary,
+.synthetic-preview-hero-title-secondary {
   display: block;
-  margin-top: 0.45rem;
+  hyphens: none;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.synthetic-preview-hero-title-primary {
+  color: var(--public-gold-strong);
+  line-height: 1.15;
+}
+
+.synthetic-preview-hero-title-secondary {
+  margin-top: 0.7rem;
   color: var(--public-text);
   font-size: 0.66em;
-  line-height: 1;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .synthetic-preview-hero-location {

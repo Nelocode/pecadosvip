@@ -87,6 +87,7 @@ export default function SyntheticServicesHeader({
 }) {
   const messages = getSyntheticServiceMessages(locale);
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
 
@@ -105,13 +106,34 @@ export default function SyntheticServicesHeader({
     if (!menuOpen) return;
 
     const previousOverflow = document.body.style.overflow;
+    const header = headerRef.current;
     const panel = menuPanelRef.current;
+    const backgroundElements = [
+      ...Array.from(header?.parentElement?.children ?? []).filter(
+        (element): element is HTMLElement => element instanceof HTMLElement && element !== header,
+      ),
+      ...Array.from(header?.children ?? []).filter(
+        (element): element is HTMLElement =>
+          element instanceof HTMLElement &&
+          element !== panel &&
+          element !== menuButtonRef.current,
+      ),
+    ];
+    const backgroundState = backgroundElements.map((element) => ({
+      element,
+      ariaHidden: element.getAttribute('aria-hidden'),
+      inert: element.inert,
+    }));
     const focusable = Array.from(
       panel?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? [],
     );
 
     document.body.style.overflow = 'hidden';
     document.body.dataset.syntheticMenuOpen = 'true';
+    for (const element of backgroundElements) {
+      element.inert = true;
+      element.setAttribute('aria-hidden', 'true');
+    }
     focusable[0]?.focus();
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -140,11 +162,20 @@ export default function SyntheticServicesHeader({
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = previousOverflow;
       delete document.body.dataset.syntheticMenuOpen;
+      for (const { element, ariaHidden, inert } of backgroundState) {
+        element.inert = inert;
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      }
     };
   }, [menuOpen]);
 
   return (
-    <header className="public-header synthetic-preview-header synthetic-services-header" id="service-top">
+    <header
+      className="public-header synthetic-preview-header synthetic-services-header"
+      id="service-top"
+      ref={headerRef}
+    >
       <a className="public-brand synthetic-preview-brand" href={previewAnchor(locale, '#inicio')}>
         <span>PecadosVip</span>
         <small>{messages.navigation.previewLabel}</small>

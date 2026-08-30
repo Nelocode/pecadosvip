@@ -102,9 +102,9 @@ pnpm run cms:local
 
 Si se omite el puerto, se elige uno libre. Abrir únicamente el origen `http://127.0.0.1:<puerto>` que imprime el proceso e introducir allí el token. El proceso no lo imprime ni lo guarda. Al terminar, cierra el proceso y elimina las variables con `Remove-Item Env:PECADOSVIP_LOCAL_CMS_ADMIN_TOKEN` y, si aplica, `Remove-Item Env:PECADOSVIP_LOCAL_CMS_EDITOR_TOKEN`. `/health` solo confirma que el workbench local está levantado; no prueba consistencia de contenido, respaldo ni preparación productiva.
 
-La herramienta permite gestionar el ciclo de perfiles, evidencia/aprobación y asociaciones multimedia con revisión optimista y protección contra replay. La interfaz carga JPEG, PNG o WebP de hasta 5 MiB; el store comprueba firma, tamaño y SHA-256. No transforma imágenes, no genera variantes, no ejecuta antivirus y no publica al sitio.
+La herramienta permite gestionar el ciclo de perfiles, evidencia/aprobación y asociaciones multimedia con revisión optimista y protección contra replay. La interfaz carga JPEG, PNG o WebP de hasta 5 MiB y MP4 de hasta 12 MiB. El store comprueba firma, tamaño y SHA-256; las imágenes se decodifican en variantes WebP `desktop` y `mobile` acotadas y sin metadatos, mientras el MP4 se valida estructuralmente sin transcodificar. No ejecuta antivirus, no usa CDN y no publica al sitio.
 
-Cerrar con `Ctrl+C` y esperar que el proceso termine. Debe existir **un solo proceso escritor** por directorio de datos. La serialización es interna al proceso: una segunda instancia, un editor externo o la sincronización de archivos pueden producir conflictos o pérdida de integridad.
+Cerrar con `Ctrl+C` y esperar que el proceso termine. Las mutaciones usan locks de archivo adyacentes con creación exclusiva entre procesos cooperantes, pero no existe lease distribuido, limpieza automática de locks obsoletos ni transacción global entre perfiles y medios. Mantén **un solo proceso escritor** por directorio de datos; un editor externo o la sincronización de archivos aún pueden producir conflictos o pérdida de integridad.
 
 Archivar es la eliminación normal. Restaurar un perfil vuelve a borrador e invalida aprobación/evidencia anterior; archivar o restaurar medios actualiza estado y auditoría. No existe borrado físico desde el workbench.
 

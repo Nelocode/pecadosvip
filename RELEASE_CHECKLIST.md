@@ -11,6 +11,7 @@ Un `[x]` acredita únicamente el control local descrito. No equivale a certifica
 - [x] Candidato 98 local: **155/155** pruebas PASS, typecheck PASS, build PASS y validador i18n PASS; scorecard 98 con dimensiones 15/15, 9/10, 45/45, 24/25 y 5/5.
 - [x] Remediación local actual: `release:verify` con **167/167** pruebas, build, SBOM de 612 componentes, artefactos worker/standalone y smoke fail-closed PASS.
 - [x] Cierre técnico local final sobre el árbol de trabajo derivado de `35a9f1313c0a044473f8747af415830f469237bc`: `release:verify` con **192/192** pruebas, lint, typecheck, build, i18n, scorecard 98, SBOM de 612 componentes, artefactos worker/standalone y smoke fail-closed PASS. El árbol aún no es un commit candidato.
+- [x] Auditoría de cuarta zona Barcelona, favicon transparente y tipografía sobre el árbol local del 2026-08-30: `release:verify` con **204/204** pruebas, lint, typecheck, build, i18n, scorecard 98, SBOM de 612 componentes, artefactos worker/standalone y smoke fail-closed PASS. Los cambios siguen sin commit, despliegue ni aprobación de publicación.
 - [x] Captura durable del candidato 98 sobre `73249861acb9874a310e9f112450d00a65a4b1e3`; manifiesto SHA-256 `7EC3DB4BDF77E732E8B22D8EC6E1B5C3646CF27F406E21E5C75F64AE78A7A512`.
 - [x] Manifiesto y logs guardados bajo `evidence/87-local-checkpoint/`, con SHA-256 por comando y hash del manifiesto `673FA0FB0CBDB5516C29F446B6A0E9DD0F8AF3079BC2A2E3736583210EDC1E93`.
 - [x] Evidencia histórica: `pnpm audit --prod --audit-level=moderate` registró exit code 0 y `No known vulnerabilities found` en su commit; no describe el árbol actual.
@@ -25,7 +26,7 @@ Un `[x]` acredita únicamente el control local descrito. No equivale a certifica
 - [x] Holding: Tab + Enter sobre el skip link enfoca `main-content`.
 - [x] Browser multilingüe actual: 16/16 raíces ES/EN/FR/IT a 320/390/768/1440 px, 4/4 legales holding, 4/4 perfiles inexistentes localizados y 4/4 rutas negativas PASS; sin errores inesperados, requests externos ni overflow.
 - [x] Preview sintético: 6 perfiles/tarjetas, filtros, estado vacío, ficha de Sofía, galería y error seguro; consola 0 errores/advertencias.
-- [x] Preview: 7 imágenes locales cargadas, sin destinos externos, contacto/reserva desactivados y sin overflow a 1440/390 px.
+- [x] Preview: 8 imágenes urbanas locales cargadas, sin destinos externos, contacto/reserva desactivados y sin overflow a 1440/1180/780/390 px.
 - [x] Preview: Tab + Enter sobre el skip link enfoca `main-content`.
 - [x] Exportador local fail-closed con JSON canónico, inventario/SHA, `productionActivation:false` y sin IDs/evidencia/auditoría internos.
 - [x] Restore corregido para reconstruir `profiles.json` y `media/` en la raíz de datos activa.

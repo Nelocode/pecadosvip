@@ -1,0 +1,75 @@
+{
+  "finding_id": "F-c50061b394b6617e",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "public-legal-operator-disclosure",
+  "url_or_path": "lib/content/public-legal.ts",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "lssi-governance",
+  "control_id": "GOV-LSSI-OPERATOR-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The project targets Spain and appears commercial, but the legal operator, establishment and precise information-society-service role are not confirmed.",
+  "expected": "If LSSI applies, the site must provide permanent, easy, direct and free access to the operator information required by the applicable provisions.",
+  "observed": "The release gate correctly hides all legal links unless four approved legal documents exist, but no approved operator identity or legal notice is present for a public release.",
+  "method": "Static review of legal projection, footer and release validation; official BOE review of LSSI article 10.",
+  "limitations": [
+    "No company certificate, tax identity, registry details, authorisations or final operator establishment were supplied."
+  ],
+  "tool_status": "SUCCEEDED",
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "lib/content/public-legal.ts",
+      "sha256": "4fbaddf51ba1887cb1913e5ad385f2c592749370fab3750d5fe922e3c767df66",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "app/components/PublicFooter.tsx",
+      "sha256": "f4d22e8243f3959487f2c8546a9812535ba3171781e5737280e84049aa2d971d",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    }
+  ],
+  "impact": "A public commercial service could launch without mandatory operator disclosure and without a legally approved notice.",
+  "prevalence": "Global footer and all public routes.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P0 before publication",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Requires covered providers to make specified general information permanently, easily, directly and freely accessible.",
+      "instrument_id": "ES-LSSI-34-2002",
+      "instrument": "Ley 34/2002 de servicios de la sociedad de la información y de comercio electrónico",
+      "identifier": "BOE-A-2002-13758",
+      "provision": "arts. 1-5 and 10",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+      "applicability_reason": "Likely relevant to a Spanish-targeted commercial web service, subject to operator and scope confirmation.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text and article review."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "The current public runtime is intentionally held closed, so this is not presented as an observed live omission from an active commercial service.",
+  "counterevidence": [
+    "Legal documents and footer links are fail-closed until release approval."
+  ],
+  "remediation_minimum": "Confirm the legal operator and obtain approved operator data and a legal notice; bind the approval record to the exact content snapshot before opening release.",
+  "additional_hardening": "Automate a release assertion that operator data, legal document hashes and canonical origin match the signed approval package.",
+  "suggested_owner": "Legal operator and product owner",
+  "effort": "Operator intake plus legal drafting/review",
+  "retest": "Verify the approved notice in every locale and at the deployed origin without bypassing the release gate.",
+  "residual_risk": "Material until operator identity, scope and final text are confirmed."
+}

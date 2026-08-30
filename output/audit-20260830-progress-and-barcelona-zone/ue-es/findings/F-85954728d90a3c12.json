@@ -1,0 +1,78 @@
+{
+  "finding_id": "F-85954728d90a3c12",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "synthetic-image-production-and-provenance",
+  "url_or_path": "app/(legacy)/preview-local-sintetico/perfiles/[slug]/page.tsx",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "ai-transparency",
+  "control_id": "AI-ROLE-DATE-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The web runtime contains no AI inference, but the content-production process uses an external generative system. Provider/deployer role, system introduction date and machine-readable marking responsibility are not established by the repository.",
+  "expected": "Classify each actor and date under the current consolidated AI Act and preserve provider provenance/marking evidence where the applicable transparency branch requires it.",
+  "observed": "Every inspected city/profile image is visibly labelled as AI-generated and the profile is expressly fictitious. No machine-readable provenance or external provider compliance record is present in the repository.",
+  "method": "Static source review, visual inspection of current screenshots and official EUR-Lex verification of the 2026 consolidated AI Act.",
+  "limitations": [
+    "No Gemini/Nano Banana provider contract, generation metadata or system introduction date was available.",
+    "This audit does not assign the website operator the AI provider obligations of article 50(2)."
+  ],
+  "tool_status": "SUCCEEDED",
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "app/(legacy)/preview-local-sintetico/perfiles/[slug]/page.tsx",
+      "sha256": "a0d7ddf497983f7d8cf2243fde6e352f886e1f371ddb97725cf145bf9e02e691",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "SCREENSHOT",
+      "path_or_url": "output/audit-20260830-progress-and-barcelona-zone/product-design/flow/03-perfil-sofia.jpg",
+      "sha256": "a47070612f5797f0d7e58b266ba9c109f96815945f52523987d72579c0fea4d6",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:23:43Z"
+    }
+  ],
+  "impact": "The visible disclosure is helpful, but the operator cannot demonstrate whether the relevant provider/deployer transparency duties and transition dates were met.",
+  "prevalence": "All synthetic profile, service and city media.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "MEDIUM",
+  "confidence": "HIGH",
+  "priority": "P1 before publishing synthetic media",
+  "legal_relevance": "POSSIBLE",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Direct obligations depend on actor role, AI-system scope and staged application dates; article 50(2) addresses provider marking of synthetic outputs.",
+      "instrument_id": "EU-AI-ACT-2024-1689",
+      "instrument": "Reglamento (UE) 2024/1689 de Inteligencia Artificial, modificado por Reglamento (UE) 2026/1744",
+      "identifier": "CELEX:02024R1689-20260727",
+      "provision": "arts. 2, 3, 50, 111 and 113",
+      "version": "EUR-Lex consolidated text dated 2026-07-27",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02024R1689-20260727",
+      "applicability_reason": "External generative content production creates a role/date/provenance question, but no runtime AI system or role allocation is proven in the repository.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official EUR-Lex consolidated text, article 50 and transition/application provisions review."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "The visible label may exceed what is required of a mere website publisher, and static fictional imagery is not automatically a deep fake. The finding is therefore role/provenance uncertainty, not a nonconformity claim.",
+  "counterevidence": [
+    "Profiles say PERFIL FICTICIO GENERADO CON IA.",
+    "Images are visibly labelled Generada con IA / IMAGEN GENERADA CON IA.",
+    "The current preview is not authorised for publication."
+  ],
+  "remediation_minimum": "Preserve generation provenance and provider terms; obtain a role/date assessment under the current AI Act; retain visible disclosure and verify any applicable machine-readable marking before public use.",
+  "additional_hardening": "Store C2PA or equivalent provenance metadata when supplied and include its verification status in the asset manifest without stripping it during optimisation.",
+  "suggested_owner": "Content operations, legal counsel and media pipeline engineering",
+  "effort": "Provider/document review plus media-pipeline validation",
+  "retest": "Inspect original and optimised assets, provider evidence, actor classification and the then-current article 50 transition.",
+  "residual_risk": "Moderate until role and provenance are documented; visible consumer-facing disclosure already reduces deception risk."
+}

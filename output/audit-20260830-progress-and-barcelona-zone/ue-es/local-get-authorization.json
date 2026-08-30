@@ -1,0 +1,15 @@
+{
+  "owner": "Workspace user",
+  "target_host": "127.0.0.1",
+  "expires_at": "2026-08-31T04:59:59Z",
+  "permitted_actions": [
+    "single_get"
+  ],
+  "max_requests": 3,
+  "stop_conditions": [
+    "Stop on redirect outside 127.0.0.1.",
+    "Stop on unexpected authentication, personal data or server degradation.",
+    "Do not submit forms, mutate state or authenticate."
+  ],
+  "authorization_basis": "The user expressly requested several audits of the local project and preview. This artifact narrows that request to three passive unauthenticated loopback GET requests only."
+}

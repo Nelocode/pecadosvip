@@ -19,6 +19,7 @@ const labels = {
   toledo: 'Toledo',
   guadalajara: 'Guadalajara',
   segovia: 'Segovia',
+  sitges: 'Sitges',
 } as const;
 
 function escapedSvgText(value: string): string {

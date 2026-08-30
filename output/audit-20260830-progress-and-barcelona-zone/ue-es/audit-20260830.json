@@ -1,0 +1,586 @@
+{
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": {
+    "name": "pecadosvip-hybrid",
+    "owner": "Product owner identified in project context; final legal operator unconfirmed",
+    "kind": "HYBRID",
+    "url": "http://localhost:3000/preview-local-sintetico?lang=es",
+    "path": "pecadosvip-nelocode-dev"
+  },
+  "snapshot": {
+    "version": "branch codex/design-sync-20260829 at ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 with uncommitted Sitges/design/a11y/SEO changes",
+    "commit": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9",
+    "build": "Loopback-only synthetic development preview; public release remains fail-closed",
+    "historical": false,
+    "effective_at": null
+  },
+  "environment": "Dirty local repository plus loopback-only synthetic preview. No production or deployed-origin state is inferred.",
+  "audit_date": "2026-08-30",
+  "objective": "Resolve EU/Spain applicability before controls and identify evidence-backed publication blockers and technical/legal improvement opportunities without certifying compliance.",
+  "authorization": {
+    "mode": "READ_ONLY",
+    "owner_statement": "The user requested several audits of the local project and preview. Review remained static/passive; three narrowly authorised loopback GET attempts did not connect.",
+    "artifact": "output/audit-20260830-progress-and-barcelona-zone/ue-es/local-get-authorization.json",
+    "stop_conditions": [
+      "No deployment, external submission, authentication, purchase, payment or active security scan.",
+      "Stop legal conclusions when operator, exact service, contracting, provider or regional facts are missing.",
+      "Do not publish real profiles or infer human/legal approval from automated tests."
+    ]
+  },
+  "applicability": [
+    {
+      "instrument_id": "EU-GDPR-2016-679+ES-LOPDGDD-3-2018",
+      "status": "APPLICABLE",
+      "reason": "The planned release models identifiable profiles, media, adult-age and rights evidence and contact data for a Spain-targeted service. The current loopback preview itself uses fictitious identities and does not submit contact data.",
+      "facts": [
+        "Source validation requires adult-age, consent and rights evidence for published profiles.",
+        "Contact is gated by release, privacy approval, channel approval and exact destination match.",
+        "No substantive controller/provider/privacy package is approved."
+      ],
+      "assumptions": [
+        "The applicability decision covers the planned production processing as well as the current fail-closed preview boundary."
+      ],
+      "evidence": [
+        "lib/content/validation.ts",
+        "lib/content/runtime-publication.ts",
+        "LEGAL_INPUTS_REQUIRED.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-GDPR-2016-679",
+          "identifier": "CELEX:02016R0679-20160504",
+          "provision": "arts. 2-9, 12-25, 32 and 35",
+          "version": "EUR-Lex consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02016R0679-20160504",
+          "applicability_reason": "The planned product processes personal data and targets users/services in Spain."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LOPDGDD-3-2018",
+          "identifier": "BOE-A-2018-16673",
+          "provision": "arts. 6-19",
+          "version": "BOE consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/lo/2018/12/05/3/con",
+          "applicability_reason": "Spanish complement to GDPR for the targeted service and rights flows."
+        }
+      ],
+      "open_questions": [
+        "Who is controller, processor and legal operator?",
+        "What are purposes, bases, retention, recipients, transfers and rights procedures?",
+        "Does exact profile/contact processing require Article 9 analysis or an Article 35 DPIA?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LSSI-34-2002",
+      "status": "UNCERTAIN",
+      "reason": "The project appears to target Spain commercially, but operator identity, establishment, remuneration model and final contracting/technology stack are not confirmed.",
+      "facts": [
+        "Four legal documents are fail-closed until approval.",
+        "The local preview stores one first-party acknowledgement value.",
+        "No deployed technology inventory exists."
+      ],
+      "assumptions": [
+        "A future public commercial release is likely a service of the information society, subject to legal confirmation."
+      ],
+      "evidence": [
+        "lib/content/public-legal.ts",
+        "app/components/SyntheticPreviewNotice.tsx",
+        "LEGAL_INPUTS_REQUIRED.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LSSI-34-2002",
+          "identifier": "BOE-A-2002-13758",
+          "provision": "arts. 1-5, 10, 20-22 and 27-28",
+          "version": "BOE consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/l/2002/07/11/34/con",
+          "applicability_reason": "Potential Spanish information-society service with provider disclosure, communications, contracting and terminal-technology branches."
+        }
+      ],
+      "open_questions": [
+        "What is the operator identity and establishment?",
+        "Which technologies will hosting, CDN, forms, logs, media and analytics inject?",
+        "Is a contract concluded at a distance through the website or subsequent messaging?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LGP-34-1988+ES-LO-10-2022",
+      "status": "UNCERTAIN",
+      "reason": "The exact legal characterisation of the promoted adult-companionship service is missing. If it is characterised as prostitution, statutory restrictions on advertising that promotes prostitution are material.",
+      "facts": [
+        "The preview promotes models, services, cities and future private reservation/contact.",
+        "The preview is local-only, synthetic and says not to publish.",
+        "No signed legal classification was found."
+      ],
+      "assumptions": [
+        "No conclusion is made that the service is prostitution or that the current local preview is unlawful."
+      ],
+      "evidence": [
+        "findings/F-378fb158f9b8fde9.json",
+        "app/(legacy)/preview-local-sintetico/page.tsx"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LGP-34-1988",
+          "identifier": "BOE-A-1988-26156",
+          "provision": "arts. 2, 3.a and 6",
+          "version": "BOE consolidated text, latest update shown 2023-03-01",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/l/1988/11/11/34/con",
+          "applicability_reason": "Potentially material to the promotional communication after exact service classification."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LO-10-2022",
+          "identifier": "BOE-A-2022-14630",
+          "provision": "art. 11",
+          "version": "BOE consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/lo/2022/09/06/10/con",
+          "applicability_reason": "Potentially material to the promotional communication after exact service classification."
+        }
+      ],
+      "open_questions": [
+        "What is the exact service, operating model and contractual promise?",
+        "Has qualified Spanish counsel approved each public claim and image against national and regional rules?"
+      ]
+    },
+    {
+      "instrument_id": "ES-LAW-11-2023-T1+ES-RD-193-2023",
+      "status": "UNCERTAIN",
+      "reason": "Covered-service, consumer, distance-contracting, microenterprise and new/existing-service facts are unresolved; RD 193/2023 also has staged dates for ordinary private services.",
+      "facts": [
+        "The current preview is non-transactional.",
+        "The future site may support contact/reservation but no distance-contract decision exists.",
+        "Focused accessibility contracts pass 16/16, without assistive-technology evidence."
+      ],
+      "assumptions": [
+        "Accessibility remains a technical baseline even where the exact legal branch is unresolved."
+      ],
+      "evidence": [
+        "tests/accessibility-contract.test.ts",
+        "findings/F-17b3bddca0f6c35a.json"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-LAW-11-2023-T1",
+          "identifier": "BOE-A-2023-11022",
+          "provision": "arts. 2-3, 13-17 and annex I",
+          "version": "BOE consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/l/2023/05/08/11/con",
+          "applicability_reason": "Potential covered consumer e-commerce service, subject to service and microenterprise confirmation."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-RD-193-2023",
+          "identifier": "BOE-A-2023-7417",
+          "provision": "arts. 2-6, 14-15 and disposición final sexta",
+          "version": "BOE consolidated text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/rd/2023/03/21/193/con",
+          "applicability_reason": "Potential private service available to the public; the ordinary-private timetable and service status require confirmation."
+        }
+      ],
+      "open_questions": [
+        "Does the final site conclude a consumer contract?",
+        "Is the service provider a microenterprise?",
+        "What is the applicable RD 193/2023 category and transition date?"
+      ]
+    },
+    {
+      "instrument_id": "ES-TRLGDCU-1-2007+ES-LCD-3-1991",
+      "status": "UNCERTAIN",
+      "reason": "The site is consumer-facing in appearance, but final B2C status, price, contracting point, cancellation, claims and commercial promises are not established.",
+      "facts": [
+        "No checkout, payment or enabled reservation exists in the current preview.",
+        "The service catalogue is expressly synthetic and coverage is unconfirmed."
+      ],
+      "assumptions": [],
+      "evidence": [
+        "app/(legacy)/preview-local-sintetico/servicios/page.tsx",
+        "output/audit-20260830-progress-and-barcelona-zone/product-design/after/03-servicios-ciudades-1440.jpg"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-TRLGDCU-1-2007",
+          "identifier": "BOE-A-2007-20555",
+          "provision": "arts. 8, 20-21, 59-62 and 92-113",
+          "version": "BOE consolidated text; freshness checked 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/rdlg/2007/11/16/1/con",
+          "applicability_reason": "Would apply to a confirmed entrepreneur-consumer and distance-contracting flow."
+        }
+      ],
+      "open_questions": [
+        "Where and how is the contract concluded?",
+        "What prices, taxes, cancellation, claims and support terms apply?"
+      ]
+    },
+    {
+      "instrument_id": "EU-DSA-2022-2065",
+      "status": "NOT_APPLICABLE",
+      "reason": "The audited design is a first-party promotional website and does not provide conduit, caching, hosting, marketplace or other intermediary functionality to recipients.",
+      "facts": [
+        "No user-generated-content or marketplace workflow exists.",
+        "Profiles are project-controlled synthetic records in the local preview."
+      ],
+      "assumptions": [
+        "This status must be reopened if third parties can upload profiles/content or transact through a platform layer."
+      ],
+      "evidence": [
+        "profile-20260830.json",
+        "lib/preview/synthetic-preview.ts"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-DSA-2022-2065",
+          "identifier": "CELEX:32022R2065",
+          "provision": "arts. 2-6 and 11-32",
+          "version": "EUR-Lex official text opened 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://eur-lex.europa.eu/eli/reg/2022/2065/oj",
+          "applicability_reason": "No intermediary-service role is implemented by the audited asset."
+        }
+      ],
+      "open_questions": []
+    },
+    {
+      "instrument_id": "EU-AI-ACT-2024-1689-CONTENT-PRODUCTION",
+      "status": "UNCERTAIN",
+      "reason": "There is no runtime AI system, but the content-production process uses an external generative system. Provider/deployer role, introduction date and machine-readable provenance are not established.",
+      "facts": [
+        "City and profile media are visibly labelled as AI-generated.",
+        "Profiles are expressly fictitious.",
+        "No inference model or AI API is present in the web runtime."
+      ],
+      "assumptions": [],
+      "evidence": [
+        "findings/F-85954728d90a3c12.json",
+        "assets/synthetic-profiles/README.md"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "EU-AI-ACT-2024-1689",
+          "identifier": "CELEX:02024R1689-20260727",
+          "provision": "arts. 2, 3, 50, 111 and 113",
+          "version": "EUR-Lex consolidated text dated 2026-07-27",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:02024R1689-20260727",
+          "applicability_reason": "Role/date/provenance assessment is needed for the external synthetic-media production chain, not the static web runtime itself."
+        }
+      ],
+      "open_questions": [
+        "Who is provider and deployer for each generation event?",
+        "Was machine-readable marking supplied and preserved through optimisation?",
+        "Which transition applies to the provider system?"
+      ]
+    },
+    {
+      "instrument_id": "EU-WAD-2016-2102+ES-RD-1112-2018+ES-ENS-311-2022+ES-ENI-4-2010",
+      "status": "UNCERTAIN",
+      "reason": "The product is presented as private, but legal operator and any public-contract/system scope are not positively documented. Silence cannot close public-contract branches.",
+      "facts": [
+        "No public administration branding, procedure or electronic-administration flow appears in the repository.",
+        "No public contract or system categorisation was supplied."
+      ],
+      "assumptions": [
+        "Current design intent is private commercial service."
+      ],
+      "evidence": [
+        "profile-20260830.json"
+      ],
+      "source_refs": [
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-RD-1112-2018",
+          "identifier": "BOE-A-2018-12699",
+          "provision": "arts. 2-7 and 10-19",
+          "version": "BOE consolidated text; freshness checked 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/rd/2018/09/07/1112/con",
+          "applicability_reason": "Would require a public-sector subject/content nexus not demonstrated here."
+        },
+        {
+          "class": "BINDING_LAW",
+          "instrument_id": "ES-ENS-311-2022",
+          "identifier": "BOE-A-2022-7191",
+          "provision": "arts. 2-3 and 12-27",
+          "version": "BOE consolidated text; freshness checked 2026-08-30",
+          "effective_as_of": "2026-08-30",
+          "official_url": "https://www.boe.es/eli/es/rd/2022/05/03/311/con",
+          "applicability_reason": "Would require a public system or covered contract not demonstrated here."
+        }
+      ],
+      "open_questions": [
+        "Is the operator or any system a public contractor or part of a covered public service?"
+      ]
+    },
+    {
+      "instrument_id": "SECTOR-FINANCE-NIS-CRA-DATA-IDENTITY",
+      "status": "NOT_APPLICABLE",
+      "reason": "The audited asset is not a financial entity, payment service, CASP, connected product, data intermediary, trust service, NIS entity or public electronic-administration service.",
+      "facts": [
+        "No payment, crypto, banking, trust-service, connected-product or data-intermediation feature exists.",
+        "Profile explicitly records negative sector triggers."
+      ],
+      "assumptions": [
+        "Reopen if payment, identity, platform, connected-product, regulated-sector or critical-infrastructure features are introduced."
+      ],
+      "evidence": [
+        "profile-20260830.json",
+        "resolver-output-20260830.json"
+      ],
+      "source_refs": [],
+      "open_questions": []
+    },
+    {
+      "instrument_id": "ES-REGIONAL-MADRID-CATALONIA",
+      "status": "UNCERTAIN",
+      "reason": "Madrid and Barcelona/Catalonia targeting is visible, but operator establishment, place of performance and a directed BOCM/DOGC sectoral and language inventory are missing.",
+      "facts": [
+        "Coverage copy names Madrid, Barcelona, Girona, Tarragona and Sitges.",
+        "The technical locales are Spanish, English, French and Italian; this does not resolve any Catalan-language legal trigger."
+      ],
+      "assumptions": [],
+      "evidence": [
+        "output/audit-20260830-progress-and-barcelona-zone/product-design/after/01-cobertura-desktop-1440.jpg",
+        "profile-20260830.json"
+      ],
+      "source_refs": [],
+      "open_questions": [
+        "Where is the operator established and where are services legally performed?",
+        "Which regional/municipal service, advertising, consumer and language rules apply?"
+      ]
+    }
+  ],
+  "scope": {
+    "included": [
+      "Repository source and configuration relevant to publication, legal content, privacy, contact, accessibility, security headers, SEO and synthetic-media disclosure",
+      "Loopback synthetic preview evidence for home coverage, services and one profile",
+      "Official-source verification for material EU/Spain regimes",
+      "Preliminary 46-control catalog classification"
+    ],
+    "excluded": [
+      "Production/deployed origin, provider dashboards, live logs and backend data",
+      "Authentication, form submission, booking, payment, messaging or any mutation",
+      "Active security scanning, fuzzing, load or exploitation",
+      "Named human screen-reader, linguistic or legal review",
+      "Complete regional and municipal legal inventory"
+    ],
+    "flows": [
+      "Synthetic home and coverage",
+      "Synthetic service catalogue and city directory",
+      "Synthetic profile detail with contact disabled",
+      "Fail-closed public legal/contact projection"
+    ],
+    "profiles": [
+      "anonymous visitor",
+      "synthetic local-preview visitor",
+      "future consumer/contact requester (design only)"
+    ],
+    "locales": [
+      "es",
+      "en",
+      "fr",
+      "it"
+    ]
+  },
+  "coverage": {
+    "universe": 46,
+    "sample": 46,
+    "tested_controls": 10,
+    "not_tested_controls": 12,
+    "not_applicable_controls": 14,
+    "uncertainty": "All 46 catalog controls were considered for applicability, but only 10 received direct static/test/visual evidence in this legal sub-audit. The remaining candidate branches are uncertain, pending operator/service facts or outside the observed environment; no percentage is presented as legal compliance."
+  },
+  "tools": [
+    {
+      "name": "resolve_applicability.py",
+      "version": "1.1.0",
+      "status": "SUCCEEDED",
+      "reason": "Generated a preliminary 15-module matrix, manually refined where repository-specific evidence changed the branch.",
+      "affected_controls": [
+        "GOV-APPLICABILITY-001"
+      ],
+      "configuration": "audit_date=2026-08-30; hybrid profile"
+    },
+    {
+      "name": "validate_catalog.py",
+      "version": "skill package 2026.08.26",
+      "status": "SUCCEEDED",
+      "reason": "56 instruments, 46 controls, no integrity errors; 48/48 binding-law entries complete.",
+      "affected_controls": [
+        "GOV-SOURCE-FRESHNESS-001"
+      ],
+      "configuration": "packaged legal register and control catalog"
+    },
+    {
+      "name": "check_source_freshness.py",
+      "version": "skill package 2026.08.26",
+      "status": "SUCCEEDED",
+      "reason": "Reported 52 fresh and 4 pending-verification sources. Exit code 1 was the expected fail-on-pending gate, not a tool malfunction.",
+      "affected_controls": [
+        "GOV-SOURCE-FRESHNESS-001"
+      ],
+      "configuration": "as-of 2026-08-30; max-age 30; fail-on-stale; fail-on-pending"
+    },
+    {
+      "name": "Official-source web verification",
+      "version": "2026-08-30 retrieval",
+      "status": "SUCCEEDED",
+      "reason": "Reopened material EUR-Lex and BOE consolidated sources and checked scope, provisions, dates and current identifiers.",
+      "affected_controls": [
+        "GOV-SOURCE-FRESHNESS-001",
+        "PRIV-RGPD-BASES-001",
+        "COOKIE-LSSI-CONSENT-001",
+        "A11Y-EAA-SERVICE-001",
+        "AI-ROLE-DATE-001",
+        "ADVERTISING-SECTOR-SCOPE-001"
+      ],
+      "configuration": "Primary official sources only"
+    },
+    {
+      "name": "noninvasive_collect.py URL mode",
+      "version": "1.0.0",
+      "status": "FAILED",
+      "reason": "Three authorised loopback GET attempts failed with WinError 10061 from this execution context.",
+      "affected_controls": [
+        "COOKIE-LSSI-CONSENT-001",
+        "SEC-HEADERS-CONTEXT-001"
+      ],
+      "configuration": "127.0.0.1:3000; three single GETs; no redirect outside allowlist"
+    },
+    {
+      "name": "noninvasive_collect.py fixture mode",
+      "version": "1.0.0",
+      "status": "SUCCEEDED",
+      "reason": "Hashed three existing browser screenshots without copying raw bodies or interpreting law.",
+      "affected_controls": [
+        "A11Y-EAA-SERVICE-001",
+        "AI-ROLE-DATE-001"
+      ],
+      "configuration": "three JPEG fixtures; max 2 MB"
+    },
+    {
+      "name": "Node test runner",
+      "version": "project local runtime",
+      "status": "SUCCEEDED",
+      "reason": "Focused accessibility, contact and public-legal contracts passed 16/16.",
+      "affected_controls": [
+        "A11Y-EAA-SERVICE-001",
+        "PRIV-RGPD-BASES-001",
+        "GOV-LSSI-OPERATOR-001"
+      ],
+      "configuration": "tests/accessibility-contract.test.ts tests/contact-config.test.ts tests/public-legal.test.ts"
+    },
+    {
+      "name": "validate_report.py",
+      "version": "skill package 2026.08.26",
+      "status": "SUCCEEDED",
+      "reason": "Schemas resolved and all six findings plus this audit document validated.",
+      "affected_controls": [
+        "GOV-APPLICABILITY-001"
+      ],
+      "configuration": "Draft 2020-12 local schemas"
+    }
+  ],
+  "finding_ids": [
+    "F-378fb158f9b8fde9",
+    "F-c50061b394b6617e",
+    "F-57c5d62f5d2e98b8",
+    "F-184b6e6ef073d33e",
+    "F-17b3bddca0f6c35a",
+    "F-85954728d90a3c12"
+  ],
+  "evidence_manifest": [
+    {
+      "evidence_id": "E-PROFILE-20260830",
+      "sha256": "b2792e4c24ab66dbe92cf89dd1fbfbb5faf9ca207f2ea09fe214313efc4db472",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-RESOLVER-20260830",
+      "sha256": "f413f283d4b19546a44f3841f27e85d7dc389ed857e8d18f7a56424a75df13e3",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-FRESHNESS-20260830",
+      "sha256": "c889da36100437343870e8a5d85b5c9d258be985ddb197f40c6e71c7f5ee8696",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-COMMANDS-20260830",
+      "sha256": "4bec2aca07c75cde6b16922beda80eaa596511f0b340ff15b25a871bffc3c84d",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCREEN-COVERAGE",
+      "sha256": "468c42b7dc4f37f33ea8135e78966e46b3a99a78265aeb883df3ce2658c4190e",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCREEN-SERVICES",
+      "sha256": "db1ea0fdc0c8b538fffbc9b9cd68fe13c64e490713a4113d54813592830d29d5",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-SCREEN-SOFIA",
+      "sha256": "a47070612f5797f0d7e58b266ba9c109f96815945f52523987d72579c0fea4d6",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-FINDING-ADULT-ADVERTISING",
+      "sha256": "20f7ccd7929a07b2034ce5a1ec2577d344fc0a9a4aeb53a45f6c6c88c75cd76c",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-FINDING-PRIVACY",
+      "sha256": "55bb8cea19027e30facdd1d5c50da2731a57155ecd80fbad2b79ed08da010ad9",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    },
+    {
+      "evidence_id": "E-FINDING-LSSI",
+      "sha256": "2cbf46853f31cbe23bc976571968a201f09fe549e9fcd1fa514a8fac1f4434dd",
+      "access": "INTERNAL",
+      "redacted": false,
+      "retention_until": null
+    }
+  ],
+  "limitations": [
+    "This is not legal advice, certification or a guarantee of compliance.",
+    "The legal operator, exact service, B2C/distance-contract model, business size and regional establishment/performance facts are unresolved.",
+    "No production or deployed-origin evidence was tested.",
+    "The URL collector could not access the browser-owned loopback server; network, headers and four-state storage controls were not tested by this sub-audit.",
+    "No named human legal, linguistic or accessibility specialist reviewed the output.",
+    "The working tree is dirty and the audit is not bound to a clean immutable release."
+  ]
+}

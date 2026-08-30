@@ -1,0 +1,95 @@
+{
+  "finding_id": "F-378fb158f9b8fde9",
+  "audit_id": "A-PECADOSVIP-20260830",
+  "asset": "pecadosvip-hybrid",
+  "environment": "dirty local working tree and loopback synthetic preview",
+  "release": "ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9 plus uncommitted changes",
+  "logical_location": "planned-public-adult-service-advertising",
+  "url_or_path": "app/(legacy)/preview-local-sintetico/page.tsx",
+  "observed_at": "2026-08-30T20:53:49Z",
+  "domain": "sectoral-advertising",
+  "control_id": "ADVERTISING-SECTOR-SCOPE-001",
+  "control_version": "1.0.0",
+  "applicability_status": "UNCERTAIN",
+  "applicability_reason": "The design promotes private accompaniment, models, services and future reservation/contact, but the legal nature of the final service has not been classified. If the promoted activity is legally characterised as prostitution, the cited advertising restrictions become material.",
+  "expected": "Before public activation, qualified Spanish counsel should classify the exact service, copy, imagery and acquisition flow and provide a written publication decision against the applicable advertising rules.",
+  "observed": "The repository contains a polished promotional service/catalogue experience, but no written legal classification or approval addressing the statutory restriction on advertising that promotes prostitution was found. The current preview is clearly marked local, synthetic and not authorised for publication, which limits present exposure but does not resolve the launch question.",
+  "method": "Static source review, visual inspection of current local-preview evidence, official BOE verification and countercheck of the fail-closed publication boundary.",
+  "preconditions": [
+    "No conclusion is made that the service is prostitution or that the current local preview is unlawful.",
+    "The finding is a launch-classification blocker, not a legal determination."
+  ],
+  "limitations": [
+    "No definitive service contract, operating model, legal operator identity or lawyer-approved copy was available.",
+    "No regional or municipal adult-service advertising inventory was completed."
+  ],
+  "tool_status": "SUCCEEDED",
+  "result": "INCONCLUSIVE",
+  "evidence": [
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "app/(legacy)/preview-local-sintetico/page.tsx",
+      "sha256": "54367317bc675445c1b685438c0108ef1e80b8b9b5aad7553e56bfca0028a7c5",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    },
+    {
+      "kind": "DOCUMENT",
+      "path_or_url": "LEGAL_INPUTS_REQUIRED.md",
+      "sha256": "61874a4a251077882f9e6a5ea6fd2d2ccac22c7c5105e035243ea666ec7aea5b",
+      "redacted": false,
+      "access": "INTERNAL",
+      "captured_at": "2026-08-30T20:53:49Z"
+    }
+  ],
+  "impact": "A wrong classification could expose public launch, marketing assets and acquisition copy to cessation, unfair-competition and reputational risk.",
+  "prevalence": "Site-wide launch decision affecting home, profiles, services, cities and contact acquisition.",
+  "reproducibility": "REPRODUCED_TWICE",
+  "technical_severity": "HIGH",
+  "confidence": "HIGH",
+  "priority": "P0 publication blocker",
+  "legal_relevance": "MATERIAL_REVIEW_REQUIRED",
+  "source_refs": [
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Defines advertising and classifies advertising that promotes prostitution within unlawful advertising.",
+      "instrument_id": "ES-LGP-34-1988",
+      "instrument": "Ley 34/1988 General de Publicidad",
+      "identifier": "BOE-A-1988-26156",
+      "provision": "arts. 2, 3.a and 6",
+      "version": "BOE consolidated text, latest update shown 2023-03-01",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/l/1988/11/11/34/con",
+      "applicability_reason": "Potentially material only after legal classification of the exact promoted service and communication.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text and provision review."
+    },
+    {
+      "class": "BINDING_LAW",
+      "legal_effect": "Establishes specific prevention rules on advertising that promotes prostitution within the integral guarantee of sexual freedom framework.",
+      "instrument_id": "ES-LO-10-2022",
+      "instrument": "Ley Orgánica 10/2022 de garantía integral de la libertad sexual",
+      "identifier": "BOE-A-2022-14630",
+      "provision": "art. 11",
+      "version": "BOE consolidated text opened 2026-08-30",
+      "effective_as_of": "2026-08-30",
+      "official_url": "https://www.boe.es/eli/es/lo/2022/09/06/10/con",
+      "applicability_reason": "Potentially material only after legal classification of the exact promoted service and communication.",
+      "verified_at": "2026-08-30",
+      "verification_method": "Official BOE ELI consolidated text and article review."
+    }
+  ],
+  "review_status": "REQUIRES_LEGAL_COUNSEL",
+  "false_positive_analysis": "The preview labels services as private companionship and is local-only; those facts are counterevidence against treating the legal characterisation as established. They do not replace a substantive legal classification of the final offer.",
+  "counterevidence": [
+    "Current route is loopback-only, noindex and says PREVIEW LOCAL / NO PUBLICAR.",
+    "Contact and reservation are disabled in the synthetic profile flow."
+  ],
+  "remediation_minimum": "Keep publication and contact closed; obtain a written Spanish legal classification of the service and a line-by-line approval of home, profile, service, city, reservation and campaign copy before activation.",
+  "additional_hardening": "Add a release-gate field for legal classification reference, scope, reviewer and expiry so content changes reopen review.",
+  "suggested_owner": "Legal operator and qualified Spanish counsel",
+  "effort": "External legal review required",
+  "retest": "Re-evaluate identical routes and copy against the signed legal classification and any regional/municipal rules.",
+  "residual_risk": "Remains material until the exact operating model and public communications are legally classified and approved."
+}

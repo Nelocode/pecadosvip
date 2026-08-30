@@ -151,6 +151,7 @@ test('localized metadata emits reciprocal base-code hreflang only behind release
       en: 'https://www.pecadosvip.com/en/madrid',
       fr: 'https://www.pecadosvip.com/fr/madrid',
       it: 'https://www.pecadosvip.com/it/madrid',
+      'x-default': 'https://www.pecadosvip.com/es/madrid',
     },
   });
   assert.equal(published.openGraph && 'locale' in published.openGraph

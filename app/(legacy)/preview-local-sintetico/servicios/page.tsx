@@ -30,6 +30,7 @@ const cityLabels = {
   toledo: 'Toledo',
   guadalajara: 'Guadalajara',
   segovia: 'Segovia',
+  sitges: 'Sitges',
 } as const;
 
 export const metadata: Metadata = {
