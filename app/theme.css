@@ -40,6 +40,8 @@ a {
   text-decoration: none;
 }
 
+
+
 button,
 input,
 select {
@@ -69,16 +71,24 @@ select {
   height: 92px;
   margin: 0 auto;
   border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.85rem;
   width: max-content;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.32rem;
+  font-size: 1.35rem;
   letter-spacing: -0.04em;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.brand:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
 }
 
 .brand > span:last-child > span {
@@ -94,7 +104,8 @@ select {
   transform: rotate(-5deg);
   border: 1px solid #b41a46;
   border-radius: 46% 46% 52% 52% / 42% 42% 58% 58%;
-  box-shadow: inset 7px 0 14px rgb(183 25 69 / 14%);
+  box-shadow: inset 7px 0 14px rgb(183 25 69 / 22%), 0 0 14px rgb(183 25 69 / 18%);
+  background: radial-gradient(circle at 35% 35%, rgb(199 42 85 / 22%), transparent 70%);
 }
 
 .apple-mark::before {
@@ -123,7 +134,9 @@ select {
   width: 110px;
   height: 122px;
   border-width: 2px;
-  opacity: 0.9;
+  opacity: 0.95;
+  background: radial-gradient(circle at 35% 35%, rgb(199 42 85 / 25%), transparent 70%);
+  box-shadow: inset 14px 0 28px rgb(183 25 69 / 28%), 0 0 40px rgb(183 25 69 / 22%);
 }
 
 .apple-mark.large::before {
@@ -153,7 +166,7 @@ select {
 .desktop-nav a {
   position: relative;
   padding: 1rem 0;
-  transition: color 180ms ease;
+  transition: color 200ms ease;
 }
 
 .desktop-nav a:hover,
@@ -162,7 +175,7 @@ select {
   color: var(--paper);
 }
 
-.desktop-nav a.active::after {
+.desktop-nav a::after {
   position: absolute;
   right: 0;
   bottom: 7px;
@@ -170,22 +183,34 @@ select {
   height: 1px;
   background: var(--wine);
   content: '';
+  opacity: 0;
+  transform: scaleX(0);
+  transition: transform 220ms ease, opacity 220ms ease;
+}
+
+.desktop-nav a.active::after,
+.desktop-nav a:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .header-cta {
   justify-self: end;
   border: 1px solid rgb(255 255 255 / 18%);
-  padding: 0.72rem 1.2rem;
+  background: linear-gradient(135deg, rgb(173 23 66 / 14%), transparent);
+  padding: 0.72rem 1.3rem;
   font-size: 0.7rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: border-color 180ms ease, background 180ms ease;
+  transition: border-color 220ms ease, background 220ms ease, transform 220ms ease, box-shadow 220ms ease;
 }
 
 .header-cta:hover,
 .header-cta:focus-visible {
-  border-color: var(--wine);
-  background: rgb(173 23 66 / 12%);
+  border-color: var(--wine-bright);
+  background: linear-gradient(135deg, rgb(173 23 66 / 28%), rgb(173 23 66 / 10%));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgb(173 23 66 / 20%);
 }
 
 .mobile-city-switch {
@@ -213,7 +238,7 @@ select {
   z-index: -2;
   border-left: 1px solid rgb(255 255 255 / 5%);
   background:
-    radial-gradient(circle at 31% 42%, rgb(116 12 43 / 24%), transparent 28%),
+    radial-gradient(circle at 31% 42%, rgb(116 12 43 / 28%), transparent 32%),
     linear-gradient(rgb(255 255 255 / 2.4%) 1px, transparent 1px);
   background-size: auto, 100% 84px;
   content: '';
@@ -222,7 +247,7 @@ select {
 
 .city-barcelona .hero::before {
   background:
-    radial-gradient(circle at 31% 42%, rgb(116 12 43 / 22%), transparent 28%),
+    radial-gradient(circle at 31% 42%, rgb(116 12 43 / 26%), transparent 32%),
     repeating-linear-gradient(
       -12deg,
       transparent 0 38px,
@@ -236,9 +261,9 @@ select {
   right: -8rem;
   width: 32rem;
   height: 32rem;
-  border: 1px solid rgb(182 28 69 / 20%);
+  border: 1px solid rgb(182 28 69 / 24%);
   border-radius: 50%;
-  box-shadow: 0 0 120px rgb(126 12 45 / 18%);
+  box-shadow: 0 0 140px rgb(126 12 45 / 22%);
 }
 
 .hero-copy {
@@ -273,7 +298,7 @@ select {
   margin: 0 0 0.8rem;
   color: var(--muted);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-style: italic;
 }
 
@@ -285,11 +310,13 @@ select {
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.065em;
+  text-shadow: 0 4px 24px rgb(0 0 0 / 70%);
 }
 
 .hero-copy h1 em {
   color: var(--wine-bright);
   font-weight: 400;
+  font-style: italic;
 }
 
 .hero-lead {
@@ -305,7 +332,7 @@ select {
   display: flex;
   align-items: center;
   gap: 1.8rem;
-  margin-top: 2.4rem;
+  margin-top: 2.6rem;
 }
 
 .primary-cta {
@@ -314,25 +341,35 @@ select {
   justify-content: space-between;
   gap: 2rem;
   min-height: 48px;
-  background: var(--wine);
-  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, var(--wine-bright), var(--wine));
+  padding: 1rem 1.4rem;
   font-size: 0.71rem;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: background 180ms ease, transform 180ms ease;
+  box-shadow: 0 4px 20px rgb(169 20 64 / 35%);
+  transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 
 .primary-cta:hover,
 .primary-cta:focus-visible {
   transform: translateY(-2px);
-  background: var(--wine-bright);
+  background: linear-gradient(135deg, #d83462, var(--wine-bright));
+  box-shadow: 0 8px 28px rgb(169 20 64 / 50%);
 }
 
 .text-cta {
+  position: relative;
   border-bottom: 1px solid rgb(255 255 255 / 24%);
   padding: 0.65rem 0;
   color: #aaa39f;
   font-size: 0.75rem;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+
+.text-cta:hover {
+  color: var(--paper);
+  border-color: var(--wine-bright);
 }
 
 .trust-row {
@@ -348,10 +385,24 @@ select {
   text-transform: uppercase;
 }
 
+.trust-row li {
+  display: inline-flex;
+  align-items: center;
+}
+
 .trust-row span {
-  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-right: 0.6rem;
+  border: 1px solid rgb(216 91 126 / 35%);
+  border-radius: 50%;
   color: var(--wine-text);
   font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.65rem;
+  background: rgb(216 91 126 / 8%);
 }
 
 .hero-art {
@@ -379,19 +430,19 @@ select {
   border: 1px solid rgb(212 47 88 / 55%);
   border-radius: 50%;
   background:
-    radial-gradient(circle at 38% 32%, rgb(255 153 169 / 26%), transparent 7%),
-    radial-gradient(circle at 36% 30%, #ac143f, #4d081d 46%, #13050a 72%);
+    radial-gradient(circle at 38% 32%, rgb(255 153 169 / 30%), transparent 8%),
+    radial-gradient(circle at 36% 30%, #b81745, #530920 46%, #13050a 72%);
   box-shadow:
-    inset -42px -28px 70px rgb(0 0 0 / 58%),
-    0 44px 100px rgb(85 5 30 / 34%);
+    inset -42px -28px 70px rgb(0 0 0 / 60%),
+    0 44px 110px rgb(133 11 50 / 40%);
 }
 
 .city-barcelona .orb {
   transform: rotate(3deg);
   border-radius: 46% 54% 51% 49% / 52% 43% 57% 48%;
   background:
-    radial-gradient(circle at 37% 31%, rgb(255 169 182 / 23%), transparent 8%),
-    radial-gradient(circle at 40% 35%, #9d1238, #470717 47%, #13050a 74%);
+    radial-gradient(circle at 37% 31%, rgb(255 169 182 / 26%), transparent 9%),
+    radial-gradient(circle at 40% 35%, #a8153d, #4e0819 47%, #13050a 74%);
 }
 
 .orb::before {
@@ -444,7 +495,7 @@ select {
   right: 0;
   bottom: 8%;
   margin: 0;
-  color: #4e4a48;
+  color: #5a5451;
   font-size: 0.55rem;
   line-height: 1.7;
   letter-spacing: 0.18em;
@@ -455,7 +506,7 @@ select {
   top: 50%;
   right: -5rem;
   transform: rotate(90deg);
-  color: #504b48;
+  color: #58524f;
   font-size: 0.55rem;
   letter-spacing: 0.28em;
   white-space: nowrap;

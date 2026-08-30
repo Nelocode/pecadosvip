@@ -13,7 +13,7 @@ El registro SCA clasifica `image-size@2.0.2` como afectado por versión. A 2026-
 
 | Entorno | Estado | Justificación y evidencia |
 |---|---|---|
-| Build local | `downstream_patched` | `pnpm.patchedDependencies` aplica `patches/image-size@2.0.2.patch`; SHA-256 `61d62c28df252b7fa3c09f4631138e794eb407ce80c31bf467d19ff84c09c771`. Las pruebas ejecutan las salidas CJS y ESM con watchdog, cubren ICNS/JXL/HEIF malformados y preservan fixtures válidos. |
+| Build local | `downstream_patched` | `pnpm.patchedDependencies` aplica `patches/image-size@2.0.2.patch`; SHA-256 canónico LF `61d62c28df252b7fa3c09f4631138e794eb407ce80c31bf467d19ff84c09c771`. `.gitattributes` fija `patches/*.patch` a LF y la prueba normaliza una copia de trabajo CRLF antes de validar el digest, evitando diferencias entre Windows y Linux. Las pruebas ejecutan las salidas CJS y ESM con watchdog, cubren ICNS/JXL/HEIF malformados y preservan fixtures válidos. |
 | Standalone entregable | `not_affected: component_not_present` | `prepare-standalone.ts` elimina el paquete; la política 3 del validador rechaza `image-size` a cualquier profundidad bajo `node_modules`; el gate verifica el artefacto después del build. |
 | Worker/hosting futuro | `needs_review` | Debe reconstruirse desde el lockfile, repetir audit, pruebas, SBOM y validación del artefacto. No se infiere estado de un despliegue no observado. |
 

@@ -380,7 +380,7 @@ function Assert-NoHighConfidenceSecret {
         '.bat', '.cjs', '.cmd', '.conf', '.css', '.csv', '.graphql', '.html',
         '.ini', '.js', '.json', '.jsx', '.log', '.md', '.mjs', '.patch', '.properties', '.ps1',
         '.sh', '.sha256', '.svg', '.toml', '.txt', '.ts', '.tsx', '.xml', '.yaml', '.yml',
-        '.dockerfile', '.dockerignore', '.example', '.gitignore'
+        '.dockerfile', '.dockerignore', '.example', '.gitattributes', '.gitignore'
     )
     $binaryExtensions = @(
         '.docx', '.gif', '.ico', '.jpeg', '.jpg', '.mp4', '.pdf', '.png',
@@ -390,8 +390,15 @@ function Assert-NoHighConfidenceSecret {
     if ($entry.Name.ToLowerInvariant() -eq 'dockerfile') {
         $extension = '.dockerfile'
     }
+    if ($entry.Name.ToLowerInvariant() -eq '.gitattributes') {
+        $extension = '.gitattributes'
+    }
     if ($entry.Name.ToLowerInvariant() -eq '.gitkeep') {
-        if ($entry.Length -gt 1 -or -not [string]::IsNullOrWhiteSpace([System.IO.File]::ReadAllText($entry.FullName))) {
+        $markerText = [System.IO.File]::ReadAllText($entry.FullName)
+        if (
+            $entry.Length -gt 2 -or
+            $markerText -notin @('', "`n", "`r`n")
+        ) {
             throw 'A .gitkeep marker must be empty or contain only one newline.'
         }
         return

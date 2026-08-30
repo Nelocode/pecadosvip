@@ -202,10 +202,12 @@
     z-index: 50;
     display: flex;
     justify-content: space-between;
-    background: var(--wine);
-    padding: 1rem 1.1rem;
-    box-shadow: 0 15px 40px rgb(0 0 0 / 45%);
-    font-size: 0.68rem;
+    align-items: center;
+    background: linear-gradient(135deg, var(--wine-bright), var(--wine));
+    padding: 1.1rem 1.4rem;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 55%), 0 0 24px rgb(169 20 64 / 30%);
+    font-size: 0.7rem;
+    font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
