@@ -30,10 +30,16 @@ Evidencia local:
 - `output/design-qa/services-symbolic-desktop-top.png`
 - `output/design-qa/service-symbolic-detail-desktop.png`
 - `output/design-qa/services-symbolic-mobile-top.png`
+- `output/design-qa/services-unique-assets-contact-sheet.png`
+- `output/design-qa/services-unique-catalog-desktop.png`
+- `output/design-qa/services-unique-catalog-mobile.png`
+- `output/design-qa/services-reference-vs-implementation-unique.png`
 
-La extensión del 30 de agosto sustituyó los retratos decorativos de servicios por doce bodegones originales generados con IA, sin personas, texto, marcas ni lugares identificables. Se comparó en una sola imagen la referencia gráfica del cliente y la implementación final. La nueva composición conserva el sistema negro, marfil y dorado, la jerarquía editorial, el contraste de superficies y la densidad premium de la referencia, mientras diferencia con claridad servicios y perfiles.
+La extensión del 30 de agosto sustituyó los retratos decorativos de servicios por 34 bodegones generados específicamente para la maqueta: uno por cada ruta, sin compartir claves, rutas ni bytes. El mosaico completo permitió comparar silueta, objeto principal y densidad visual de las 34 composiciones; el manifiesto y las pruebas recalculan hashes, formatos y dimensiones desde los archivos reales. La versión activa de llegada a hotel fue regenerada sin símbolos o trazos semejantes a marcas, y el candidato descartado quedó fuera de las rutas.
 
-No quedaron hallazgos P0, P1 o P2 en la muestra visual final. Los encuadres de hero, tarjeta y detalle conservan los objetos principales; las insignias no cubren el foco; no hay imágenes estiradas, placeholders, arte CSS ni controles superpuestos. La captura de página completa presentó artefactos de cosido del navegador, por lo que el dictamen visual se basó en capturas normales de viewport y en el DOM renderizado.
+Se comparó en una sola imagen la referencia gráfica del cliente y la implementación final. La composición conserva el sistema negro, marfil y dorado, la jerarquía editorial, el contraste de superficies y la densidad premium de la referencia, mientras diferencia con claridad servicios y perfiles. “Generada para la maqueta” describe la procedencia técnica y no acredita derechos de publicación.
+
+No quedaron hallazgos P0, P1 o P2 en la muestra visual final relacionada con duplicación o encuadre. Los encuadres de hero, tarjeta y detalle conservan los objetos principales; las insignias no cubren el foco; no hay imágenes estiradas, placeholders, arte CSS ni controles superpuestos. El DOM mostró 34 tarjetas, 34 `src` distintos y cero desbordamiento horizontal en 1440 × 1000 y 390 × 844. La captura de página completa presentó artefactos de cosido del navegador, por lo que el dictamen visual se basó en capturas normales de viewport y en el DOM renderizado.
 
 ## Interacciones y responsive
 

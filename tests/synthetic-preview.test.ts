@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import test from 'node:test';
+
+import sharp from 'sharp';
 
 import {
   filterSyntheticPreviewProfiles,
@@ -24,6 +27,13 @@ import {
   syntheticServiceMediaKeys,
 } from '../lib/preview/synthetic-service-media.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
+
+function fileSha256(path: string): string {
+  return createHash('sha256')
+    .update(readFileSync(resolve(path)))
+    .digest('hex')
+    .toUpperCase();
+}
 
 test('the local preview middleware fails closed on malformed request URLs', () => {
   assert.equal(parseLocalRequestPathname('/preview-local-sintetico'), '/preview-local-sintetico');
@@ -281,7 +291,14 @@ test('service preview exposes 34 PecadosVip routes in four complete locale proje
 
 test('service catalogue maps every route to reviewed local symbolic media', () => {
   const catalog = getSyntheticServiceCatalog('es');
-  assert.equal(syntheticServiceMediaKeys.length, 12);
+  const assignedMediaKeys = catalog.map((service) => service.mediaKey);
+  assert.equal(syntheticServiceMediaKeys.length, 34);
+  assert.equal(new Set(syntheticServiceMediaKeys).size, 34);
+  assert.equal(
+    new Set(assignedMediaKeys).size,
+    catalog.length,
+    'every service route must use its own symbolic image',
+  );
   assert.equal(catalog.every((service) => syntheticServiceMediaKeys.includes(service.mediaKey)), true);
 
   for (const key of syntheticServiceMediaKeys) {
@@ -359,17 +376,58 @@ test('manifest keeps synthetic candidates outside public production paths', () =
   }
 });
 
-test('service image manifest remains non-public and pending human/legal review', () => {
+test('service image manifest remains non-public and pending human/legal review', async () => {
   const manifest = readFileSync(
     'assets/synthetic-services/ASSET_MANIFEST.csv',
     'utf8',
   );
   const rows = manifest.trim().split(/\r?\n/).slice(1);
-  assert.equal(rows.length, 12);
-  for (const row of rows) {
-    const columns = row.split(',');
-    assert.equal(columns[4], '', 'public_path must remain empty before approval');
-    assert.equal(columns[13], 'PENDING');
-    assert.equal(columns[14], 'PENDING');
+  const columns = rows.map((row) => row.split(','));
+  assert.equal(rows.length, 34);
+  assert.deepEqual(
+    columns.map((row) => row[0]),
+    [...syntheticServiceMediaKeys],
+  );
+  assert.equal(
+    new Set(columns.map((row) => row[7])).size,
+    34,
+    'master files must not repeat the same image bytes',
+  );
+  assert.equal(
+    new Set(columns.map((row) => row[8])).size,
+    34,
+    'selected files must not repeat the same image bytes',
+  );
+  for (const row of columns) {
+    assert.match(
+      row[3]!,
+      new RegExp(`^assets/synthetic-services/selected/${row[0]}-v\\d{2}\\.webp$`, 'u'),
+    );
+    assert.equal(
+      row[2],
+      row[3]!.replace('/selected/', '/master/').replace(/\.webp$/u, '.png'),
+    );
+    assert.equal(existsSync(resolve(row[2]!)), true, row[2]);
+    assert.equal(existsSync(resolve(row[3]!)), true, row[3]);
+    assert.equal(fileSha256(row[2]!), row[7], `${row[0]} master hash`);
+    assert.equal(fileSha256(row[3]!), row[8], `${row[0]} selected hash`);
+    const [masterMetadata, selectedMetadata] = await Promise.all([
+      sharp(resolve(row[2]!)).metadata(),
+      sharp(resolve(row[3]!)).metadata(),
+    ]);
+    assert.equal(masterMetadata.format, 'png', `${row[0]} master format`);
+    assert.equal(selectedMetadata.format, 'webp', `${row[0]} selected format`);
+    assert.equal(selectedMetadata.width, 960, `${row[0]} selected width`);
+    assert.equal(selectedMetadata.height, 1200, `${row[0]} selected height`);
+    assert.equal(
+      `${masterMetadata.width}x${masterMetadata.height}`,
+      row[9],
+      `${row[0]} master dimensions`,
+    );
+    assert.equal(`${selectedMetadata.width}x${selectedMetadata.height}`, row[10]);
+    assert.equal(row[4], '', 'public_path must remain empty before approval');
+    assert.equal(row[12], 'PASS_HASH_DIMENSION_FORMAT_UNIQUE');
+    assert.equal(row[13], 'PENDING');
+    assert.equal(row[14], 'PENDING');
   }
 });
