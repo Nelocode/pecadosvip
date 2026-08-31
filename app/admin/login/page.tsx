@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import '../admin.css';
 
 export default function AdminLoginPage() {
   const router = useRouter();
