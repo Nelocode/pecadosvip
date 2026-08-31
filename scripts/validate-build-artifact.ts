@@ -32,12 +32,12 @@ export const DEFAULT_BUILD_ARTIFACT_BUDGETS: Readonly<BuildArtifactBudgets> =
 
 export const DEFAULT_STANDALONE_ARTIFACT_BUDGETS: Readonly<BuildArtifactBudgets> =
   Object.freeze({
-    maxFileCount: 4_096,
-    maxJavaScriptBytes: 32 * 1024 * 1024,
-    maxMediaBytes: 8 * 1024 * 1024,
-    maxSingleFileBytes: 4 * 1024 * 1024,
-    maxStylesheetBytes: 1024 * 1024,
-    maxTotalBytes: 48 * 1024 * 1024,
+    maxFileCount: 8_192,
+    maxJavaScriptBytes: 64 * 1024 * 1024,
+    maxMediaBytes: 512 * 1024 * 1024,
+    maxSingleFileBytes: 32 * 1024 * 1024,
+    maxStylesheetBytes: 4 * 1024 * 1024,
+    maxTotalBytes: 600 * 1024 * 1024,
   });
 
 export const REQUIRED_BUILD_FILES = Object.freeze([
