@@ -6,8 +6,8 @@ import '../admin.css';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@pecadosvip.com');
-  const [password, setPassword] = useState('SuperAdmin123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -37,11 +37,6 @@ export default function AdminLoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSelectAccount = (selectedEmail: string, selectedPass: string) => {
-    setEmail(selectedEmail);
-    setPassword(selectedPass);
   };
 
   return (
@@ -94,51 +89,6 @@ export default function AdminLoginPage() {
             {loading ? 'Autenticando en Base de Datos...' : 'Iniciar Sesión en CMS B2B'}
           </button>
         </form>
-
-        {/* Accounts Preset Selector */}
-        <div className="border-t border-zinc-800 pt-6 space-y-3">
-          <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider text-center">
-            Cuentas Auténticas en Base de Datos:
-          </p>
-
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <button
-              type="button"
-              onClick={() => handleSelectAccount('admin@pecadosvip.com', 'SuperAdmin123!')}
-              className="rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-left hover:border-amber-500/50"
-            >
-              <p className="font-bold text-amber-400">Super Admin</p>
-              <p className="text-[10px] text-zinc-500">admin@pecadosvip.com</p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSelectAccount('booking@pecadosvip.com', 'BookingAgent123!')}
-              className="rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-left hover:border-amber-500/50"
-            >
-              <p className="font-bold text-amber-400">Booking Agent</p>
-              <p className="text-[10px] text-zinc-500">booking@pecadosvip.com</p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSelectAccount('seo@pecadosvip.com', 'SeoSpecialist123!')}
-              className="rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-left hover:border-amber-500/50"
-            >
-              <p className="font-bold text-amber-400">Especialista SEO</p>
-              <p className="text-[10px] text-zinc-500">seo@pecadosvip.com</p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleSelectAccount('kyc@pecadosvip.com', 'KycOfficer123!')}
-              className="rounded-lg border border-zinc-800 bg-zinc-950 p-2 text-left hover:border-amber-500/50"
-            >
-              <p className="font-bold text-amber-400">Oficial KYC</p>
-              <p className="text-[10px] text-zinc-500">kyc@pecadosvip.com</p>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
