@@ -18,6 +18,7 @@ import {
   isSyntheticPreviewRequestAllowed,
 } from '../../../../lib/preview/synthetic-preview';
 import PublicProfileMedia from '../../../components/PublicProfileMedia';
+import SyntheticFiligree from '../../../components/SyntheticFiligree';
 import SyntheticPreviewNotice from '../../../components/SyntheticPreviewNotice';
 import SyntheticServiceExplorer from '../../../components/SyntheticServiceExplorer';
 import SyntheticServicesHeader from '../../../components/SyntheticServicesHeader';
@@ -92,6 +93,7 @@ export default async function SyntheticServicesPage({
 
   return (
     <div className="public-page synthetic-preview-page synthetic-services-page" id="service-top" lang={locale}>
+      <SyntheticFiligree />
       <SyntheticServicesHeader
         current="services"
         documentDescription={messages.hub.lead}

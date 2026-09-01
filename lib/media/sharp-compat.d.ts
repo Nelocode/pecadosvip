@@ -7,6 +7,8 @@ declare module 'sharp' {
     exif?: Buffer;
     iptc?: Buffer;
     xmp?: Buffer;
+    icc?: Buffer;
+    hasAlpha?: boolean;
   };
 
   export type SharpOutputInfo = {
@@ -26,14 +28,17 @@ declare module 'sharp' {
     resize(options: {
       width?: number;
       height?: number;
-      fit?: 'inside' | 'cover';
+      fit?: 'inside' | 'cover' | 'contain' | 'fill';
       position?: 'centre' | 'center';
       withoutEnlargement?: boolean;
     }): SharpInstance;
     resize(
       width: number,
       height: number,
-      options?: { fit?: 'inside' | 'cover'; position?: 'centre' | 'center' },
+      options?: {
+        fit?: 'inside' | 'cover' | 'contain' | 'fill';
+        position?: 'centre' | 'center';
+      },
     ): SharpInstance;
     extract(options: {
       left: number;
@@ -42,6 +47,8 @@ declare module 'sharp' {
       height: number;
     }): SharpInstance;
     composite(overlays: SharpOverlayOptions[]): SharpInstance;
+    ensureAlpha(): SharpInstance;
+    raw(): SharpInstance;
     toColourspace(colourspace: 'srgb'): SharpInstance;
     webp(options: {
       quality: number;

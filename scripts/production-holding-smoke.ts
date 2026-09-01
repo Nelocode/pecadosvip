@@ -225,6 +225,20 @@ async function main() {
       404,
       'Synthetic preview media must remain unavailable in production.',
     );
+    const previewFiligrees = await Promise.all(
+      [
+        '/preview-local-sintetico/decor-media/border-filigree',
+        '/preview-local-sintetico/decor-media/border-filigree-left',
+        '/preview-local-sintetico/decor-media/border-filigree-right',
+      ].map((path) => request(origin, path)),
+    );
+    for (const previewFiligree of previewFiligrees) {
+      assert.equal(
+        previewFiligree.status,
+        404,
+        `${previewFiligree.path} must remain unavailable in production.`,
+      );
+    }
 
     const robots = await request(origin, '/robots.txt');
     assert.equal(robots.status, 200);
@@ -257,6 +271,10 @@ async function main() {
           { path: legal.path, status: legal.status },
           { path: preview.path, status: preview.status },
           { path: previewMedia.path, status: previewMedia.status },
+          ...previewFiligrees.map((result) => ({
+            path: result.path,
+            status: result.status,
+          })),
           ...localizedNotFoundResults,
         ],
         robotsDisallowAll: true,

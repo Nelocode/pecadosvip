@@ -18,6 +18,7 @@ import {
 } from '../../../../../lib/preview/synthetic-preview';
 import ProfileCard from '../../../../components/ProfileCard';
 import PublicProfileMedia from '../../../../components/PublicProfileMedia';
+import SyntheticFiligree from '../../../../components/SyntheticFiligree';
 import SyntheticPreviewNotice from '../../../../components/SyntheticPreviewNotice';
 import SyntheticServiceCard from '../../../../components/SyntheticServiceCard';
 import SyntheticServicesHeader from '../../../../components/SyntheticServicesHeader';
@@ -83,6 +84,7 @@ export default async function SyntheticServiceDetailPage({
 
   return (
     <div className="public-page synthetic-preview-page synthetic-services-page synthetic-service-detail-page" id="service-top" lang={locale}>
+      <SyntheticFiligree />
       <SyntheticServicesHeader
         current="detail"
         documentDescription={service.teaser}

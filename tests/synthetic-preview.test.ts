@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve, sep } from 'node:path';
 import test from 'node:test';
 
@@ -31,6 +31,10 @@ import {
   getSyntheticCityPresentation,
   syntheticCityMediaSlugs,
 } from '../lib/preview/synthetic-city-media.ts';
+import {
+  getSyntheticDecorMedia,
+  syntheticDecorMediaKeys,
+} from '../lib/preview/synthetic-decor-media.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
 
 function fileSha256(path: string): string {
@@ -195,6 +199,9 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(mediaMiddlewareSource, /syntheticCityMediaPattern/);
   assert.match(mediaMiddlewareSource, /isSyntheticCityMediaSlug/);
   assert.match(mediaMiddlewareSource, /'synthetic-cities'/);
+  assert.match(mediaMiddlewareSource, /syntheticDecorMediaPattern/);
+  assert.match(mediaMiddlewareSource, /isSyntheticDecorMediaKey/);
+  assert.match(mediaMiddlewareSource, /'synthetic-decor'/);
   assert.match(mediaMiddlewareSource, /assetRoot/);
   assert.match(mediaMiddlewareSource, /private, no-store/);
   assert.match(mediaMiddlewareSource, /noimageindex/);
@@ -273,6 +280,227 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(publicCssSource, /\.synthetic-preview-service-grid\s*\{/);
   assert.match(publicCssSource, /@media \(max-width: 480px\)/);
   assert.match(publicCssSource, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test('decorative full-background mosaic is local-only, inert and responsive by contract', async () => {
+  const css = readFileSync('app/public-site.css', 'utf8');
+  const masterPath = 'assets/brand/filigree-mosaic-source-v04.png';
+  const masterSha256 =
+    'B169F9E48C3B5000DAC445BF42F6AE2225E9F7B2B6AB3A550BA21DCB0269BD11';
+  assert.equal(fileSha256(masterPath), masterSha256);
+  const masterMetadata = await sharp(masterPath).metadata();
+  assert.equal(masterMetadata.format, 'png');
+  assert.equal(masterMetadata.width, 1254);
+  assert.equal(masterMetadata.height, 1254);
+  assert.equal(masterMetadata.hasAlpha, false);
+
+  const expectations = {
+    'border-filigree': {
+      width: 768,
+      height: 768,
+      sha256: '3D1D8836953C5D63A36AC370DE9968E735BA3F196294D6868A2EC2D9E2BDF903',
+    },
+    'border-filigree-left': {
+      width: 320,
+      height: 1056,
+      sha256: '1397B7F72D6BA24AE876FF0C3367B0BADF60BBFD8812FB823352B1683AE5EAA4',
+    },
+    'border-filigree-right': {
+      width: 320,
+      height: 1056,
+      sha256: 'F9BB97B7EF083CCBC828D647BFDDD08715EB34A59A3CE6807485E8A223D3EEF3',
+    },
+  } as const;
+
+  assert.deepEqual([...syntheticDecorMediaKeys], Object.keys(expectations));
+  for (const key of syntheticDecorMediaKeys) {
+    const media = getSyntheticDecorMedia(key);
+    const expected = expectations[key];
+    assert.equal(media.contentType, 'image/webp');
+    assert.equal(media.width, expected.width);
+    assert.equal(media.height, expected.height);
+    assert.equal(
+      media.desktopUrl,
+      `/preview-local-sintetico/decor-media/${key}`,
+    );
+    assert.doesNotMatch(media.desktopUrl, /https?:|data:/i);
+    const source = resolve(media.sourcePath);
+    assert.ok(source.startsWith(`${resolve('assets', 'synthetic-decor')}${sep}`));
+    assert.equal(existsSync(source), true, media.sourcePath);
+    assert.doesNotMatch(media.sourcePath, /public[\\/]/i);
+    assert.equal(fileSha256(media.sourcePath), expected.sha256);
+
+    const metadata = await sharp(source).metadata();
+    assert.equal(metadata.format, 'webp');
+    assert.equal(metadata.width, media.width);
+    assert.equal(metadata.height, media.height);
+    assert.equal(metadata.hasAlpha, true);
+    assert.equal(metadata.exif, undefined);
+    assert.equal(metadata.icc, undefined);
+    assert.equal(metadata.xmp, undefined);
+    assert.ok(
+      statSync(source).size < (key === 'border-filigree' ? 750_000 : 450_000),
+      `${key} exceeds its reviewed local-preview weight budget.`,
+    );
+
+    const raw = await sharp(source).ensureAlpha().raw().toBuffer({
+      resolveWithObject: true,
+    });
+    let transparentPixels = 0;
+    let subtlePixels = 0;
+    let visiblePixels = 0;
+    for (let index = 3; index < raw.data.length; index += 4) {
+      const alpha = raw.data[index]!;
+      if (alpha === 0) transparentPixels += 1;
+      if (alpha > 0 && alpha < 24) subtlePixels += 1;
+      if (alpha >= 96) visiblePixels += 1;
+    }
+    const totalPixels = raw.info.width * raw.info.height;
+    assert.ok(transparentPixels > totalPixels * 0.08);
+    assert.ok(subtlePixels > totalPixels * 0.5);
+    assert.ok(visiblePixels > totalPixels * 0.2);
+  }
+
+  const manifestRows = readFileSync(
+    'assets/synthetic-decor/ASSET_MANIFEST.csv',
+    'utf8',
+  )
+    .trim()
+    .split(/\r?\n/u);
+  assert.equal(manifestRows.length, 4);
+  const rowsByKey = new Map(
+    manifestRows.slice(1).map((row) => {
+      const columns = row.split(',');
+      return [columns[0], columns] as const;
+    }),
+  );
+  for (const key of syntheticDecorMediaKeys) {
+    const media = getSyntheticDecorMedia(key);
+    const columns = rowsByKey.get(key);
+    assert.ok(columns, `Missing manifest row for ${key}`);
+    assert.equal(columns[2], media.sourcePath);
+    assert.equal(columns[3], '', 'public_path must remain empty before approval');
+    assert.equal(
+      columns[4],
+      masterSha256,
+    );
+    assert.equal(columns[5], fileSha256(media.sourcePath));
+    assert.equal(columns[12], 'PASS_HASH_DIMENSION_FORMAT_ALPHA');
+    assert.equal(columns[13], 'PENDING');
+    assert.equal(columns[14], 'PENDING');
+    assert.equal(columns[15], 'PENDING');
+    assert.equal(columns[10], 'user_supplied_chatgpt_gold_mosaic');
+    assert.equal(columns[16], 'local_preview_only_no_publication');
+  }
+
+  const interaction = readFileSync(
+    'app/components/SyntheticFiligree.tsx',
+    'utf8',
+  );
+  assert.match(interaction, /^'use client';/);
+  assert.match(interaction, /aria-hidden="true"/);
+  assert.match(interaction, /data-active="false"/);
+  assert.match(
+    interaction,
+    /\(min-width: 1100px\) and \(hover: hover\) and \(pointer: fine\)/,
+  );
+  assert.match(interaction, /\(prefers-reduced-motion: reduce\)/);
+  assert.match(interaction, /pointerQuery\.matches && !motionQuery\.matches/);
+  assert.match(interaction, /addEventListener\('pointermove', handlePointerMove, \{ passive: true \}\)/);
+  assert.match(interaction, /addEventListener\('scroll', handleScroll, \{ passive: true \}\)/);
+  assert.match(interaction, /requestAnimationFrame\(renderPointer\)/);
+  assert.match(interaction, /cancelAnimationFrame\(animationFrame\)/);
+  assert.match(interaction, /event\.pointerType === 'touch'/);
+  assert.match(interaction, /decoration\.getBoundingClientRect\(\)/);
+  assert.match(
+    interaction,
+    /decoration\.style\.setProperty\(\s*'--filigree-pointer-x'/,
+  );
+  assert.match(
+    interaction,
+    /decoration\.style\.setProperty\(\s*'--filigree-pointer-y'/,
+  );
+  assert.match(interaction, /removeEventListener\('pointermove', handlePointerMove\)/);
+  assert.match(interaction, /removeEventListener\('scroll', handleScroll\)/);
+  assert.doesNotMatch(interaction, /synthetic-preview-filigree-rail/);
+  assert.doesNotMatch(interaction, /tabIndex=|role=|onClick=|onKeyDown=/);
+
+  for (const pagePath of [
+    'app/(legacy)/preview-local-sintetico/page.tsx',
+    'app/(legacy)/preview-local-sintetico/perfiles/[slug]/page.tsx',
+    'app/(legacy)/preview-local-sintetico/servicios/page.tsx',
+    'app/(legacy)/preview-local-sintetico/servicios/[slug]/page.tsx',
+  ]) {
+    const page = readFileSync(pagePath, 'utf8');
+    assert.match(page, /import SyntheticFiligree from/);
+    assert.equal(
+      page.match(/<SyntheticFiligree \/>/g)?.length,
+      1,
+      `${pagePath} must mount exactly one inert filigree layer.`,
+    );
+  }
+
+  assert.match(
+    css,
+    /\.synthetic-preview-filigree\s*\{[\s\S]*?position:\s*absolute;[\s\S]*?inset:\s*0;[\s\S]*?z-index:\s*24;[\s\S]*?display:\s*block;[\s\S]*?overflow:\s*hidden;[\s\S]*?pointer-events:\s*none;[\s\S]*?user-select:\s*none;/,
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 1099px\)[\s\S]*?\.synthetic-preview-page\s*\{[\s\S]*?--filigree-rest-opacity:\s*0\.045;[\s\S]*?--filigree-tile-size:\s*clamp\(14rem, 58vw, 16\.25rem\);[\s\S]*?\.synthetic-services-page\s*\{[\s\S]*?--filigree-rest-opacity:\s*0\.02;/,
+  );
+  assert.match(
+    css,
+    /@media \(min-width: 1100px\) and \(max-width: 1279px\)[\s\S]*?\.synthetic-preview-page\s*\{[\s\S]*?--filigree-tile-size:\s*clamp\(18rem, 25vw, 20rem\);/,
+  );
+  const filigreeStart = css.indexOf('.synthetic-preview-filigree {');
+  const filigreeEnd = css.indexOf('.synthetic-preview-header > strong', filigreeStart);
+  assert.ok(filigreeStart >= 0 && filigreeEnd > filigreeStart);
+  const filigreeCss = css.slice(filigreeStart, filigreeEnd);
+  assert.deepEqual(
+    [...filigreeCss.matchAll(/url\('([^']+)'\)/g)].map((match) => match[1]),
+    ['/preview-local-sintetico/decor-media/border-filigree'],
+  );
+  assert.match(filigreeCss, /background-repeat:\s*repeat;/);
+  assert.match(
+    filigreeCss,
+    /background-size:\s*var\(--filigree-tile-size\) auto;/,
+  );
+  assert.doesNotMatch(
+    filigreeCss,
+    /repeat-y|position:\s*fixed|translate(?:X|Y)?\(/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-preview-filigree::before\s*\{[\s\S]*?opacity:\s*var\(--filigree-rest-opacity\);[\s\S]*?brightness\(0\.54\)[\s\S]*?saturate\(0\.48\)[\s\S]*?contrast\(0\.96\)[\s\S]*?sepia\(0\.08\)/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-preview-filigree::after\s*\{[\s\S]*?opacity:\s*0;[\s\S]*?brightness\(0\.68\)[\s\S]*?saturate\(0\.56\)[\s\S]*?contrast\(0\.98\)[\s\S]*?drop-shadow\(0 0 5px rgb\(216 173 98 \/ 8%\)\)[\s\S]*?rgb\(0 0 0 \/ 72%\) 0 14%[\s\S]*?rgb\(0 0 0 \/ 18%\) 76%[\s\S]*?var\(--filigree-pointer-x\) var\(--filigree-pointer-y\)[\s\S]*?transition:\s*opacity 620ms cubic-bezier\(0\.22, 0\.61, 0\.36, 1\);/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-preview-filigree\[data-active='true'\]::after\s*\{[\s\S]*?opacity:\s*var\(--filigree-active-opacity\);[\s\S]*?transition-duration:\s*460ms;/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-preview-page\s*\{[\s\S]*?--filigree-active-opacity:\s*0\.105;[\s\S]*?--filigree-rest-opacity:\s*0\.06;[\s\S]*?--filigree-tile-size:\s*clamp\(22\.5rem, 30vw, 26rem\);/,
+  );
+  assert.match(
+    css,
+    /\.synthetic-services-page\s*\{[\s\S]*?--filigree-active-opacity:\s*0\.042;[\s\S]*?--filigree-rest-opacity:\s*0\.025;/,
+  );
+  assert.match(
+    css,
+    /@media print[\s\S]*?\.synthetic-preview-filigree\s*\{[\s\S]*?display:\s*none;/,
+  );
+  assert.match(
+    css,
+    /@media \(forced-colors: active\)[\s\S]*?\.synthetic-preview-filigree\s*\{[\s\S]*?display:\s*none;/,
+  );
+  assert.match(
+    css,
+    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.synthetic-preview-filigree::after\s*\{[\s\S]*?display:\s*none;/,
+  );
 });
 
 test('service preview exposes 34 PecadosVip routes in four complete locale projections', () => {
