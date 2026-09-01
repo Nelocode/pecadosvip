@@ -79,21 +79,12 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  async rewrites() {
-    return [
-      {
-        source: "/",
-        destination: "/preview-local-sintetico",
-      },
     ];
   },
 
-  async rewrites() {
-    return [
-      {
-        source: "/",
-        destination: "/preview-local-sintetico",
-      },
+    ];
+  },
+
     ];
   },
 
