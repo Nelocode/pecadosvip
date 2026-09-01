@@ -8,10 +8,12 @@ export type ReleaseGateResult = {
 };
 
 export function evaluateRelease(snapshot: ContentSnapshot): ReleaseGateResult {
+  const blockers = validateContentSnapshot(snapshot, 'release');
+
   return {
-    ok: true,
-    blockerCodes: [],
-    blockers: [],
+    ok: blockers.length === 0,
+    blockerCodes: [...new Set(blockers.map((blocker) => blocker.code))],
+    blockers,
   };
 }
 

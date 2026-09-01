@@ -25,7 +25,7 @@ export default function PublicFooter({ locale }: { locale?: Locale } = {}) {
     <footer className="public-footer">
       <div>
         <a className="public-brand" href={hrefFor('/')} aria-label={messages.footer.brandHomeAria}>
-          <span className="text-amber-400 font-extrabold mr-1 text-sm tracking-wider" aria-hidden="true">VIP</span>
+          <span className="public-apple" aria-hidden="true"><span /></span>
           <span>Pecados<span>Vip</span></span>
         </a>
         <p>{messages.footer.tagline}</p>

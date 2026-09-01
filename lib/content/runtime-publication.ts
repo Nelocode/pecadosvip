@@ -28,9 +28,11 @@ export type RuntimeVisibilityState = {
 export function evaluateRuntimeVisibility(
   snapshot: ContentSnapshot,
 ): RuntimeVisibilityState {
+  const releaseReady = evaluateRelease(snapshot).ok;
+
   return {
-    releaseReady: true,
-    renderPublicExperience: true,
+    releaseReady,
+    renderPublicExperience: releaseReady,
   };
 }
 
@@ -38,13 +40,24 @@ export function evaluateRuntimeContact(
   snapshot: ContentSnapshot,
   config: ResolvedContactConfig,
 ): RuntimeContactState {
+  const releaseGateSatisfied = evaluateRelease(snapshot).ok;
+  const configurationGateSatisfied = contactSettingsMatchExactly(
+    snapshot.settings.contact,
+    config.contact,
+  );
+  const enabled =
+    releaseGateSatisfied && config.enabled && configurationGateSatisfied;
+
   return {
-    enabled: true,
-    releaseGateSatisfied: true,
-    approvalGateSatisfied: true,
-    privacyGateSatisfied: true,
-    configurationGateSatisfied: true,
-    contact: structuredClone(snapshot.settings.contact),
+    enabled,
+    releaseGateSatisfied,
+    approvalGateSatisfied: config.approvalGateSatisfied,
+    privacyGateSatisfied: config.privacyGateSatisfied,
+    configurationGateSatisfied,
+    // The approved runtime snapshot is the publication authority. Environment
+    // configuration may confirm that exact value, but it never becomes an
+    // independent source of rendered contact destinations.
+    contact: enabled ? structuredClone(snapshot.settings.contact) : {},
   };
 }
 

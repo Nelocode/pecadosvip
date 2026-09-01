@@ -28,7 +28,7 @@ export default function PublicHeader({ currentPath, locale }: PublicHeaderProps)
     <>
       <header className="public-header">
         <a className="public-brand" href={hrefFor('/')} aria-label={messages.brandHomeAria}>
-          <span className="text-amber-400 font-extrabold mr-1 text-sm tracking-wider" aria-hidden="true">VIP</span>
+          <span className="public-apple" aria-hidden="true"><span /></span>
           <span>Pecados<span>Vip</span></span>
         </a>
 

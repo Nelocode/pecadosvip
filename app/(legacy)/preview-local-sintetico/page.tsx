@@ -18,6 +18,7 @@ import {
 } from '../../../lib/preview/synthetic-preview';
 import ProfileCard from '../../components/ProfileCard';
 import PublicProfileMedia from '../../components/PublicProfileMedia';
+import SyntheticFiligree from '../../components/SyntheticFiligree';
 
 export const metadata: Metadata = {
   title: 'PecadosVip · Previsualización local sintética',
@@ -192,6 +193,7 @@ export default async function SyntheticPreviewPage({
 
   return (
     <div className="public-page synthetic-preview-page">
+      <SyntheticFiligree />
       <header className="public-header synthetic-preview-header" id="inicio">
         <a className="public-brand synthetic-preview-brand" href="#inicio">
           <span>PecadosVip</span>

@@ -10,6 +10,14 @@ type PublicProfileMediaProps = {
   sizes: string;
 };
 
+function resolveUrl(url: unknown): string {
+  if (typeof url === 'string') return url;
+  if (url && typeof url === 'object') {
+    return (url as Record<string, string>).es || Object.values(url)[0] || '';
+  }
+  return '';
+}
+
 function mimeType(url: string, kind: PublicMedia['kind']): string {
   const pathname = url.split(/[?#]/u, 1)[0]?.toLowerCase() ?? '';
   if (kind === 'video') {
@@ -35,46 +43,50 @@ export default function PublicProfileMedia({
   };
   style.objectPosition = objectPosition;
 
+  const altString = typeof media.alt === 'string' ? media.alt : (media.alt as any)?.es || '';
+  const desktopUrl = resolveUrl(media.desktopUrl);
+  const mobileUrl = resolveUrl(media.mobileUrl);
+
   if (media.kind === 'video') {
     return (
       <video
-        aria-label={media.alt}
+        aria-label={altString || undefined}
         controls
         playsInline
         preload="metadata"
         style={style}
       >
-        {media.mobileUrl ? (
+        {mobileUrl ? (
           <source
             media="(max-width: 780px)"
-            src={media.mobileUrl}
-            type={mimeType(media.mobileUrl, media.kind)}
+            src={mobileUrl}
+            type={mimeType(mobileUrl, media.kind)}
           />
         ) : null}
         <source
-          src={media.desktopUrl}
-          type={mimeType(media.desktopUrl, media.kind)}
+          src={desktopUrl}
+          type={mimeType(desktopUrl, media.kind)}
         />
       </video>
     );
   }
 
-  if (media.mobileUrl) {
+  if (mobileUrl) {
     return (
       <picture>
         <source
           media="(max-width: 780px)"
-          srcSet={media.mobileUrl}
-          type={mimeType(media.mobileUrl, media.kind)}
+          srcSet={mobileUrl}
+          type={mimeType(mobileUrl, media.kind)}
         />
         <img
-          alt={media.alt}
+          alt={altString}
           decoding="async"
           fetchPriority={priority ? 'high' : 'auto'}
           height={1280}
           loading={priority ? 'eager' : 'lazy'}
           sizes={sizes}
-          src={media.desktopUrl}
+          src={desktopUrl}
           style={style}
           width={960}
         />
@@ -84,13 +96,13 @@ export default function PublicProfileMedia({
 
   return (
     <Image
-      alt={media.alt}
+      alt={altString}
       fill
       priority={priority}
       sizes={sizes}
-      src={media.desktopUrl}
+      src={desktopUrl}
       style={style}
-      unoptimized={media.desktopUrl.startsWith('/preview-local-sintetico/')}
+      unoptimized={desktopUrl.startsWith('/preview-local-sintetico/')}
     />
   );
 }

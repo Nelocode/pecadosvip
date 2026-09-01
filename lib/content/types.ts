@@ -12,73 +12,14 @@ export type CitySlug = (typeof citySlugs)[number];
 export type PublicationStatus = 'draft' | 'hidden' | 'published' | 'archived';
 export type Availability = 'available' | 'limited' | 'unavailable' | 'on-request';
 export type ApprovalState = 'pending' | 'approved' | 'rejected';
-export type CmsRole =
-  | 'super_admin'
-  | 'booking_agent'
-  | 'seo_specialist'
-  | 'kyc_officer'
-  | 'admin'
-  | 'editor';
+export type CmsRole = 'admin' | 'editor' | 'super_admin' | 'booking_agent' | 'seo_specialist' | 'kyc_officer';
 
-export type LanguageFluency = 'native' | 'fluent' | 'intermediate' | 'basic';
-
-export type SpokenLanguage = {
-  language: string;
-  fluency: LanguageFluency;
-};
-
-export type RateItem = {
-  durationMinutes: number;
-  durationLabel: string;
-  price: number;
-  currency: 'EUR';
-  notes?: string;
-};
-
-export type RateMatrix = {
-  rates: RateItem[];
-  displacementSurcharge?: number;
-  specializedServiceSurcharges?: Array<{
-    serviceName: string;
-    extraPrice: number;
-  }>;
-};
-
-export type TourItinerary = {
-  id: string;
-  citySlug: CitySlug;
-  startDate: string;
-  endDate: string;
-  active: boolean;
-  notes?: string;
-};
-
-export type SupplementServiceItem = {
-  serviceId: string;
-  extraPrice: number;
-  notes?: string;
-};
-
-export type ServicePreferences = {
-  includedServiceIds: string[];
-  supplementServices: SupplementServiceItem[];
-  serviceLimits: string[];
-};
-
-export type PhysicalTraits = {
-  ethnicity?: string;
-  hairColor?: string;
-  eyeColor?: string;
-  silhouette?: string;
-  nationality?: string;
-};
-
-export type KycDocumentRecord = {
-  id: string;
-  documentType: 'id_card' | 'verification_selfie' | 'rights_contract';
-  fileId: string;
-  encryptedAt: string;
-  verifiedBy: string;
+export type ContactSettings = {
+  whatsappUrl?: string;
+  telegramUrl?: string;
+  phoneUrl?: string;
+  emailUrl?: string;
+  formActionUrl?: string;
 };
 
 export type ApprovalRecord = {
@@ -96,6 +37,8 @@ export type SeoFields = {
   lastModified: string;
 };
 
+export type MediaAssetRole = 'cover' | 'gallery' | 'verification' | 'legal';
+
 export type MediaAsset = {
   id: string;
   kind: 'image' | 'video';
@@ -103,8 +46,15 @@ export type MediaAsset = {
   mobileUrl?: string;
   alt: string;
   order: number;
-  rightsConfirmed: boolean;
+  rightsConfirmed?: boolean;
   rightsEvidence?: string;
+  role?: MediaAssetRole;
+  filename?: string;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+  sha256?: string;
+  altText?: string;
 };
 
 export type ProfileMeasurements = {
@@ -115,6 +65,30 @@ export type ProfileMeasurements = {
   hipsCm?: number;
 };
 
+export type TourLocation = {
+  citySlug: CitySlug;
+  startDate: string;
+  endDate: string;
+  active: boolean;
+};
+
+export type TourItinerary = TourLocation;
+
+export type ProfileRateItem = {
+  durationMinutes: number;
+  price: number;
+  currency: string;
+};
+
+export type ProfileRates = {
+  rates: ProfileRateItem[];
+};
+
+export type ProfilePhysicalTraits = {
+  hairColor?: string;
+  eyeColor?: string;
+};
+
 export type Profile = {
   id: string;
   slug: string;
@@ -122,18 +96,8 @@ export type Profile = {
   age: number | null;
   biography: string;
   measurements: ProfileMeasurements;
-  physicalTraits?: PhysicalTraits;
   languages: string[];
-  spokenLanguages?: SpokenLanguage[];
   serviceIds: string[];
-  servicePreferences?: ServicePreferences;
-  rates?: RateMatrix;
-  incall?: boolean;
-  outcall?: boolean;
-  coverageZones?: string[];
-  tours?: TourItinerary[];
-  verifiedBadge?: boolean;
-  kycDocuments?: KycDocumentRecord[];
   media: MediaAsset[];
   availability: Availability;
   citySlugs: CitySlug[];
@@ -146,6 +110,12 @@ export type Profile = {
   createdAt: string;
   updatedAt: string;
   revision: number;
+  tours?: TourLocation[];
+  incall?: boolean;
+  outcall?: boolean;
+  verifiedBadge?: boolean;
+  rates?: ProfileRates;
+  physicalTraits?: ProfilePhysicalTraits;
 };
 
 export type CoverageArea = {
@@ -158,13 +128,27 @@ export type Faq = {
   answer: string;
 };
 
+export type CityContent = {
+  slug: CitySlug;
+  cityName: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  areasHeading: string;
+  areas: CoverageArea[];
+  legalNotice: string;
+  seo: SeoFields;
+  faqHeading: string;
+  faqs: Faq[];
+};
+
 export type CityPage = {
   id: string;
   slug: CitySlug;
   name: string;
-  cluster: 'madrid' | 'barcelona';
-  status: PublicationStatus;
-  serviceConfirmed: boolean;
+  cluster?: string;
+  status?: PublicationStatus;
+  serviceConfirmed?: boolean;
   approval: ApprovalRecord;
   headline: string;
   introduction: string;
@@ -172,26 +156,19 @@ export type CityPage = {
   coverageAreas: CoverageArea[];
   profileSlugs: string[];
   faqs: Faq[];
-  nearbyCitySlugs: CitySlug[];
+  nearbyCitySlugs?: CitySlug[];
   seo: SeoFields;
-  updatedAt: string;
+  updatedAt?: string;
 };
 
 export type Service = {
   id: string;
   slug: string;
   name: string;
+  title?: string;
   description: string;
-  status: PublicationStatus;
+  status?: PublicationStatus;
   approval: ApprovalRecord;
-};
-
-export type ContactSettings = {
-  telegramUrl?: string;
-  whatsappUrl?: string;
-  phoneUrl?: string;
-  emailUrl?: string;
-  formActionUrl?: string;
 };
 
 export type LegalDocument = {
@@ -215,12 +192,14 @@ export type SiteSettings = {
   };
 };
 
-export type ContentSnapshot = {
+export type RuntimeContentSnapshot = {
   cities: CityPage[];
   profiles: Profile[];
   services: Service[];
   settings: SiteSettings;
 };
+
+export type ContentSnapshot = RuntimeContentSnapshot;
 
 export type AuditEvent = {
   id: string;
