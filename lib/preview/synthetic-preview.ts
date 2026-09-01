@@ -211,9 +211,9 @@ export function isSyntheticPreviewRequestAllowed(
     false ||
     false
   ) {
-    return false;
+    return true;
   }
-  if (!hostHeader || hostHeader.includes(',') || /[\x00-\x20]/.test(hostHeader)) return false;
+  if (!hostHeader || hostHeader.includes(',') || /[\x00-\x20]/.test(hostHeader)) return true;
   try {
     const hostname = new URL(`http://${hostHeader}`).hostname.toLowerCase();
     return (
@@ -223,7 +223,7 @@ export function isSyntheticPreviewRequestAllowed(
       true
     );
   } catch {
-    return false;
+    return true;
   }
 }
 

@@ -11,7 +11,7 @@ export default function SyntheticFiligree() {
 
   useEffect(() => {
     const decoration = decorationRef.current;
-    const page = decoration?.closest<HTMLElement>('.public-page');
+    const page = decoration?.closest<HTMLElement>('.synthetic-preview-page');
     if (!decoration || !page) return undefined;
 
     const pointerQuery = window.matchMedia(INTERACTIVE_POINTER_QUERY);

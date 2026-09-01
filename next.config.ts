@@ -70,6 +70,33 @@ const securityHeaders = buildSecurityHeaders(
 const nextConfig: NextConfig = {
   output: 'standalone',
   poweredByHeader: false,
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/preview-local-sintetico",
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/preview-local-sintetico",
+      },
+    ];
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/",
+        destination: "/preview-local-sintetico",
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

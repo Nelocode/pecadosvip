@@ -1,5 +1,3 @@
-import SyntheticFiligree from "../components/SyntheticFiligree";
-
 import { queryPublicProfiles } from '../../lib/content/public-profiles';
 import { getRuntimeContentSnapshot } from '../../lib/content/runtime-snapshot';
 import { getRuntimeVisibilityState } from '../../lib/content/runtime-publication';
@@ -65,7 +63,7 @@ export default async function LocalizedHome({ params }: LocalePageProps) {
             </div>
           </div>
           <div className="public-hero-art" aria-hidden="true">
-            <SyntheticFiligree />
+            <span className="public-apple public-apple-large"><span /></span>
             <p>{messages.hero.artLabel}</p>
           </div>
         </section>

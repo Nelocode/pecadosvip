@@ -32,7 +32,7 @@ export function evaluateRuntimeVisibility(
 
   return {
     releaseReady,
-    renderPublicExperience: true,
+    renderPublicExperience: releaseReady,
   };
 }
 

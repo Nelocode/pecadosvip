@@ -1,5 +1,3 @@
-import SyntheticFiligree from "../components/SyntheticFiligree";
-
 /* eslint-disable @next/next/no-html-link-for-pages -- Vinext 1.0.0-beta.3 client navigation throws at runtime; native links are the verified fallback. */
 import { queryPublicProfiles } from '../../lib/content/public-profiles';
 import { getRuntimeContentSnapshot } from '../../lib/content/runtime-snapshot';
@@ -55,7 +53,7 @@ export default function Home() {
           </div>
         </div>
         <div className="public-hero-art" aria-hidden="true">
-          <SyntheticFiligree />
+          <span className="public-apple public-apple-large"><span /></span>
           <p>Madrid · Barcelona</p>
         </div>
       </section>

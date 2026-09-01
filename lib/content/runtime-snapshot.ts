@@ -81,56 +81,7 @@ const draftCities: CityPage[] = Object.values(cities).map(
 
 const runtimeDraftSnapshot: ContentSnapshot = {
   cities: draftCities,
-  profiles: [
-    {
-      id: "profile-valeria",
-      slug: "valeria",
-      displayName: "Valeria",
-      age: 27,
-      biography: "Concepto editorial ficticio de elegancia mediterránea.",
-      measurements: {
-        heightCentimeters: 170,
-        weightKilograms: 55,
-        chestCentimeters: 90,
-        waistCentimeters: 60,
-        hipsCentimeters: 90
-      },
-      languages: ["Español", "Inglés"],
-      serviceIds: [],
-      media: [
-        {
-          kind: "image",
-          id: "media-valeria-cover", role: "cover",
-          label: "Retrato",
-          sourcePath: "assets/synthetic-profiles/valeria/cover/valeria-cover-v01.png",
-          desktopUrl: "/assets/synthetic-profiles/valeria/cover",
-          mobileUrl: "/assets/synthetic-profiles/valeria/cover",
-          alt: "Valeria cover",
-          order: 0
-        },
-        {
-          kind: "image",
-          id: "media-valeria-gallery-01", role: "gallery-01",
-          label: "Retrato",
-          sourcePath: "assets/synthetic-profiles/valeria/gallery/valeria-gallery-01-v01.png",
-          desktopUrl: "/assets/synthetic-profiles/valeria/gallery-01",
-          mobileUrl: "/assets/synthetic-profiles/valeria/gallery-01",
-          alt: "Valeria gallery",
-          order: 1
-        }
-      ],
-      availability: "available",
-      citySlugs: ["madrid"],
-      status: "published",
-      approval: { state: "approved", approvedAt: "2026-08-27T00:00:00-05:00", approvedBy: "system" },
-      adultAgeConfirmed: true,
-      publicationConsentConfirmed: true,
-      rightsConfirmed: true,
-      createdAt: "2026-08-27T00:00:00-05:00",
-      updatedAt: "2026-08-27T00:00:00-05:00",
-      revision: 1
-    }
-],
+  profiles: [],
   services: [],
   settings: {
     brandName: 'PecadosVip',
