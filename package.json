@@ -12,7 +12,7 @@
     "cms:restore": "node --experimental-strip-types scripts/local-cms-backup.ts restore",
     "dev": "vinext dev",
     "dev:preview": "node --experimental-strip-types scripts/local-synthetic-preview.ts",
-    "build": "vinext build && pnpm run standalone:prepare",
+    "build": "vinext build && npm run standalone:prepare",
     "brand:filigree": "node --experimental-strip-types scripts/prepare-brand-filigree.ts",
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern output --ignore-pattern .playwright-cli",

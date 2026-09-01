@@ -56,3 +56,4 @@ next-env.d.ts
 /.firecrawl/
 /.local-cms/
 /stage-archives/
+*.zip

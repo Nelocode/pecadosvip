@@ -28,8 +28,10 @@ export type RuntimeVisibilityState = {
 export function evaluateRuntimeVisibility(
   snapshot: ContentSnapshot,
 ): RuntimeVisibilityState {
+  const releaseReady = evaluateRelease(snapshot).ok;
+
   return {
-    releaseReady: true,
+    releaseReady,
     renderPublicExperience: true,
   };
 }

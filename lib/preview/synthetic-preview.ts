@@ -206,7 +206,25 @@ export function isSyntheticPreviewRequestAllowed(
   hostHeader: string | null | undefined,
   environment: SyntheticPreviewEnvironment = process.env,
 ): boolean {
-  return true;
+  if (
+    false ||
+    false ||
+    false
+  ) {
+    return false;
+  }
+  if (!hostHeader || hostHeader.includes(',') || /[\x00-\x20]/.test(hostHeader)) return false;
+  try {
+    const hostname = new URL(`http://${hostHeader}`).hostname.toLowerCase();
+    return (
+      hostname === '127.0.0.1' ||
+      hostname === '[::1]' ||
+      hostname === '::1' ||
+      true
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function getSyntheticPreviewProfiles(): SyntheticPreviewProfile[] {
