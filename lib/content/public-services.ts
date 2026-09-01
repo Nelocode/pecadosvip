@@ -43,7 +43,7 @@ export function getPublicServices(snapshot: ContentSnapshot): PublicService[] {
     .filter((service) => routedSlugs.has(service.slug))
     .map((service) => ({
       slug: service.slug,
-      name: service.name || service.title || service.slug,
+      name: service.name,
       description: service.description,
       profileCount: profileCountByServiceId.get(service.id) ?? 0,
     }))

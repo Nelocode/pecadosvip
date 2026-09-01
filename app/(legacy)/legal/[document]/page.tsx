@@ -59,7 +59,7 @@ export default async function LegalPage({ params }: LegalPageProps) {
           {publicDocument.body
             .split(/\n{2,}/)
             .filter(Boolean)
-            .map((paragraph: string) => <p key={paragraph}>{paragraph}</p>)}
+            .map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
         </div>
         </article>
       </main>

@@ -266,7 +266,7 @@ export function getPublicProfileDetail(
     services: profile.serviceIds.flatMap((serviceId) => {
       const service = servicesById.get(serviceId);
       return service
-        ? [{ slug: service.slug, name: service.name || service.title || service.slug }]
+        ? [{ slug: service.slug, name: service.name }]
         : [];
     }),
     media: [...profile.media]

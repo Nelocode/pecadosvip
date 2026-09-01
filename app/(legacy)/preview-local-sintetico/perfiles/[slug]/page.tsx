@@ -11,6 +11,7 @@ import {
 import type { Locale } from '../../../../../lib/i18n/locales';
 import { isSyntheticServiceLocale } from '../../../../../lib/preview/synthetic-services';
 import PublicProfileMedia from '../../../../components/PublicProfileMedia';
+import SyntheticFiligree from '../../../../components/SyntheticFiligree';
 
 export const metadata: Metadata = {
   title: 'Ficha sintética · Previsualización local',
@@ -79,6 +80,7 @@ export default async function SyntheticProfilePage({
 
   return (
     <div className="public-page synthetic-preview-page synthetic-profile-page">
+      <SyntheticFiligree />
       <header className="public-header synthetic-preview-header">
         <a className="public-brand" href={`/preview-local-sintetico?lang=${locale}#inicio`}>
           PecadosVip

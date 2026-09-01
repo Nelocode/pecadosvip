@@ -38,10 +38,10 @@ Importante: el build público permanece deliberadamente en **holding fail-closed
 ## Estado de esta copia
 
 - Rama local observada: codex/design-sync-20260829
-- HEAD base: ec6190ecc23a29d6cbdd0b3977cdfb3f09a1b3a9
+- HEAD base: 430a5c13e9b9c33762e8e150c9feabf0a1dd1592
 - Remoto observado: https://github.com/Nelocode/pecadosvip.git
 - Árbol con cambios locales incluidos: True
-- Fecha UTC: 20260830-215612Z
+- Fecha UTC: 20260901-001648Z
 
 ---
 

@@ -14,14 +14,6 @@ export type Availability = 'available' | 'limited' | 'unavailable' | 'on-request
 export type ApprovalState = 'pending' | 'approved' | 'rejected';
 export type CmsRole = 'admin' | 'editor' | 'super_admin' | 'booking_agent' | 'seo_specialist' | 'kyc_officer';
 
-export type ContactSettings = {
-  whatsappUrl?: string;
-  telegramUrl?: string;
-  phoneUrl?: string;
-  emailUrl?: string;
-  formActionUrl?: string;
-};
-
 export type ApprovalRecord = {
   state: ApprovalState;
   sourceReference?: string;
@@ -37,8 +29,6 @@ export type SeoFields = {
   lastModified: string;
 };
 
-export type MediaAssetRole = 'cover' | 'gallery' | 'verification' | 'legal';
-
 export type MediaAsset = {
   id: string;
   kind: 'image' | 'video';
@@ -46,15 +36,8 @@ export type MediaAsset = {
   mobileUrl?: string;
   alt: string;
   order: number;
-  rightsConfirmed?: boolean;
+  rightsConfirmed: boolean;
   rightsEvidence?: string;
-  role?: MediaAssetRole;
-  filename?: string;
-  mimeType?: string;
-  width?: number;
-  height?: number;
-  sha256?: string;
-  altText?: string;
 };
 
 export type ProfileMeasurements = {
@@ -128,27 +111,13 @@ export type Faq = {
   answer: string;
 };
 
-export type CityContent = {
-  slug: CitySlug;
-  cityName: string;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  areasHeading: string;
-  areas: CoverageArea[];
-  legalNotice: string;
-  seo: SeoFields;
-  faqHeading: string;
-  faqs: Faq[];
-};
-
 export type CityPage = {
   id: string;
   slug: CitySlug;
   name: string;
-  cluster?: string;
-  status?: PublicationStatus;
-  serviceConfirmed?: boolean;
+  cluster: 'madrid' | 'barcelona';
+  status: PublicationStatus;
+  serviceConfirmed: boolean;
   approval: ApprovalRecord;
   headline: string;
   introduction: string;
@@ -156,19 +125,26 @@ export type CityPage = {
   coverageAreas: CoverageArea[];
   profileSlugs: string[];
   faqs: Faq[];
-  nearbyCitySlugs?: CitySlug[];
+  nearbyCitySlugs: CitySlug[];
   seo: SeoFields;
-  updatedAt?: string;
+  updatedAt: string;
 };
 
 export type Service = {
   id: string;
   slug: string;
   name: string;
-  title?: string;
   description: string;
-  status?: PublicationStatus;
+  status: PublicationStatus;
   approval: ApprovalRecord;
+};
+
+export type ContactSettings = {
+  telegramUrl?: string;
+  whatsappUrl?: string;
+  phoneUrl?: string;
+  emailUrl?: string;
+  formActionUrl?: string;
 };
 
 export type LegalDocument = {
@@ -192,14 +168,12 @@ export type SiteSettings = {
   };
 };
 
-export type RuntimeContentSnapshot = {
+export type ContentSnapshot = {
   cities: CityPage[];
   profiles: Profile[];
   services: Service[];
   settings: SiteSettings;
 };
-
-export type ContentSnapshot = RuntimeContentSnapshot;
 
 export type AuditEvent = {
   id: string;

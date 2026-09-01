@@ -168,6 +168,32 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     );
   }
 
+  for (const fixture of [
+    'assets/brand/filigree-source-v01.png',
+    'assets/brand/filigree-gold-texture-source-v02.png',
+    'assets/brand/filigree-gold-texture-source-v03.png',
+    'assets/brand/filigree-mosaic-source-v04.png',
+    'assets/synthetic-decor/ASSET_MANIFEST.csv',
+    'assets/synthetic-decor/selected/border-filigree-v01.webp',
+    'assets/synthetic-decor/selected/border-filigree-left-v02.webp',
+    'assets/synthetic-decor/selected/border-filigree-right-v02.webp',
+    'assets/synthetic-decor/selected/border-filigree-gold-v02.webp',
+    'assets/synthetic-decor/selected/border-filigree-left-v03.webp',
+    'assets/synthetic-decor/selected/border-filigree-right-v03.webp',
+    'assets/synthetic-decor/selected/border-filigree-gold-v03.webp',
+    'assets/synthetic-decor/selected/border-filigree-left-v04.webp',
+    'assets/synthetic-decor/selected/border-filigree-right-v04.webp',
+    'assets/synthetic-decor/selected/border-filigree-mosaic-v04.webp',
+    'assets/synthetic-decor/selected/border-filigree-left-v05.webp',
+    'assets/synthetic-decor/selected/border-filigree-right-v05.webp',
+  ]) {
+    assert.equal(
+      isExcludedByDockerignore(fixture, patterns),
+      true,
+      `${fixture} must remain outside the production build context.`,
+    );
+  }
+
   const publicFixtures = [
     'app/[locale]/page.tsx',
     'lib/content/repository.ts',

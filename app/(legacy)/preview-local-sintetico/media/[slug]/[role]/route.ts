@@ -14,7 +14,6 @@ export async function GET(
     return new NextResponse('Asset not found', { status: 404 });
   }
 
-  // Look in public/assets or assets
   const publicPath = path.join(process.cwd(), 'public', asset.sourcePath);
   const fallbackPath = path.join(process.cwd(), asset.sourcePath);
   const filePath = fs.existsSync(publicPath) ? publicPath : fallbackPath;
