@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import {
   getSyntheticPreviewProfile,
+  getSyntheticPreviewBuildEnvironment,
   isSyntheticPreviewRequestAllowed,
   syntheticPreviewAssetRoles,
   type SyntheticPreviewAssetRole,
@@ -52,11 +53,7 @@ export default async function SyntheticProfilePage({
   searchParams,
 }: SyntheticProfilePageProps) {
   const requestHeaders = await headers();
-  const previewEnvironment = {
-    NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
-    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
-      import.meta.env.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
-  };
+  const previewEnvironment = getSyntheticPreviewBuildEnvironment(import.meta.env);
   if (
     !isSyntheticPreviewRequestAllowed(
       requestHeaders.get('host'),

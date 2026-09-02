@@ -12,6 +12,12 @@ $archiveDirectory = Join-Path $repoRoot 'stage-archives'
 $timestamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmssZ')
 $archivePath = Join-Path $archiveDirectory "pecadosvip-source-$Stage-$timestamp.zip"
 $repoPrefix = $repoRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) + [System.IO.Path]::DirectorySeparatorChar
+$generatedEntryNames = @(
+    'LEEME_PRIMERO_SUBIR_PROYECTO.md',
+    'INVENTARIO_ARCHIVO_ETAPA.tsv',
+    'EXCLUSIONES_ARCHIVO_ETAPA.txt',
+    'MANIFIESTO_ARCHIVO_ETAPA.json'
+)
 
 function Normalize-ArchivePath {
     param([Parameter(Mandatory)][string]$Path)
@@ -90,6 +96,11 @@ $maximumArchiveSourceBytes = 400MB
 foreach ($relativePath in $gitPaths) {
     if ([string]::IsNullOrWhiteSpace($relativePath)) { continue }
     $normalized = Normalize-ArchivePath -Path $relativePath
+
+    if ($generatedEntryNames -contains $normalized) {
+        $excluded.Add("$normalized (regenerated for this archive)")
+        continue
+    }
 
     if (Test-ExcludedPath -RelativePath $normalized) {
         $excluded.Add($normalized)
@@ -224,6 +235,16 @@ Importante: el build público permanece deliberadamente en **holding fail-closed
 ## Guía técnica completa del repositorio
 
 "@
+if (
+    $simpleGuide.IndexOf([char]0x00C3) -ge 0 -or
+    $simpleGuide.IndexOf([char]0x00E2) -ge 0
+) {
+    # Windows PowerShell 5.1 may parse a UTF-8 script without BOM as Windows-1252.
+    # Repair that source-decoding artifact before writing the UTF-8 guide into the ZIP.
+    $simpleGuide = [System.Text.Encoding]::UTF8.GetString(
+        [System.Text.Encoding]::GetEncoding(1252).GetBytes($simpleGuide)
+    )
+}
 $fullGuide = [System.IO.File]::ReadAllText((Join-Path $repoRoot 'SUBIR_PROYECTO.md'))
 $guide = $simpleGuide + $fullGuide
 
@@ -307,7 +328,7 @@ try {
             throw "Excluded entry was added to the ZIP: $entryName"
         }
     }
-    foreach ($required in @('LEEME_PRIMERO_SUBIR_PROYECTO.md', 'INVENTARIO_ARCHIVO_ETAPA.tsv', 'EXCLUSIONES_ARCHIVO_ETAPA.txt', 'MANIFIESTO_ARCHIVO_ETAPA.json')) {
+    foreach ($required in $generatedEntryNames) {
         if ($entryNames -notcontains $required) {
             throw "Required ZIP entry is missing: $required"
         }

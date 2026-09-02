@@ -7,7 +7,9 @@ import test from 'node:test';
 import sharp from 'sharp';
 
 import {
+  buildSyntheticPreviewMediaHeaders,
   filterSyntheticPreviewProfiles,
+  getSyntheticPreviewBuildEnvironment,
   getSyntheticPreviewAsset,
   getSyntheticPreviewProfile,
   getSyntheticPreviewProfiles,
@@ -35,6 +37,10 @@ import {
   getSyntheticDecorMedia,
   syntheticDecorMediaKeys,
 } from '../lib/preview/synthetic-decor-media.ts';
+import {
+  getSyntheticHeroMedia,
+  syntheticHeroMediaKeys,
+} from '../lib/preview/synthetic-hero-media.ts';
 import { parseLocalRequestPathname } from '../scripts/vite-local-synthetic-media.ts';
 
 function fileSha256(path: string): string {
@@ -42,6 +48,29 @@ function fileSha256(path: string): string {
     .update(readFileSync(resolve(path)))
     .digest('hex')
     .toUpperCase();
+}
+
+function sourceBetween(
+  source: string,
+  startMarker: string,
+  endMarker: string,
+): string {
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  assert.ok(start >= 0, `Missing source marker: ${startMarker}`);
+  assert.ok(end > start, `Missing source marker after ${startMarker}: ${endMarker}`);
+  return source.slice(start, end);
+}
+
+type PreviewZoneName = 'madrid' | 'barcelona';
+
+function parseZoneAssignments(
+  source: string,
+): Record<string, PreviewZoneName> {
+  return Object.fromEntries(
+    [...source.matchAll(/^\s+([a-z0-9-]+):\s*'(madrid|barcelona)',?$/gmu)]
+      .map((match) => [match[1]!, match[2]!]),
+  ) as Record<string, PreviewZoneName>;
 }
 
 test('the local preview middleware fails closed on malformed request URLs', () => {
@@ -68,6 +97,28 @@ test('preview requires the explicit flag and a development loopback request', ()
     }),
     false,
   );
+  assert.deepEqual(
+    getSyntheticPreviewBuildEnvironment({
+      DEV: true,
+      VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    }),
+    enabled,
+  );
+  assert.deepEqual(
+    getSyntheticPreviewBuildEnvironment({
+      DEV: false,
+      VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    }),
+    {
+      NODE_ENV: 'production',
+      PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    },
+  );
+  assert.deepEqual(buildSyntheticPreviewMediaHeaders('image/webp'), {
+    'Content-Type': 'image/webp',
+    'Cache-Control': 'private, no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
+  });
   assert.equal(
     isSyntheticPreviewRequestAllowed('localhost:3000', {
       ...enabled,
@@ -169,6 +220,13 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
     'scripts/vite-local-synthetic-media.ts',
     'utf8',
   );
+  const mediaRouteSources = [
+    'app/(legacy)/preview-local-sintetico/city-media/[citySlug]/route.ts',
+    'app/(legacy)/preview-local-sintetico/decor-media/[key]/route.ts',
+    'app/(legacy)/preview-local-sintetico/hero-media/[key]/route.ts',
+    'app/(legacy)/preview-local-sintetico/media/[profileSlug]/[role]/route.ts',
+    'app/(legacy)/preview-local-sintetico/service-media/[service]/route.ts',
+  ].map((path) => readFileSync(path, 'utf8'));
   const publicCssSource = readFileSync('app/public-site.css', 'utf8');
   const viteConfigSource = readFileSync('vite.config.ts', 'utf8');
   const profileCardSource = readFileSync('app/components/ProfileCard.tsx', 'utf8');
@@ -180,8 +238,7 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   for (const source of [pageSource, detailSource]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
-    assert.match(source, /import\.meta\.env\.DEV/);
-    assert.match(source, /VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(source, /ContactOptions|https?:\/\//);
   }
   assert.match(pageSource, /<ProfileCard/);
@@ -202,9 +259,19 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(mediaMiddlewareSource, /syntheticDecorMediaPattern/);
   assert.match(mediaMiddlewareSource, /isSyntheticDecorMediaKey/);
   assert.match(mediaMiddlewareSource, /'synthetic-decor'/);
+  assert.match(mediaMiddlewareSource, /syntheticHeroMediaPattern/);
+  assert.match(mediaMiddlewareSource, /isSyntheticHeroMediaKey/);
+  assert.match(mediaMiddlewareSource, /'synthetic-hero'/);
   assert.match(mediaMiddlewareSource, /assetRoot/);
   assert.match(mediaMiddlewareSource, /private, no-store/);
   assert.match(mediaMiddlewareSource, /noimageindex/);
+  for (const source of mediaRouteSources) {
+    assert.match(source, /isSyntheticPreviewRequestAllowed/);
+    assert.match(source, /request\.headers\.get\('host'\)/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
+    assert.match(source, /buildSyntheticPreviewMediaHeaders/);
+    assert.match(source, /status:\s*404/);
+  }
   assert.match(viteConfigSource, /localSyntheticMediaPlugin\(\)/);
   assert.match(viteConfigSource, /ignored:\s*\['\*\*\/stage-archives\/\*\*'\]/);
   assert.match(profileCardSource, /disclosure\?: string/);
@@ -229,14 +296,134 @@ test('local preview exposes the complete internal home flow without enabling con
   );
   const publicCssSource = readFileSync('app/public-site.css', 'utf8');
 
+  const referenceCssStart = publicCssSource.indexOf(
+    '/* Reference-aligned home composition. Scoped to the guarded synthetic preview. */',
+  );
+  assert.ok(referenceCssStart >= 0, 'Missing the scoped reference-aligned CSS layer.');
+  const effectivePreviewCss = publicCssSource.slice(referenceCssStart);
+  const stackedZonesCss = sourceBetween(
+    effectivePreviewCss,
+    '@media (max-width: 900px)',
+    '@media (max-width: 1100px)',
+  );
+  const mobileCss = sourceBetween(
+    effectivePreviewCss,
+    '@media (max-width: 780px)',
+    '@media (max-width: 420px)',
+  );
+  const narrowMobileCss = effectivePreviewCss.slice(
+    effectivePreviewCss.indexOf('@media (max-width: 420px)'),
+  );
+  const extraNarrowMobileCss = effectivePreviewCss.slice(
+    effectivePreviewCss.indexOf('@media (max-width: 360px)'),
+  );
+
   for (const anchor of ['inicio', 'cobertura', 'perfiles', 'seguridad']) {
     assert.match(pageSource, new RegExp(`href="#${anchor}"`));
   }
+
+  assert.equal((pageSource.match(/<main(?:\s|>)/gu) ?? []).length, 1);
+  assert.equal((pageSource.match(/<h1(?:\s|>)/gu) ?? []).length, 1);
+  assert.equal((pageSource.match(/id="main-content"/gu) ?? []).length, 1);
+  assert.equal((pageSource.match(/id="preview-title"/gu) ?? []).length, 1);
+  assert.match(pageSource, /<main id="main-content" tabIndex=\{-1\}>/);
+  assert.match(
+    pageSource,
+    /<section className="synthetic-preview-hero" aria-labelledby="preview-title">/,
+  );
+
+  const coverageGroupsSource = sourceBetween(
+    pageSource,
+    'const coverageGroups:',
+    'type PreviewZone',
+  );
+  const zoneBases = [...coverageGroupsSource.matchAll(/^\s+base: '(madrid|barcelona)',$/gmu)]
+    .map((match) => match[1]!);
+  assert.deepEqual(zoneBases, ['madrid', 'barcelona']);
+  assert.equal(new Set(zoneBases).size, 2);
+  assert.match(
+    pageSource,
+    /className=\{`synthetic-preview-city-zone synthetic-preview-city-zone--\$\{group\.base\}`\}/,
+  );
+  assert.match(pageSource, /id=\{`zona-\$\{group\.base\}`\}/);
+  assert.match(pageSource, /aria-labelledby=\{`zone-title-\$\{group\.base\}`\}/);
+  assert.match(pageSource, /<h3 id=\{`zone-title-\$\{group\.base\}`\}>/);
+
+  const profileHomeZones = parseZoneAssignments(
+    sourceBetween(pageSource, 'const profileHomeZones:', 'const filterCityZones'),
+  );
+  assert.deepEqual(profileHomeZones, {
+    valeria: 'madrid',
+    lucia: 'madrid',
+    alicia: 'madrid',
+    sofia: 'barcelona',
+    mia: 'barcelona',
+    julia: 'barcelona',
+  });
+  assert.deepEqual(
+    Object.keys(profileHomeZones).sort(),
+    getSyntheticPreviewProfiles().map((candidate) => candidate.slug).sort(),
+  );
+  assert.deepEqual(
+    (Object.values(profileHomeZones) as PreviewZoneName[]).reduce<Record<PreviewZoneName, number>>(
+      (counts, zone) => ({ ...counts, [zone]: counts[zone] + 1 }),
+      { madrid: 0, barcelona: 0 },
+    ),
+    { madrid: 3, barcelona: 3 },
+  );
+
+  const filterCityZones = parseZoneAssignments(
+    sourceBetween(pageSource, 'const filterCityZones =', 'const previewAvailabilities'),
+  );
+  assert.deepEqual(filterCityZones, {
+    madrid: 'madrid',
+    toledo: 'madrid',
+    segovia: 'madrid',
+    guadalajara: 'madrid',
+    barcelona: 'barcelona',
+    tarragona: 'barcelona',
+    girona: 'barcelona',
+  });
+  assert.match(
+    pageSource,
+    /const profiles = validFilters[\s\S]*?\? hasFilters[\s\S]*?\? filterSyntheticPreviewProfiles\(\{ city, availability \}\)[\s\S]*?: getSyntheticPreviewProfiles\(\)[\s\S]*?: \[\];/,
+  );
+  assert.match(
+    pageSource,
+    /const selectedZone = city[\s\S]*?\? filterCityZones\[city as keyof typeof filterCityZones\][\s\S]*?: undefined;/,
+  );
+  assert.match(
+    pageSource,
+    /function getProfileCoverageZones\(profile: SyntheticPreviewProfile\): PreviewZone\[\]/,
+  );
+  assert.match(
+    pageSource,
+    /const zones = selectedZone[\s\S]*?\? \[selectedZone\][\s\S]*?: availability[\s\S]*?\? getProfileCoverageZones\(candidate\)[\s\S]*?: \[profileHomeZones\[candidate\.slug\]\];/,
+  );
+  assert.match(pageSource, /for \(const zone of zones\)/);
+
   assert.match(pageSource, /id="servicios"/);
   assert.match(
     pageSource,
     /href=\{`\/preview-local-sintetico\/servicios\?lang=\$\{locale\}`\}/,
   );
+  assert.match(
+    pageSource,
+    /const zoneHref = \(zone: PreviewZone\) =>[\s\S]*?&city=\$\{zone\}[\s\S]*?availability \? `&availability=\$\{availability\}` : ''[\s\S]*?#zona-\$\{zone\}`;/,
+  );
+  assert.match(pageSource, /href=\{zoneHref\('madrid'\)\}/);
+  assert.match(pageSource, /href=\{zoneHref\('barcelona'\)\}/);
+  assert.match(
+    pageSource,
+    /href=\{zoneHref\(group\.base\)\}/,
+  );
+  assert.match(
+    pageSource,
+    /<section[\s\S]*?className="synthetic-preview-catalog-zone-section"[\s\S]*?id="perfiles"[\s\S]*?aria-labelledby="preview-results-title"/,
+  );
+  assert.match(pageSource, /<h2 id="preview-results-title">Modelos sintéticas por zona<\/h2>/);
+  assert.match(pageSource, /href="#perfiles"[\s\S]*?aria-label="Ir a las zonas y perfiles"/);
+  assert.match(pageSource, /headingLevel=\{5\}/);
   for (const [slug, city] of [
     ['madrid', 'Madrid'],
     ['barcelona', 'Barcelona'],
@@ -252,7 +439,8 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(pageSource, /getSyntheticPreviewProfiles/);
   assert.match(pageSource, /<PublicProfileMedia/);
   assert.match(pageSource, /Imagen generada con IA/);
-  assert.match(pageSource, /cityPresentation\.coverageTitle/);
+  assert.match(pageSource, /<h2 id="coverage-title">Dos zonas para elegir con claridad<\/h2>/);
+  assert.match(pageSource, /\{cityPresentation\.coverageBody\}/);
   assert.match(pageSource, /getSyntheticCityMedia/);
   assert.match(pageSource, /cityMedia\.shortDisclosure/);
   assert.match(pageSource, /id=\{`city-\$\{citySlug\}`\}/);
@@ -267,19 +455,108 @@ test('local preview exposes the complete internal home flow without enabling con
     /ContactOptions|formActionUrl|mailto:|tel:|https?:\/\/(?:t\.me|wa\.me)/,
   );
 
-  assert.match(publicCssSource, /\.synthetic-preview-hero\s*\{/);
   assert.match(
-    publicCssSource,
-    /\.synthetic-preview-hero-title-primary\s*\{[\s\S]*?line-height:\s*1\.15/,
+    pageSource,
+    /<Image[\s\S]*?alt=""[\s\S]*?aria-hidden="true"[\s\S]*?className="synthetic-preview-brand-mark"[\s\S]*?height=\{96\}[\s\S]*?src="\/icon\.png"[\s\S]*?width=\{96\}/,
   );
   assert.match(
-    publicCssSource,
-    /\.synthetic-preview-hero-title-secondary\s*\{[\s\S]*?line-height:\s*1\.15/,
+    effectivePreviewCss,
+    /\.synthetic-preview-brand-mark\s*\{[^}]*width:\s*80px;[^}]*height:\s*80px;/,
   );
-  assert.match(publicCssSource, /\.synthetic-preview-coverage-groups\s*\{/);
+  assert.match(
+    mobileCss,
+    /\.synthetic-preview-page \.synthetic-preview-brand-mark\s*\{[^}]*width:\s*56px;[^}]*height:\s*56px;/,
+  );
+  assert.match(
+    narrowMobileCss,
+    /\.synthetic-preview-page \.synthetic-preview-brand-mark\s*\{[^}]*width:\s*56px;[^}]*height:\s*56px;/,
+  );
+  assert.match(
+    extraNarrowMobileCss,
+    /\.synthetic-preview-page \.synthetic-preview-brand-mark\s*\{[^}]*width:\s*48px;[^}]*height:\s*48px;/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-brand-copy > span\s*\{[^}]*font-size:\s*3\.8rem;/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /@media \(min-width:\s*1101px\) and \(max-width:\s*1179px\)[\s\S]*?\.synthetic-preview-page \.synthetic-preview-brand-copy > span\s*\{[^}]*font-size:\s*3\.5rem;/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-page \.synthetic-preview-header\s*\{[^}]*grid-template-columns:\s*minmax\(286px, 1fr\) auto auto auto;[^}]*min-height:\s*82px;/,
+  );
+  assert.match(
+    mobileCss,
+    /\.synthetic-preview-page \.synthetic-preview-header\s*\{[^}]*grid-template-columns:\s*minmax\(156px, 1fr\) auto auto;[^}]*min-height:\s*70px;/,
+  );
+
+  assert.match(effectivePreviewCss, /\.synthetic-preview-page \.synthetic-preview-hero\s*\{/);
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-page \.synthetic-preview-hero-title-primary\s*\{[^}]*line-height:\s*1;/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-page \.synthetic-preview-hero-title-secondary\s*\{[^}]*line-height:\s*1\.04;/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-page \.synthetic-preview-city-zones\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);/,
+  );
+  assert.match(
+    effectivePreviewCss,
+    /\.synthetic-preview-page \.synthetic-preview-zone-profile-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);/,
+  );
+  assert.match(
+    stackedZonesCss,
+    /\.synthetic-preview-page \.synthetic-preview-city-zones\s*\{[^}]*grid-template-columns:\s*1fr;/,
+  );
+  assert.match(
+    mobileCss,
+    /\.synthetic-preview-page \.synthetic-preview-zone-profile-grid\s*\{[^}]*display:\s*flex;[^}]*overflow-x:\s*auto;[^}]*scroll-snap-type:\s*x mandatory;/,
+  );
   assert.match(publicCssSource, /\.synthetic-preview-service-grid\s*\{/);
   assert.match(publicCssSource, /@media \(max-width: 480px\)/);
   assert.match(publicCssSource, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test('the reference-aligned hero remains synthetic, reviewed and local-only', async () => {
+  assert.deepEqual([...syntheticHeroMediaKeys], ['home-editorial']);
+  const media = getSyntheticHeroMedia('home-editorial');
+  assert.equal(media.kind, 'image');
+  assert.equal(media.contentType, 'image/webp');
+  assert.equal(media.width, 1536);
+  assert.equal(media.height, 1024);
+  assert.equal(
+    media.desktopUrl,
+    '/preview-local-sintetico/hero-media/home-editorial',
+  );
+  assert.doesNotMatch(media.desktopUrl, /https?:|data:/i);
+  assert.equal(
+    media.sourcePath,
+    'assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
+  );
+  assert.equal(existsSync(resolve(media.sourcePath)), true);
+  assert.equal(
+    fileSha256(media.sourcePath),
+    '22859FB751202D9B5645BE116C09CD64BEE9D0963170D52E18C68FFCB9D64C35',
+  );
+  const metadata = await sharp(media.sourcePath).metadata();
+  assert.equal(metadata.format, 'webp');
+  assert.equal(metadata.width, 1536);
+  assert.equal(metadata.height, 1024);
+  assert.equal(metadata.exif, undefined);
+  assert.equal(metadata.icc, undefined);
+  assert.equal(metadata.xmp, undefined);
+  assert.ok(statSync(media.sourcePath).size < 500_000);
+
+  const manifest = readFileSync(
+    'assets/synthetic-hero/ASSET_MANIFEST.csv',
+    'utf8',
+  );
+  assert.match(manifest, /openai_image_generation,PASS,PENDING,PENDING,local_preview_only_no_publication/);
 });
 
 test('decorative full-background mosaic is local-only, inert and responsive by contract', async () => {
@@ -629,7 +906,7 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
   for (const source of [hub, detail]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
-    assert.match(source, /VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(
       source,
       /ContactOptions|formActionUrl|mailto:|tel:|https?:\/\/(?:wa\.me|t\.me)/,

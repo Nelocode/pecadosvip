@@ -67,13 +67,15 @@ async function waitForServer(origin: string, child: ChildProcess) {
   throw new Error(`Timed out waiting for the production server: ${String(lastError)}`);
 }
 
-async function request(origin: string, path: string) {
+async function request(origin: string, path: string, method = 'GET') {
   const response = await fetch(new URL(path, origin), {
+    method,
     redirect: 'manual',
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   return {
     path,
+    method,
     status: response.status,
     headers: response.headers,
     body: await response.text(),
@@ -239,6 +241,21 @@ async function main() {
         `${previewFiligree.path} must remain unavailable in production.`,
       );
     }
+    const blockedAdminRoutes = await Promise.all([
+      request(origin, '/admin'),
+      request(origin, '/admin/login'),
+      request(origin, '/admin/kyc'),
+      request(origin, '/api/admin'),
+      request(origin, '/api/admin/auth/login', 'POST'),
+      request(origin, '/admin/auth/login', 'POST'),
+    ]);
+    for (const blockedAdminRoute of blockedAdminRoutes) {
+      assert.equal(
+        blockedAdminRoute.status,
+        404,
+        `${blockedAdminRoute.method} ${blockedAdminRoute.path} must not ship in the public app.`,
+      );
+    }
 
     const robots = await request(origin, '/robots.txt');
     assert.equal(robots.status, 200);
@@ -273,6 +290,11 @@ async function main() {
           { path: previewMedia.path, status: previewMedia.status },
           ...previewFiligrees.map((result) => ({
             path: result.path,
+            status: result.status,
+          })),
+          ...blockedAdminRoutes.map((result) => ({
+            path: result.path,
+            method: result.method,
             status: result.status,
           })),
           ...localizedNotFoundResults,

@@ -48,6 +48,7 @@ export default defineConfig(async () => {
   return {
     css: { postcss: { plugins: [tailwindcss()] } },
     server: {
+      host: '127.0.0.1',
       watch: {
         // Stage ZIPs can be large and temporarily locked by OneDrive while they
         // are written. Watching them is unnecessary and can crash the Windows

@@ -16,6 +16,7 @@ import {
 import { getSyntheticServiceMedia } from '../../../../lib/preview/synthetic-service-media';
 import {
   isSyntheticPreviewRequestAllowed,
+  getSyntheticPreviewBuildEnvironment,
 } from '../../../../lib/preview/synthetic-preview';
 import PublicProfileMedia from '../../../components/PublicProfileMedia';
 import SyntheticFiligree from '../../../components/SyntheticFiligree';
@@ -54,11 +55,7 @@ function single(value: string | string[] | undefined): string | undefined {
 }
 
 function previewEnvironment() {
-  return {
-    NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
-    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
-      import.meta.env.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
-  };
+  return getSyntheticPreviewBuildEnvironment(import.meta.env);
 }
 
 export default async function SyntheticServicesPage({

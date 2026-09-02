@@ -1,10 +1,23 @@
 # QA EVIDENCE — PecadosVip Web
 
-Última reconciliación documental: 2026-08-28 — hardening local de contenedor, publicación fail-closed y navegador multilingüe sobre candidato 98.
+Última reconciliación documental: 2026-09-01 — cierre del boundary público, preview sintético fail-closed y candidato 98.
 
 Estado del checkpoint: **98/100 `LOCAL_TARGET_EARNED`, `PASS_WITH_LIMITS` técnico local, captura durable registrada y `NO-GO` público**.
 
 Esta evidencia no constituye certificación WCAG, dictamen legal, aceptación contractual, UAT, autorización de merge/despliegue/indexación ni prueba de operación en producción. Todas las comprobaciones de navegador descritas se hicieron exclusivamente en loopback.
+
+## Cierre del boundary público — 2026-09-01
+
+| Control | Resultado observado | Evidencia y límite |
+|---|---|---|
+| Puerta completa del candidato integrado | PASS | `pnpm run release:verify`; exit code 0: lint, typecheck, **208/208** pruebas, build, i18n, scorecard, SBOM, artefactos worker/standalone y smoke de producción. El único aviso preexistente de lint se corrigió y `pnpm run lint` volvió a terminar con exit code 0 sin avisos. |
+| Rutas administrativas abandonadas | PASS LOCAL | El árbol público ya no contiene `app/admin/**` ni `app/api/admin/**`; también se retiraron el inicializador SQLite y la autenticación huérfana con credenciales iniciales definidas en código. El workbench soportado permanece como proceso separado de loopback mediante `pnpm run cms:local`. |
+| Smoke negativo de administración | PASS LOCAL | El standalone devolvió HTTP 404 para `GET /admin`, `/admin/login`, `/admin/kyc`, `/api/admin` y para `POST /api/admin/auth/login` y `/admin/auth/login`. Es una prueba local del artefacto construido, no del hosting. |
+| Preview sintético y medios | PASS LOCAL | En producción, preview y medios devuelven HTTP 404. En desarrollo con flag exacto y loopback, home y tres familias de medios comprobadas devolvieron HTTP 200 con `private, no-store` y `noimageindex`; un `Host` externo fue bloqueado. |
+| Artefacto worker | PASS | 167 archivos, 3.221.421 bytes y 0 violaciones; reporte SHA-256 `3EBD0C608BB28AF6333412B9F97B552847F84A7BCB074A1DE554EFA3C09BF573`. |
+| Artefacto standalone Node | PASS | 2.426 archivos, 29.065.614 bytes y 0 violaciones; reporte SHA-256 `D12319CDCDE3D06D9428F13E543570AD1184D791D1BBA05CBAEEB7ADB5B98B05`. |
+| SBOM local | PASS WITH LIMITS | 612 componentes; SHA-256 `69A3F61B3BB6BA19A73A48F6AE8234C7053859701AED60844918141B033BB0A6`. No es attestación, VEX, análisis de alcanzabilidad ni pentest. |
+| Demo EasyPanel | NO VERIFICADA | El bypass que publicaba el preview y el rewrite de `/` fueron retirados. Sin una aprobación separada y una política de demo pública, el contrato esperado en producción es holding en `/` y 404 para `/preview-local-sintetico`; no se activó ni disparó un despliegue desde esta comprobación. |
 
 ## Remediación local EasyPanel — 2026-08-28
 
