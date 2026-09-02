@@ -34,6 +34,7 @@ export class ProductionObjectStorage {
    * Stores a binary object (image, video, encrypted KYC doc) in storage.
    */
   public async putObject(key: string, data: Buffer, options: StoragePutOptions = {}): Promise<string> {
+    void options;
     const sanitizedKey = key.replace(/^[/\\]+/, '');
     const targetPath = resolve(this.rootDir, sanitizedKey);
 

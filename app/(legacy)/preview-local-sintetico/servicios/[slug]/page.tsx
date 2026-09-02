@@ -15,6 +15,7 @@ import {
   getSyntheticPreviewProfile,
   getSyntheticPreviewProfiles,
   isSyntheticPreviewRequestAllowed,
+  getSyntheticPreviewBuildEnvironment,
 } from '../../../../../lib/preview/synthetic-preview';
 import ProfileCard from '../../../../components/ProfileCard';
 import PublicProfileMedia from '../../../../components/PublicProfileMedia';
@@ -55,11 +56,7 @@ export default async function SyntheticServiceDetailPage({
   searchParams: Promise<RawSearchParams>;
 }) {
   const requestHeaders = await headers();
-  const environment = {
-    NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
-    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
-      import.meta.env.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
-  };
+  const environment = getSyntheticPreviewBuildEnvironment(import.meta.env);
   if (!isSyntheticPreviewRequestAllowed(requestHeaders.get('host'), environment)) {
     notFound();
   }

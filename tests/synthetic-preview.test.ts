@@ -7,7 +7,9 @@ import test from 'node:test';
 import sharp from 'sharp';
 
 import {
+  buildSyntheticPreviewMediaHeaders,
   filterSyntheticPreviewProfiles,
+  getSyntheticPreviewBuildEnvironment,
   getSyntheticPreviewAsset,
   getSyntheticPreviewProfile,
   getSyntheticPreviewProfiles,
@@ -95,6 +97,28 @@ test('preview requires the explicit flag and a development loopback request', ()
     }),
     false,
   );
+  assert.deepEqual(
+    getSyntheticPreviewBuildEnvironment({
+      DEV: true,
+      VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    }),
+    enabled,
+  );
+  assert.deepEqual(
+    getSyntheticPreviewBuildEnvironment({
+      DEV: false,
+      VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    }),
+    {
+      NODE_ENV: 'production',
+      PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW: '1',
+    },
+  );
+  assert.deepEqual(buildSyntheticPreviewMediaHeaders('image/webp'), {
+    'Content-Type': 'image/webp',
+    'Cache-Control': 'private, no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
+  });
   assert.equal(
     isSyntheticPreviewRequestAllowed('localhost:3000', {
       ...enabled,
@@ -196,6 +220,13 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
     'scripts/vite-local-synthetic-media.ts',
     'utf8',
   );
+  const mediaRouteSources = [
+    'app/(legacy)/preview-local-sintetico/city-media/[citySlug]/route.ts',
+    'app/(legacy)/preview-local-sintetico/decor-media/[key]/route.ts',
+    'app/(legacy)/preview-local-sintetico/hero-media/[key]/route.ts',
+    'app/(legacy)/preview-local-sintetico/media/[profileSlug]/[role]/route.ts',
+    'app/(legacy)/preview-local-sintetico/service-media/[service]/route.ts',
+  ].map((path) => readFileSync(path, 'utf8'));
   const publicCssSource = readFileSync('app/public-site.css', 'utf8');
   const viteConfigSource = readFileSync('vite.config.ts', 'utf8');
   const profileCardSource = readFileSync('app/components/ProfileCard.tsx', 'utf8');
@@ -207,8 +238,7 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   for (const source of [pageSource, detailSource]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
-    assert.match(source, /import\.meta\.env\.DEV/);
-    assert.match(source, /VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(source, /ContactOptions|https?:\/\//);
   }
   assert.match(pageSource, /<ProfileCard/);
@@ -235,6 +265,13 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.match(mediaMiddlewareSource, /assetRoot/);
   assert.match(mediaMiddlewareSource, /private, no-store/);
   assert.match(mediaMiddlewareSource, /noimageindex/);
+  for (const source of mediaRouteSources) {
+    assert.match(source, /isSyntheticPreviewRequestAllowed/);
+    assert.match(source, /request\.headers\.get\('host'\)/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
+    assert.match(source, /buildSyntheticPreviewMediaHeaders/);
+    assert.match(source, /status:\s*404/);
+  }
   assert.match(viteConfigSource, /localSyntheticMediaPlugin\(\)/);
   assert.match(viteConfigSource, /ignored:\s*\['\*\*\/stage-archives\/\*\*'\]/);
   assert.match(profileCardSource, /disclosure\?: string/);
@@ -869,7 +906,7 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
   for (const source of [hub, detail]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
-    assert.match(source, /VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW/);
+    assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(
       source,
       /ContactOptions|formActionUrl|mailto:|tel:|https?:\/\/(?:wa\.me|t\.me)/,

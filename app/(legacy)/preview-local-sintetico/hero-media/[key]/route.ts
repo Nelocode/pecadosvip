@@ -5,11 +5,20 @@ import {
   getSyntheticHeroMedia,
   isSyntheticHeroMediaKey,
 } from '../../../../../lib/preview/synthetic-hero-media';
+import {
+  buildSyntheticPreviewMediaHeaders,
+  getSyntheticPreviewBuildEnvironment,
+  isSyntheticPreviewRequestAllowed,
+} from '../../../../../lib/preview/synthetic-preview';
 
 export async function GET(
   request: Request,
   context: { params: Promise<{ key: string }> },
 ) {
+  const environment = getSyntheticPreviewBuildEnvironment(import.meta.env);
+  if (!isSyntheticPreviewRequestAllowed(request.headers.get('host'), environment)) {
+    return new NextResponse('Not found', { status: 404 });
+  }
   const { key } = await context.params;
   if (!isSyntheticHeroMediaKey(key)) {
     return new NextResponse('Not found', { status: 404 });
@@ -18,10 +27,7 @@ export async function GET(
   try {
     const file = await readFile(resolve(process.cwd(), media.sourcePath));
     return new NextResponse(file, {
-      headers: {
-        'Content-Type': media.contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
+      headers: buildSyntheticPreviewMediaHeaders(media.contentType),
     });
   } catch {
     return new NextResponse('Not found', { status: 404 });

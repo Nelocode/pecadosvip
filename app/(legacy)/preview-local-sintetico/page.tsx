@@ -16,6 +16,7 @@ import { getSyntheticHeroMedia } from '../../../lib/preview/synthetic-hero-media
 import {
   filterSyntheticPreviewProfiles,
   getSyntheticPreviewProfiles,
+  getSyntheticPreviewBuildEnvironment,
   isSyntheticPreviewRequestAllowed,
 } from '../../../lib/preview/synthetic-preview';
 import type { SyntheticPreviewProfile } from '../../../lib/preview/synthetic-preview';
@@ -189,11 +190,7 @@ export default async function SyntheticPreviewPage({
   searchParams,
 }: SyntheticPreviewPageProps) {
   const requestHeaders = await headers();
-  const previewEnvironment = {
-    NODE_ENV: import.meta.env.DEV ? 'development' : 'production',
-    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
-      import.meta.env.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
-  };
+  const previewEnvironment = getSyntheticPreviewBuildEnvironment(import.meta.env);
   if (
     !isSyntheticPreviewRequestAllowed(
       requestHeaders.get('host'),

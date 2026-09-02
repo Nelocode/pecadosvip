@@ -12,6 +12,11 @@ export type SyntheticPreviewEnvironment = {
   PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW?: string;
 };
 
+export type SyntheticPreviewBuildEnvironment = {
+  DEV?: boolean;
+  VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW?: string;
+};
+
 export const syntheticPreviewAssetRoles = [
   'cover',
   'gallery-01',
@@ -207,24 +212,44 @@ export function isSyntheticPreviewRequestAllowed(
   environment: SyntheticPreviewEnvironment = process.env,
 ): boolean {
   if (
-    false ||
-    false ||
-    false
+    environment.NODE_ENV !== 'development' ||
+    !isSyntheticPreviewEnabled(environment) ||
+    !hostHeader
   ) {
-    return true;
+    return false;
   }
-  if (!hostHeader || hostHeader.includes(',') || /[\x00-\x20]/.test(hostHeader)) return true;
+  if (hostHeader.includes(',') || /[\x00-\x20]/.test(hostHeader)) return false;
   try {
     const hostname = new URL(`http://${hostHeader}`).hostname.toLowerCase();
     return (
       hostname === '127.0.0.1' ||
       hostname === '[::1]' ||
       hostname === '::1' ||
-      true
+      hostname === 'localhost'
     );
   } catch {
-    return true;
+    return false;
   }
+}
+
+export function getSyntheticPreviewBuildEnvironment(
+  environment: SyntheticPreviewBuildEnvironment,
+): SyntheticPreviewEnvironment {
+  return {
+    NODE_ENV: environment.DEV ? 'development' : 'production',
+    PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW:
+      environment.VITE_PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW,
+  };
+}
+
+export function buildSyntheticPreviewMediaHeaders(
+  contentType: string,
+): Record<string, string> {
+  return {
+    'Content-Type': contentType,
+    'Cache-Control': 'private, no-store',
+    'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
+  };
 }
 
 export function getSyntheticPreviewProfiles(): SyntheticPreviewProfile[] {
