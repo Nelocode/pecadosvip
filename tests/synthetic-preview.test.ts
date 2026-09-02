@@ -207,7 +207,7 @@ test('preview filtering, detail lookup and media allowlist are deterministic', (
   assert.equal(getSyntheticPreviewAsset('../alicia', 'cover'), undefined);
 });
 
-test('catalog, detail and media middleware stay local-only, noindex and contact-free', () => {
+test('local preview routes stay guarded while shared renderers select media and links by explicit mode', () => {
   const pageSource = readFileSync(
     'app/(legacy)/preview-local-sintetico/page.tsx',
     'utf8',
@@ -237,18 +237,30 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   assert.equal(SYNTHETIC_PREVIEW_PATH, '/preview-local-sintetico');
   for (const source of [pageSource, detailSource]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
+    assert.match(source, /mode = 'local-preview'/);
+    assert.match(source, /if \(mode === 'local-preview'\)/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
     assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(source, /ContactOptions|https?:\/\//);
   }
   assert.match(pageSource, /<ProfileCard/);
-  assert.match(pageSource, /disclosure=\{candidate\.syntheticNotice\}/);
+  assert.match(pageSource, /disclosure=\{messages\.profilesSection\.cardDisclosure\}/);
   assert.match(pageSource, /preserveFullImage/);
-  assert.match(pageSource, /profileHref=\{`\/preview-local-sintetico\/perfiles\//);
-  assert.match(pageSource, /name="lang" type="hidden" value=\{locale\}/);
-  assert.match(pageSource, /servicios\?lang=\$\{locale\}/);
-  assert.match(detailSource, /\?lang=\$\{locale\}&foto=\$\{candidate\.role\}/);
-  assert.match(detailSource, /Contactar · no disponible en preview/);
+  assert.match(
+    pageSource,
+    /profileHref=\{syntheticExperienceProfile\(locale, candidate\.slug, mode\)\}/,
+  );
+  assert.match(
+    pageSource,
+    /mode === 'local-preview'[\s\S]*?<input name="lang" type="hidden" value=\{locale\} \/>/,
+  );
+  assert.match(pageSource, /const servicesHref = syntheticExperienceServices\(locale, mode\)/);
+  assert.match(
+    detailSource,
+    /withSyntheticQuery\([\s\S]*?syntheticExperienceProfile\(locale, profile\.slug, mode\)[\s\S]*?foto: candidate\.role/,
+  );
+  assert.match(detailSource, /messages\.profile\.contactDisabledTitle/);
+  assert.match(detailSource, /messages\.profile\.contactDisabledButton/);
   assert.match(detailSource, /button type="button" disabled/);
   assert.match(detailSource, /<PublicProfileMedia/);
   assert.match(mediaMiddlewareSource, /apply: 'serve'/);
@@ -289,7 +301,7 @@ test('catalog, detail and media middleware stay local-only, noindex and contact-
   );
 });
 
-test('local preview exposes the complete internal home flow without enabling conversion', () => {
+test('shared synthetic home keeps the guarded local default and an explicit public-beta scope without enabling conversion', () => {
   const pageSource = readFileSync(
     'app/(legacy)/preview-local-sintetico/page.tsx',
     'utf8',
@@ -386,7 +398,7 @@ test('local preview exposes the complete internal home flow without enabling con
   });
   assert.match(
     pageSource,
-    /const profiles = validFilters[\s\S]*?\? hasFilters[\s\S]*?\? filterSyntheticPreviewProfiles\(\{ city, availability \}\)[\s\S]*?: getSyntheticPreviewProfiles\(\)[\s\S]*?: \[\];/,
+    /const profiles = validFilters[\s\S]*?\? hasFilters[\s\S]*?\? filterSyntheticPreviewProfiles\(\{ city, availability \}, mode\)[\s\S]*?: getSyntheticPreviewProfiles\(mode\)[\s\S]*?: \[\];/,
   );
   assert.match(
     pageSource,
@@ -405,11 +417,12 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(pageSource, /id="servicios"/);
   assert.match(
     pageSource,
-    /href=\{`\/preview-local-sintetico\/servicios\?lang=\$\{locale\}`\}/,
+    /const servicesHref = syntheticExperienceServices\(locale, mode\);/,
   );
+  assert.match(pageSource, /<a href=\{servicesHref\}>/);
   assert.match(
     pageSource,
-    /const zoneHref = \(zone: PreviewZone\) =>[\s\S]*?&city=\$\{zone\}[\s\S]*?availability \? `&availability=\$\{availability\}` : ''[\s\S]*?#zona-\$\{zone\}`;/,
+    /const zoneHref = \(zone: PreviewZone\) => withSyntheticQuery\([\s\S]*?homePath,[\s\S]*?\{ city: zone, availability \},[\s\S]*?\) \+ `#zona-\$\{zone\}`;/,
   );
   assert.match(pageSource, /href=\{zoneHref\('madrid'\)\}/);
   assert.match(pageSource, /href=\{zoneHref\('barcelona'\)\}/);
@@ -421,34 +434,24 @@ test('local preview exposes the complete internal home flow without enabling con
     pageSource,
     /<section[\s\S]*?className="synthetic-preview-catalog-zone-section"[\s\S]*?id="perfiles"[\s\S]*?aria-labelledby="preview-results-title"/,
   );
-  assert.match(pageSource, /<h2 id="preview-results-title">Modelos sintéticas por zona<\/h2>/);
-  assert.match(pageSource, /href="#perfiles"[\s\S]*?aria-label="Ir a las zonas y perfiles"/);
+  assert.match(pageSource, /<h2 id="preview-results-title">\{messages\.profilesSection\.title\}<\/h2>/);
+  assert.match(pageSource, /href="#perfiles"[\s\S]*?aria-label=\{messages\.navigation\.zones\}/);
   assert.match(pageSource, /headingLevel=\{5\}/);
-  for (const [slug, city] of [
-    ['madrid', 'Madrid'],
-    ['barcelona', 'Barcelona'],
-    ['girona', 'Girona'],
-    ['tarragona', 'Tarragona'],
-    ['toledo', 'Toledo'],
-    ['guadalajara', 'Guadalajara'],
-    ['segovia', 'Segovia'],
-    ['sitges', 'Sitges'],
-  ]) {
-    assert.match(pageSource, new RegExp(`${slug}: '${city}'`));
-  }
+  assert.match(pageSource, /messages\.cities\[citySlug\]/);
+  assert.match(pageSource, /messages\.cities\[group\.base\]/);
   assert.match(pageSource, /getSyntheticPreviewProfiles/);
   assert.match(pageSource, /<PublicProfileMedia/);
-  assert.match(pageSource, /Imagen generada con IA/);
-  assert.match(pageSource, /<h2 id="coverage-title">Dos zonas para elegir con claridad<\/h2>/);
-  assert.match(pageSource, /\{cityPresentation\.coverageBody\}/);
+  assert.match(pageSource, /messages\.hero\.generatedImageDisclosure/);
+  assert.match(pageSource, /<h2 id="coverage-title">\{messages\.coverage\.title\}<\/h2>/);
+  assert.match(pageSource, /\{messages\.coverage\.body\}/);
   assert.match(pageSource, /getSyntheticCityMedia/);
   assert.match(pageSource, /cityMedia\.shortDisclosure/);
   assert.match(pageSource, /id=\{`city-\$\{citySlug\}`\}/);
-  assert.match(pageSource, /Servicios exclusivos · propuesta/);
+  assert.match(pageSource, /messages\.servicesSection\.title/);
   assert.match(pageSource, /synthetic-preview-hero-title-primary/);
   assert.match(pageSource, /synthetic-preview-hero-title-secondary/);
-  assert.match(pageSource, /Reserva desactivada/);
-  assert.match(pageSource, /Contactar · no disponible/);
+  assert.match(pageSource, /messages\.navigation\.privateBooking/);
+  assert.match(pageSource, /messages\.servicesSection\.contactDisabled/);
   assert.match(pageSource, /type="button"\s+disabled/);
   assert.doesNotMatch(
     pageSource,
@@ -522,7 +525,7 @@ test('local preview exposes the complete internal home flow without enabling con
   assert.match(publicCssSource, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test('the reference-aligned hero remains synthetic, reviewed and local-only', async () => {
+test('the reference-aligned hero keeps its guarded preview URL and exposes only the explicit public-beta route', async () => {
   assert.deepEqual([...syntheticHeroMediaKeys], ['home-editorial']);
   const media = getSyntheticHeroMedia('home-editorial');
   assert.equal(media.kind, 'image');
@@ -533,6 +536,9 @@ test('the reference-aligned hero remains synthetic, reviewed and local-only', as
     media.desktopUrl,
     '/preview-local-sintetico/hero-media/home-editorial',
   );
+  const betaMedia = getSyntheticHeroMedia('home-editorial', 'public-beta');
+  assert.equal(betaMedia.desktopUrl, '/beta-media/hero/home-editorial');
+  assert.equal(betaMedia.sourcePath, media.sourcePath);
   assert.doesNotMatch(media.desktopUrl, /https?:|data:/i);
   assert.equal(
     media.sourcePath,
@@ -559,7 +565,7 @@ test('the reference-aligned hero remains synthetic, reviewed and local-only', as
   assert.match(manifest, /openai_image_generation,PASS,PENDING,PENDING,local_preview_only_no_publication/);
 });
 
-test('decorative full-background mosaic is local-only, inert and responsive by contract', async () => {
+test('decorative full-background mosaic is inert, responsive and routed through the selected experience scope', async () => {
   const css = readFileSync('app/public-site.css', 'utf8');
   const masterPath = 'assets/brand/filigree-mosaic-source-v04.png';
   const masterSha256 =
@@ -600,6 +606,9 @@ test('decorative full-background mosaic is local-only, inert and responsive by c
       media.desktopUrl,
       `/preview-local-sintetico/decor-media/${key}`,
     );
+    const betaMedia = getSyntheticDecorMedia(key, 'public-beta');
+    assert.equal(betaMedia.desktopUrl, `/beta-media/decor/${key}`);
+    assert.equal(betaMedia.sourcePath, media.sourcePath);
     assert.doesNotMatch(media.desktopUrl, /https?:|data:/i);
     const source = resolve(media.sourcePath);
     assert.ok(source.startsWith(`${resolve('assets', 'synthetic-decor')}${sep}`));
@@ -679,6 +688,10 @@ test('decorative full-background mosaic is local-only, inert and responsive by c
   assert.match(interaction, /data-active="false"/);
   assert.match(
     interaction,
+    /getSyntheticDecorMedia\('border-filigree', mode\)\.desktopUrl/,
+  );
+  assert.match(
+    interaction,
     /\(min-width: 1100px\) and \(hover: hover\) and \(pointer: fine\)/,
   );
   assert.match(interaction, /\(prefers-reduced-motion: reduce\)/);
@@ -711,9 +724,9 @@ test('decorative full-background mosaic is local-only, inert and responsive by c
     const page = readFileSync(pagePath, 'utf8');
     assert.match(page, /import SyntheticFiligree from/);
     assert.equal(
-      page.match(/<SyntheticFiligree \/>/g)?.length,
+      page.match(/<SyntheticFiligree mode=\{mode\} \/>/g)?.length,
       1,
-      `${pagePath} must mount exactly one inert filigree layer.`,
+      `${pagePath} must mount exactly one mode-scoped inert filigree layer.`,
     );
   }
 
@@ -817,7 +830,7 @@ test('service preview exposes 34 PecadosVip routes in four complete locale proje
   assert.equal(getSyntheticService('../secret', 'es'), undefined);
 });
 
-test('service catalogue maps every route to reviewed local symbolic media', () => {
+test('service catalogue maps every route to selected media with guarded-preview and public-beta URLs', () => {
   const catalog = getSyntheticServiceCatalog('es');
   const assignedMediaKeys = catalog.map((service) => service.mediaKey);
   assert.equal(syntheticServiceMediaKeys.length, 34);
@@ -831,7 +844,10 @@ test('service catalogue maps every route to reviewed local symbolic media', () =
 
   for (const key of syntheticServiceMediaKeys) {
     const media = getSyntheticServiceMedia(key, 'es');
+    const betaMedia = getSyntheticServiceMedia(key, 'es', 'public-beta');
     assert.match(media.desktopUrl, /^\/preview-local-sintetico\/service-media\//);
+    assert.equal(betaMedia.desktopUrl, `/beta-media/services/${key}`);
+    assert.equal(betaMedia.sourcePath, media.sourcePath);
     assert.equal(media.contentType, 'image/webp');
     assert.match(media.alt, /\S/);
     assert.equal(existsSync(resolve(media.sourcePath)), true, media.sourcePath);
@@ -839,7 +855,7 @@ test('service catalogue maps every route to reviewed local symbolic media', () =
   }
 });
 
-test('eight unique city references are localized and remain local-only', () => {
+test('eight unique city references are localized with guarded-preview defaults and explicit beta URLs', () => {
   assert.deepEqual(
     [...syntheticCityMediaSlugs],
     ['madrid', 'barcelona', 'girona', 'tarragona', 'toledo', 'guadalajara', 'segovia', 'sitges'],
@@ -865,6 +881,7 @@ test('eight unique city references are localized and remain local-only', () => {
     assert.match(presentation.pendingStatus, /\S/);
     for (const citySlug of syntheticCityMediaSlugs) {
       const media = getSyntheticCityMedia(citySlug, locale);
+      const betaMedia = getSyntheticCityMedia(citySlug, locale, 'public-beta');
       assert.equal(media.citySlug, citySlug);
       assert.equal(media.contentType, 'image/webp');
       assert.equal(media.disclosure, expectedDisclosure[locale]);
@@ -874,13 +891,15 @@ test('eight unique city references are localized and remain local-only', () => {
         media.desktopUrl,
         new RegExp(`^/preview-local-sintetico/city-media/${citySlug}$`, 'u'),
       );
+      assert.equal(betaMedia.desktopUrl, `/beta-media/cities/${citySlug}`);
+      assert.equal(betaMedia.sourcePath, media.sourcePath);
       assert.equal(existsSync(resolve(media.sourcePath)), true, media.sourcePath);
       assert.doesNotMatch(media.sourcePath, /public[\\/]/i);
     }
   }
 });
 
-test('service hub and detail remain local-only, noindex, contact-free and interactive', () => {
+test('shared service hub and detail keep local guards, explicit beta scope, noindex metadata and disabled contact', () => {
   const hub = readFileSync(
     'app/(legacy)/preview-local-sintetico/servicios/page.tsx',
     'utf8',
@@ -905,6 +924,8 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
 
   for (const source of [hub, detail]) {
     assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/);
+    assert.match(source, /mode = 'local-preview'/);
+    assert.match(source, /if \(mode === 'local-preview'\)/);
     assert.match(source, /isSyntheticPreviewRequestAllowed/);
     assert.match(source, /getSyntheticPreviewBuildEnvironment\(import\.meta\.env\)/);
     assert.doesNotMatch(
@@ -964,7 +985,7 @@ test('service hub and detail remain local-only, noindex, contact-free and intera
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test('manifest keeps synthetic candidates outside public production paths', () => {
+test('profile source manifest remains pending and unpromoted while selected derivatives use noindex beta delivery', () => {
   const manifest = readFileSync(
     'assets/synthetic-profiles/ASSET_MANIFEST.csv',
     'utf8',
@@ -977,7 +998,7 @@ test('manifest keeps synthetic candidates outside public production paths', () =
   }
 });
 
-test('service image manifest remains non-public and pending human/legal review', async () => {
+test('service source manifest remains pending and unpromoted while selected derivatives use noindex beta delivery', async () => {
   const manifest = readFileSync(
     'assets/synthetic-services/ASSET_MANIFEST.csv',
     'utf8',

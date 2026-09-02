@@ -19,6 +19,7 @@ import {
   serializeCycloneDxBom,
 } from '../scripts/generate-sbom.ts';
 import {
+  DEFAULT_STANDALONE_ARTIFACT_BUDGETS,
   REQUIRED_BUILD_FILES,
   REQUIRED_STANDALONE_FILES,
   serializeBuildArtifactReport,
@@ -32,6 +33,17 @@ const artifactScript = join(
   'scripts',
   'validate-build-artifact.ts',
 );
+
+test('standalone budgets bound the 70-asset public beta payload without relaxing other limits', () => {
+  assert.deepEqual(DEFAULT_STANDALONE_ARTIFACT_BUDGETS, {
+    maxFileCount: 4_096,
+    maxJavaScriptBytes: 32 * 1024 * 1024,
+    maxMediaBytes: 64 * 1024 * 1024,
+    maxSingleFileBytes: 4 * 1024 * 1024,
+    maxStylesheetBytes: 1024 * 1024,
+    maxTotalBytes: 96 * 1024 * 1024,
+  });
+});
 
 function integrity(byte: number): string {
   return `sha512-${Buffer.alloc(64, byte).toString('base64')}`;
@@ -358,7 +370,7 @@ test('standalone artifact rejects image-size at every runtime nesting depth', as
   });
 
   assert.equal(report.result, 'FAIL');
-  assert.equal(report.policyVersion, 3);
+  assert.equal(report.policyVersion, 4);
   assert.equal(
     report.violations.some(
       (violation) =>

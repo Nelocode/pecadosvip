@@ -90,7 +90,10 @@ export default function PublicProfileMedia({
       sizes={sizes}
       src={media.desktopUrl}
       style={style}
-      unoptimized={media.desktopUrl.startsWith('/preview-local-sintetico/')}
+      unoptimized={
+        media.desktopUrl.startsWith('/preview-local-sintetico/') ||
+        media.desktopUrl.startsWith('/beta-media/')
+      }
     />
   );
 }

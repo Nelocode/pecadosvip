@@ -10,7 +10,9 @@ import { getCatalog } from '../lib/i18n/catalog.ts';
 import {
   localizedPath,
   SUPPORTED_LOCALES,
+  type Locale,
 } from '../lib/i18n/locales.ts';
+import { getSyntheticBetaCopy } from '../lib/preview/synthetic-beta-copy.ts';
 
 const READY_TIMEOUT_MS = 20_000;
 const REQUEST_TIMEOUT_MS = 5_000;
@@ -82,6 +84,118 @@ async function request(origin: string, path: string, method = 'GET') {
   };
 }
 
+type HttpResult = Awaited<ReturnType<typeof request>>;
+
+const requiredHeaders = [
+  'content-security-policy',
+  'cross-origin-opener-policy',
+  'permissions-policy',
+  'referrer-policy',
+  'x-content-type-options',
+  'x-frame-options',
+  'x-robots-tag',
+] as const;
+
+function readHtmlLang(body: string): string | undefined {
+  return body.match(/<html\b[^>]*\blang=["']([^"']+)["']/iu)?.[1];
+}
+
+function readAttribute(tag: string, attribute: string): string | undefined {
+  const match = tag.match(
+    new RegExp(`\\b${attribute}=["']([^"']*)["']`, 'iu'),
+  );
+  return match?.[1];
+}
+
+function assertNoActiveConversions(origin: string, result: HttpResult) {
+  assert.doesNotMatch(result.body, /blocked-smoke-destination|example\.org/iu);
+  assert.doesNotMatch(
+    result.body,
+    /<a\b[^>]*\bhref=["'](?:https?:\/\/|\/\/|mailto:|tel:|sms:|whatsapp:|tg:)/iu,
+    `${result.path} exposes an external or direct-contact link.`,
+  );
+  assert.doesNotMatch(
+    result.body,
+    /googletagmanager|google-analytics|gtag\s*\(|dataLayer\s*=|analytics\.js|plausible\.io|matomo|mixpanel|segment\.com|amplitude/iu,
+    `${result.path} exposes an analytics integration.`,
+  );
+
+  for (const match of result.body.matchAll(/<form\b[^>]*>/giu)) {
+    const formTag = match[0];
+    const method = (readAttribute(formTag, 'method') ?? 'get').toLowerCase();
+    assert.equal(method, 'get', `${result.path} exposes a non-GET form.`);
+    const action = readAttribute(formTag, 'action') ?? result.path;
+    const actionUrl = new URL(action, origin);
+    assert.equal(
+      actionUrl.origin,
+      origin,
+      `${result.path} exposes a cross-origin form action.`,
+    );
+    assert.doesNotMatch(
+      actionUrl.pathname,
+      /(?:contact|contacto|reserv|booking|checkout|payment|pago)/iu,
+      `${result.path} exposes a conversion form action.`,
+    );
+  }
+
+  const conversionLabel =
+    /(?:contact|contatt|contacter|reserv|r[eé]serv|booking|prenot|payment|paiement|pagamento|pago|checkout|whatsapp|telegram)/iu;
+  for (const match of result.body.matchAll(
+    /<button\b([^>]*)>([\s\S]*?)<\/button>/giu,
+  )) {
+    const attributes = match[1] ?? '';
+    const text = (match[2] ?? '').replace(/<[^>]+>/gu, ' ');
+    if (!conversionLabel.test(`${attributes} ${text}`)) continue;
+    assert.match(
+      attributes,
+      /(?:^|\s)disabled(?:=["'][^"']*["'])?(?:\s|$)/iu,
+      `${result.path} exposes an enabled conversion control.`,
+    );
+  }
+}
+
+function assertPublicBetaHtml(
+  origin: string,
+  result: HttpResult,
+  locale: Locale,
+) {
+  assert.equal(result.status, 200, `${result.path} must render the public beta.`);
+  assert.match(result.headers.get('content-type') ?? '', /^text\/html\b/iu);
+  assert.equal(
+    readHtmlLang(result.body),
+    locale,
+    `${result.path} must declare html lang=${locale}.`,
+  );
+  assert.match(
+    result.body,
+    /class=["'][^"']*synthetic-preview-page/iu,
+    `${result.path} lacks the synthetic-beta document marker.`,
+  );
+
+  for (const header of requiredHeaders) {
+    assert(result.headers.has(header), `${result.path} is missing ${header}.`);
+  }
+  assert.equal(
+    result.headers.has('x-powered-by'),
+    false,
+    `${result.path} exposes x-powered-by.`,
+  );
+  assert.match(result.headers.get('x-robots-tag') ?? '', /noindex/iu);
+  assert.match(
+    result.headers.get('content-security-policy') ?? '',
+    /default-src 'self'/u,
+  );
+  assert.match(
+    result.headers.get('content-security-policy') ?? '',
+    /frame-ancestors 'none'/u,
+  );
+  assert.match(
+    result.headers.get('content-security-policy') ?? '',
+    /form-action 'self'/u,
+  );
+  assertNoActiveConversions(origin, result);
+}
+
 async function stopServer(child: ChildProcess) {
   if (child.exitCode !== null) return;
   child.kill('SIGTERM');
@@ -130,75 +244,68 @@ async function main() {
 
   try {
     await waitForServer(origin, child);
-    const legacyHoldingPaths = [
-      '/',
-      '/madrid',
-      '/barcelona',
-      '/perfiles',
-      '/contacto',
-    ];
-    const localizedSemanticPaths = [
-      '/',
-      '/madrid',
-      '/barcelona',
-      '/perfiles',
-      '/contacto',
-      '/legal/aviso-legal',
-      '/legal/privacidad',
-      '/legal/cookies',
-      '/legal/terminos-del-servicio',
-    ] as const;
-    const holdingResults = [];
-    const requiredHeaders = [
-      'content-security-policy',
-      'cross-origin-opener-policy',
-      'permissions-policy',
-      'referrer-policy',
-      'x-content-type-options',
-      'x-frame-options',
-      'x-robots-tag',
-    ];
+    const root = await request(origin, '/');
+    assert.ok(
+      root.status === 307 || root.status === 308,
+      '/ must redirect permanently or temporarily to the Spanish beta.',
+    );
+    assert.equal(root.headers.get('location'), '/es');
 
-    for (const path of legacyHoldingPaths) {
-      const result = await request(origin, path);
-      assert.equal(result.status, 200, `${path} must render the neutral holding page.`);
-      assert.match(result.body, /Contenido en preparaci[oó]n/u, `${path} lacks the holding state.`);
-      assert.doesNotMatch(result.body, /blocked-smoke-destination|example\.org/iu);
-      assert.doesNotMatch(result.body, /href=["'][^"']*(?:whatsapp|telegram|tel:)/iu);
-      assert.match(result.headers.get('content-type') ?? '', /^text\/html\b/iu);
-
-      for (const header of requiredHeaders) {
-        assert(result.headers.has(header), `${path} is missing ${header}.`);
-      }
-      assert.equal(result.headers.has('x-powered-by'), false, `${path} exposes x-powered-by.`);
-      assert.match(result.headers.get('x-robots-tag') ?? '', /noindex/iu);
-      assert.match(result.headers.get('content-security-policy') ?? '', /default-src 'self'/u);
-      assert.match(result.headers.get('content-security-policy') ?? '', /frame-ancestors 'none'/u);
-      assert.match(result.headers.get('content-security-policy') ?? '', /form-action 'self'/u);
-      holdingResults.push({ path, status: result.status, holding: true });
-    }
-
+    const localizedBetaResults = [];
+    const cleanCatalogResults = [];
+    const contactHoldingResults = [];
     for (const locale of SUPPORTED_LOCALES) {
-      const messages = getCatalog(locale);
-      for (const semanticPath of localizedSemanticPaths) {
-        const path = localizedPath(locale, semanticPath);
-        const result = await request(origin, path);
-        assert.equal(result.status, 200, `${path} must render the neutral holding page.`);
-        assert.ok(
-          result.body.includes(messages.holding.title),
-          `${path} lacks its localized holding state.`,
-        );
-        assert.doesNotMatch(result.body, /blocked-smoke-destination|example\.org/iu);
-        assert.doesNotMatch(result.body, /href=["'][^"']*(?:whatsapp|telegram|tel:)/iu);
-        assert.match(result.headers.get('content-type') ?? '', /^text\/html\b/iu);
+      const homePath = localizedPath(locale);
+      const home = await request(origin, homePath);
+      assertPublicBetaHtml(origin, home, locale);
+      assert.ok(
+        home.body.includes(getSyntheticBetaCopy(locale).hero.note),
+        `${homePath} lacks its localized synthetic-beta disclosure.`,
+      );
+      localizedBetaResults.push({
+        path: home.path,
+        status: home.status,
+        lang: readHtmlLang(home.body),
+        noindex: true,
+      });
 
-        for (const header of requiredHeaders) {
-          assert(result.headers.has(header), `${path} is missing ${header}.`);
-        }
-        assert.equal(result.headers.has('x-powered-by'), false, `${path} exposes x-powered-by.`);
-        assert.match(result.headers.get('x-robots-tag') ?? '', /noindex/iu);
-        holdingResults.push({ path, status: result.status, holding: true });
+      const cleanPaths = [
+        localizedPath(locale, '/perfiles'),
+        localizedPath(locale, '/perfiles/valeria'),
+        localizedPath(locale, '/servicios'),
+        localizedPath(locale, '/servicios/compania-privada'),
+      ];
+      for (const path of cleanPaths) {
+        assert.equal(/[?#]/u.test(path), false, `${path} must remain a clean path.`);
+        const result = await request(origin, path);
+        assertPublicBetaHtml(origin, result, locale);
+        cleanCatalogResults.push({
+          path: result.path,
+          status: result.status,
+          lang: readHtmlLang(result.body),
+          noindex: true,
+        });
       }
+
+      const contactPath = localizedPath(locale, '/contacto');
+      const contact = await request(origin, contactPath);
+      assert.equal(
+        contact.status,
+        200,
+        `${contactPath} must render a neutral, inactive contact state.`,
+      );
+      assert.equal(readHtmlLang(contact.body), locale);
+      assert.ok(
+        contact.body.includes(getCatalog(locale).holding.title),
+        `${contactPath} must remain a localized holding page.`,
+      );
+      assert.match(contact.headers.get('x-robots-tag') ?? '', /noindex/iu);
+      assertNoActiveConversions(origin, contact);
+      contactHoldingResults.push({
+        path: contact.path,
+        status: contact.status,
+        active: false,
+      });
     }
 
     const localizedNotFoundResults = [];
@@ -216,29 +323,24 @@ async function main() {
 
     const legal = await request(origin, '/legal/privacidad');
     assert.equal(legal.status, 404, 'Blocked legal copy must not be exposed.');
-    const preview = await request(origin, '/preview-local-sintetico');
-    assert.equal(preview.status, 404, 'The synthetic preview must remain unavailable in production.');
-    const previewMedia = await request(
-      origin,
-      '/preview-local-sintetico/media/valeria/cover',
-    );
-    assert.equal(
-      previewMedia.status,
-      404,
-      'Synthetic preview media must remain unavailable in production.',
-    );
-    const previewFiligrees = await Promise.all(
+    const blockedPreviewRoutes = await Promise.all(
       [
+        '/preview-local-sintetico',
+        '/preview-local-sintetico/perfiles/valeria',
+        '/preview-local-sintetico/servicios',
+        '/preview-local-sintetico/servicios/compania-privada',
+        '/preview-local-sintetico/media/valeria/cover',
+        '/preview-local-sintetico/service-media/company-private-lounge',
+        '/preview-local-sintetico/city-media/madrid',
         '/preview-local-sintetico/decor-media/border-filigree',
-        '/preview-local-sintetico/decor-media/border-filigree-left',
-        '/preview-local-sintetico/decor-media/border-filigree-right',
+        '/preview-local-sintetico/hero-media/home-editorial',
       ].map((path) => request(origin, path)),
     );
-    for (const previewFiligree of previewFiligrees) {
+    for (const blockedPreviewRoute of blockedPreviewRoutes) {
       assert.equal(
-        previewFiligree.status,
+        blockedPreviewRoute.status,
         404,
-        `${previewFiligree.path} must remain unavailable in production.`,
+        `${blockedPreviewRoute.path} must remain unavailable in production.`,
       );
     }
     const blockedAdminRoutes = await Promise.all([
@@ -254,6 +356,23 @@ async function main() {
         blockedAdminRoute.status,
         404,
         `${blockedAdminRoute.method} ${blockedAdminRoute.path} must not ship in the public app.`,
+      );
+    }
+    const blockedConversionApis = await Promise.all(
+      [
+        '/api/contact',
+        '/api/reservas',
+        '/api/bookings',
+        '/api/payments',
+        '/api/checkout',
+        '/api/analytics',
+      ].map((path) => request(origin, path, 'POST')),
+    );
+    for (const blockedConversionApi of blockedConversionApis) {
+      assert.equal(
+        blockedConversionApi.status,
+        404,
+        `${blockedConversionApi.path} must not expose a conversion endpoint.`,
       );
     }
 
@@ -278,17 +397,23 @@ async function main() {
 
     console.log(
       JSON.stringify({
-        schema: 'pecadosvip.production-holding-smoke',
-        version: 1,
+        schema: 'pecadosvip.production-public-beta-smoke',
+        version: 2,
         result: 'PASS',
-        productionActivation: false,
+        publicSyntheticBeta: true,
+        commercialActivation: false,
         origin,
-        holdingRoutes: holdingResults,
+        rootRedirect: {
+          path: root.path,
+          status: root.status,
+          location: root.headers.get('location'),
+        },
+        localizedBetaRoutes: localizedBetaResults,
+        cleanCatalogRoutes: cleanCatalogResults,
+        inactiveContactRoutes: contactHoldingResults,
         blockedRoutes: [
           { path: legal.path, status: legal.status },
-          { path: preview.path, status: preview.status },
-          { path: previewMedia.path, status: previewMedia.status },
-          ...previewFiligrees.map((result) => ({
+          ...blockedPreviewRoutes.map((result) => ({
             path: result.path,
             status: result.status,
           })),
@@ -297,13 +422,25 @@ async function main() {
             method: result.method,
             status: result.status,
           })),
+          ...blockedConversionApis.map((result) => ({
+            path: result.path,
+            method: result.method,
+            status: result.status,
+          })),
           ...localizedNotFoundResults,
         ],
+        conversionControls: {
+          externalContactLinks: 0,
+          nonGetForms: 0,
+          enabledConversionButtons: 0,
+          conversionApis: 0,
+          analyticsIntegrations: 0,
+        },
         robotsDisallowAll: true,
         sitemapUrlCount: 0,
         limits: [
           'Local loopback Vinext standalone runtime only; no Docker engine or deployed runtime was tested.',
-          'This smoke proves the fail-closed holding boundary, not legal approval, UAT or production readiness.',
+          'This smoke proves the public synthetic-beta routing and fail-closed conversion boundary, not legal approval, linguistic approval, UAT or deployed production readiness.',
         ],
       }),
     );

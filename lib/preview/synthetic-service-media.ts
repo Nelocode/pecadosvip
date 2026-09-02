@@ -1,5 +1,6 @@
 import type { PublicMedia } from '../content/public-profiles.ts';
 import type { Locale } from '../i18n/locales.ts';
+import type { SyntheticMediaScope } from './synthetic-preview.ts';
 
 export const syntheticServiceMediaKeys = [
   'company-private-lounge',
@@ -416,12 +417,16 @@ export function isSyntheticServiceMediaKey(
 export function getSyntheticServiceMedia(
   key: SyntheticServiceMediaKey,
   locale: Locale,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticServiceMedia {
   const definition = mediaDefinitions[key];
   return {
     key,
     kind: 'image',
-    desktopUrl: `/preview-local-sintetico/service-media/${key}`,
+    desktopUrl:
+      scope === 'public-beta'
+        ? `/beta-media/services/${key}`
+        : `/preview-local-sintetico/service-media/${key}`,
     alt: definition.alt[locale],
     order: syntheticServiceMediaKeys.indexOf(key),
     sourcePath: `assets/synthetic-services/selected/${definition.filename}`,

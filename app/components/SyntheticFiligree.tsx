@@ -1,12 +1,20 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
+
+import { getSyntheticDecorMedia } from '../../lib/preview/synthetic-decor-media';
+import type { SyntheticExperienceMode } from '../../lib/preview/synthetic-experience';
 
 const INTERACTIVE_POINTER_QUERY =
   '(min-width: 1100px) and (hover: hover) and (pointer: fine)';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
-export default function SyntheticFiligree() {
+export default function SyntheticFiligree({
+  mode = 'local-preview',
+}: {
+  mode?: SyntheticExperienceMode;
+}) {
   const decorationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,6 +112,9 @@ export default function SyntheticFiligree() {
       ref={decorationRef}
       className="synthetic-preview-filigree"
       data-active="false"
+      style={{
+        '--filigree-image': `url('${getSyntheticDecorMedia('border-filigree', mode).desktopUrl}')`,
+      } as CSSProperties}
       aria-hidden="true"
     />
   );

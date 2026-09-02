@@ -1,4 +1,8 @@
 import type { Locale } from '../../lib/i18n/locales';
+import {
+  syntheticExperienceService,
+  type SyntheticExperienceMode,
+} from '../../lib/preview/synthetic-experience';
 import { getSyntheticServiceMedia } from '../../lib/preview/synthetic-service-media';
 import type { SyntheticServiceCard as SyntheticServiceCardData } from '../../lib/preview/synthetic-services';
 import PublicProfileMedia from './PublicProfileMedia';
@@ -17,6 +21,7 @@ export default function SyntheticServiceCard({
   badge,
   badgeLabel,
   selection,
+  mode = 'local-preview',
 }: {
   service: SyntheticServiceCardData;
   locale: Locale;
@@ -24,9 +29,10 @@ export default function SyntheticServiceCard({
   badge: string;
   badgeLabel: string;
   selection?: SelectionControl;
+  mode?: SyntheticExperienceMode;
 }) {
-  const media = getSyntheticServiceMedia(service.mediaKey, locale);
-  const href = `/preview-local-sintetico/servicios/${service.slug}?lang=${locale}`;
+  const media = getSyntheticServiceMedia(service.mediaKey, locale, mode);
+  const href = syntheticExperienceService(locale, service.slug, mode);
   const selectionLabel = selection?.selected
     ? selection.removeLabel
     : selection?.addLabel;

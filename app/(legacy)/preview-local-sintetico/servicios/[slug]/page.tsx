@@ -3,6 +3,15 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import type { Locale } from '../../../../../lib/i18n/locales';
+import { getSyntheticBetaCopy } from '../../../../../lib/preview/synthetic-beta-copy';
+import {
+  syntheticExperienceHome,
+  syntheticExperienceProfile,
+  syntheticExperienceProfiles,
+  syntheticExperienceService,
+  syntheticExperienceServices,
+  type SyntheticExperienceMode,
+} from '../../../../../lib/preview/synthetic-experience';
 import {
   getRelatedSyntheticServices,
   getSyntheticService,
@@ -48,53 +57,69 @@ export function generateStaticParams() {
   return getSyntheticServiceCatalog('es').map((service) => ({ slug: service.slug }));
 }
 
+export type SyntheticServiceDetailPageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<RawSearchParams>;
+  localeOverride?: Locale;
+  mode?: SyntheticExperienceMode;
+};
+
 export default async function SyntheticServiceDetailPage({
   params,
   searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<RawSearchParams>;
-}) {
-  const requestHeaders = await headers();
-  const environment = getSyntheticPreviewBuildEnvironment(import.meta.env);
-  if (!isSyntheticPreviewRequestAllowed(requestHeaders.get('host'), environment)) {
-    notFound();
+  localeOverride,
+  mode = 'local-preview',
+}: SyntheticServiceDetailPageProps) {
+  if (mode === 'local-preview') {
+    const requestHeaders = await headers();
+    const environment = getSyntheticPreviewBuildEnvironment(import.meta.env);
+    if (!isSyntheticPreviewRequestAllowed(requestHeaders.get('host'), environment)) {
+      notFound();
+    }
   }
 
   const { slug } = await params;
   if (!slugPattern.test(slug)) notFound();
   const raw = await searchParams;
   const rawLocale = single(raw.lang);
-  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const locale: Locale = localeOverride ?? (
+    isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es'
+  );
   const service = getSyntheticService(slug, locale);
   if (!service) notFound();
 
   const messages = getSyntheticServiceMessages(locale);
+  const betaMessages = getSyntheticBetaCopy(locale);
   const group = messages.groups[service.group];
   const related = getRelatedSyntheticServices(service, locale, 4);
-  const primaryProfile = getSyntheticPreviewProfile(service.profileSlug)!;
-  const primaryMedia = getSyntheticServiceMedia(service.mediaKey, locale);
-  const relatedProfiles = getSyntheticPreviewProfiles()
+  const primaryProfile = getSyntheticPreviewProfile(service.profileSlug, mode)!;
+  const primaryMedia = getSyntheticServiceMedia(service.mediaKey, locale, mode);
+  const relatedProfiles = getSyntheticPreviewProfiles(mode)
     .filter((profile) => profile.slug !== primaryProfile.slug)
     .slice(0, 2);
   const profiles = [primaryProfile, ...relatedProfiles];
+  const homePath = syntheticExperienceHome(locale, mode);
+  const profilesPath = syntheticExperienceProfiles(locale, mode);
+  const servicesPath = syntheticExperienceServices(locale, mode);
+  const servicePath = syntheticExperienceService(locale, service.slug, mode);
 
   return (
     <div className="public-page synthetic-preview-page synthetic-services-page synthetic-service-detail-page" id="service-top" lang={locale}>
-      <SyntheticFiligree />
+      <SyntheticFiligree mode={mode} />
       <SyntheticServicesHeader
         current="detail"
         documentDescription={service.teaser}
         documentTitle={`${service.name} | PecadosVip`}
-        languagePath={`/preview-local-sintetico/servicios/${service.slug}`}
+        languagePath={servicePath}
         locale={locale}
+        mode={mode}
       />
 
       <main id="main-content" tabIndex={-1}>
         <nav className="synthetic-service-breadcrumb" aria-label={messages.navigation.breadcrumbAria}>
-          <a href={`/preview-local-sintetico?lang=${locale}#inicio`}>{messages.navigation.home}</a>
+          <a href={`${homePath}#inicio`}>{messages.navigation.home}</a>
           <span aria-hidden="true">/</span>
-          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>{messages.detail.breadcrumb}</a>
+          <a href={servicesPath}>{messages.detail.breadcrumb}</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{service.name}</span>
         </nav>
@@ -179,6 +204,7 @@ export default async function SyntheticServiceDetailPage({
                   badgeLabel={messages.media.generatedBadge}
                   key={candidate.slug}
                   locale={locale}
+                  mode={mode}
                   service={candidate}
                 />
               ))}
@@ -198,7 +224,8 @@ export default async function SyntheticServiceDetailPage({
                   key={profile.slug}
                   preserveFullImage
                   profile={{ ...profile, cover: { ...profile.cover, alt: messages.media.generatedAlt } }}
-                  profileHref={`/preview-local-sintetico/perfiles/${profile.slug}?lang=${locale}`}
+                  profileHref={syntheticExperienceProfile(locale, profile.slug, mode)}
+                  locale={locale}
                 />
               ))}
             </div>
@@ -213,7 +240,7 @@ export default async function SyntheticServiceDetailPage({
             <button disabled type="button">{messages.detail.disabledButton}</button>
           </section>
 
-          <a className="synthetic-service-back" href={`/preview-local-sintetico/servicios?lang=${locale}`}>
+          <a className="synthetic-service-back" href={servicesPath}>
             <span aria-hidden="true">←</span> {messages.detail.backToServices}
           </a>
         </article>
@@ -225,14 +252,23 @@ export default async function SyntheticServiceDetailPage({
           <p>{messages.footer.tagline}</p>
         </div>
         <nav aria-label={messages.navigation.footerAria}>
-          <a href={`/preview-local-sintetico/servicios?lang=${locale}`}>{messages.navigation.services}</a>
-          <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>{messages.navigation.profiles}</a>
+          <a href={servicesPath}>{messages.navigation.services}</a>
+          <a href={profilesPath}>{messages.navigation.profiles}</a>
           <a href="#service-top">{messages.footer.top}</a>
         </nav>
         <span>{messages.footer.status}</span>
       </footer>
 
-      <SyntheticPreviewNotice {...messages.notice} />
+      <SyntheticPreviewNotice
+        {...(mode === 'public-beta'
+          ? {
+              label: `${betaMessages.navigation.betaStatus} · 18+`,
+              body: betaMessages.servicesSection.conversionBody,
+              accept: messages.notice.accept,
+              restore: messages.notice.restore,
+            }
+          : messages.notice)}
+      />
     </div>
   );
 }

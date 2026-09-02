@@ -1,4 +1,5 @@
 import type { PublicMedia } from '../content/public-profiles.ts';
+import type { SyntheticMediaScope } from './synthetic-preview.ts';
 
 export const syntheticHeroMediaKeys = ['home-editorial'] as const;
 
@@ -39,13 +40,17 @@ export function isSyntheticHeroMediaKey(
 
 export function getSyntheticHeroMedia(
   key: SyntheticHeroMediaKey,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticHeroMedia {
   const definition = mediaDefinitions[key];
   return {
     key,
     kind: 'image',
     order: 1,
-    desktopUrl: `/preview-local-sintetico/hero-media/${key}`,
+    desktopUrl:
+      scope === 'public-beta'
+        ? `/beta-media/hero/${key}`
+        : `/preview-local-sintetico/hero-media/${key}`,
     alt: definition.alt,
     sourcePath: `assets/synthetic-hero/selected/${definition.filename}`,
     contentType: 'image/webp',

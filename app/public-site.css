@@ -821,7 +821,10 @@
 .synthetic-preview-filigree::after {
   position: absolute;
   inset: 0;
-  background-image: url('/preview-local-sintetico/decor-media/border-filigree');
+  background-image: var(
+    --filigree-image,
+    url('/preview-local-sintetico/decor-media/border-filigree')
+  );
   background-position: center top;
   background-repeat: repeat;
   background-size: var(--filigree-tile-size) auto;
@@ -3190,6 +3193,30 @@
 }
 
 @media (max-width: 780px) {
+  .synthetic-preview-page .synthetic-preview-header.synthetic-beta-home-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: auto;
+    padding-block: 0.55rem;
+  }
+
+  .synthetic-preview-page .synthetic-beta-home-header > .synthetic-service-language {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    width: 100%;
+    border-top: 1px solid rgb(216 173 98 / 14%);
+    padding-top: 0.4rem;
+  }
+
+  .synthetic-preview-page .synthetic-beta-home-header > .synthetic-preview-reservation {
+    display: none;
+  }
+
+  .synthetic-preview-page .synthetic-beta-home-header > .synthetic-preview-menu-link {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .synthetic-preview-page .synthetic-preview-header {
     grid-template-columns: minmax(156px, 1fr) auto auto;
     width: 100%;

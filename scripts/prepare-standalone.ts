@@ -11,14 +11,14 @@ import {
 import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { betaRuntimeAssetPaths } from '../lib/beta/beta-media-catalog.ts';
+
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, '..');
 const standaloneRoot = resolve(repositoryRoot, 'dist', 'standalone');
 const repositoryRequire = createRequire(resolve(repositoryRoot, 'package.json'));
 const buildOnlyRuntimeExclusions = Object.freeze(['image-size']);
-const runtimeAssetPaths = Object.freeze([
-  'assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
-]);
+const runtimeAssetPaths = betaRuntimeAssetPaths;
 
 type PackageDescriptor = {
   name?: unknown;

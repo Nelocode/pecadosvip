@@ -4,6 +4,8 @@ import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { betaRuntimeAssetPaths } from '../lib/beta/beta-media-catalog.ts';
+
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 function dockerGlobMatches(path: string, pattern: string): boolean {
@@ -39,6 +41,20 @@ function isExcludedByDockerignore(path: string, patterns: readonly string[]): bo
     if (dockerGlobMatches(path, pattern)) excluded = !negated;
   }
   return excluded;
+}
+
+function betaAssetDockerNegations(): Set<string> {
+  const negations = new Set<string>();
+
+  for (const assetPath of betaRuntimeAssetPaths) {
+    const segments = assetPath.split('/');
+    for (let length = 1; length < segments.length; length += 1) {
+      negations.add(`!${segments.slice(0, length).join('/')}`);
+    }
+    negations.add(`!${assetPath}`);
+  }
+
+  return negations;
 }
 
 test('Docker runtime pins an exact multi-platform digest, runs release gates and stays non-root', async () => {
@@ -109,9 +125,7 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     '!public',
     '!public/**',
     '!assets',
-    '!assets/synthetic-hero',
-    '!assets/synthetic-hero/selected',
-    '!assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
+    ...betaAssetDockerNegations(),
     '!scripts',
     '!scripts/prepare-standalone.ts',
     '!scripts/production-holding-smoke.ts',
@@ -187,9 +201,6 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     'assets/synthetic-decor/selected/border-filigree-gold-v03.webp',
     'assets/synthetic-decor/selected/border-filigree-left-v04.webp',
     'assets/synthetic-decor/selected/border-filigree-right-v04.webp',
-    'assets/synthetic-decor/selected/border-filigree-mosaic-v04.webp',
-    'assets/synthetic-decor/selected/border-filigree-left-v05.webp',
-    'assets/synthetic-decor/selected/border-filigree-right-v05.webp',
     'assets/synthetic-hero/ASSET_MANIFEST.csv',
     'assets/synthetic-hero/master/home-hero-editorial-v01.png',
     'assets/synthetic-hero/selected/unreviewed-hero.webp',
@@ -206,7 +217,7 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     'lib/content/repository.ts',
     'public/images/holding.webp',
     'patches/image-size@2.0.2.patch',
-    'assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
+    ...betaRuntimeAssetPaths,
   ];
   for (const fixture of publicFixtures) {
     assert.equal(
@@ -217,7 +228,7 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
   }
 });
 
-test('standalone preparation copies the reviewed hero to its runtime source path', async () => {
+test('standalone preparation copies exactly the beta media catalog to runtime source paths', async () => {
   const prepareStandalone = await readFile(
     join(repositoryRoot, 'scripts', 'prepare-standalone.ts'),
     'utf8',
@@ -225,8 +236,9 @@ test('standalone preparation copies the reviewed hero to its runtime source path
 
   assert.match(
     prepareStandalone,
-    /const runtimeAssetPaths = Object\.freeze\(\[\s*'assets\/synthetic-hero\/selected\/home-hero-editorial-v01\.webp',\s*\]\);/u,
+    /import \{ betaRuntimeAssetPaths \} from '\.\.\/lib\/beta\/beta-media-catalog\.ts';/u,
   );
+  assert.match(prepareStandalone, /const runtimeAssetPaths = betaRuntimeAssetPaths;/u);
   assert.match(
     prepareStandalone,
     /const destination = resolve\(standaloneRoot, \.\.\.pathSegments\);/u,
