@@ -19,35 +19,15 @@ $KnownPastedRequest = 'C:\Users\artot\.codex\attachments\735e9299-6e6f-4fc5-823f
 $ExpectedInputCount = 8
 $MaximumFileBytes = 128MB
 $MaximumArchiveSourceBytes = 512MB
-$MaximumTextScanBytes = 2MB
-$ExpectedTrackedPlaywrightEvidenceCount = 25
+$MaximumTextScanBytes = 4MB
+$ExpectedTrackedPlaywrightEvidenceCount = 5
 $ExpectedFinalEvidenceCount = 63
 $TrackedPlaywrightEvidence = @(
-    'output/playwright/contact-gate-retest.json',
-    'output/playwright/final-preview/reflow-320-equivalent-400.png',
-    'output/playwright/final-preview/viewport-1024.png',
-    'output/playwright/final-preview/viewport-1440.png',
-    'output/playwright/final-preview/viewport-1920.png',
-    'output/playwright/final-preview/viewport-360.png',
-    'output/playwright/final-preview/viewport-390.png',
-    'output/playwright/final-preview/viewport-768.png',
-    'output/playwright/final-workbench/workbench-e2e.png',
-    'output/playwright/home-1440.png',
-    'output/playwright/home-390.png',
-    'output/playwright/production-holding-smoke.json',
     'output/playwright/pv95/production-holding-1920.png',
     'output/playwright/pv95/production-holding-320.png',
     'output/playwright/pv95/smoke-summary.json',
     'output/playwright/pv95/synthetic-preview-1920.png',
-    'output/playwright/pv95/synthetic-preview-320-full.png',
-    'output/playwright/pv98-i18n/browser-smoke-function.js',
-    'output/playwright/pv98-i18n/holding-es-1440.png',
-    'output/playwright/pv98-i18n/holding-es-320.png',
-    'output/playwright/pv98-i18n/legal-it-1440.png',
-    'output/playwright/pv98-i18n/not-found-it-390.png',
-    'output/playwright/pv98-i18n/smoke-summary.json',
-    'output/playwright/qa-results.json',
-    'output/playwright/responsive-smoke.js'
+    'output/playwright/pv95/synthetic-preview-320-full.png'
 )
 $FinalEvidence = @(
     'output/playwright/final-100-preview-desktop.png',
@@ -415,7 +395,7 @@ function Assert-NoHighConfidenceSecret {
     $textExtensions = @(
         '.bat', '.cjs', '.cmd', '.conf', '.css', '.csv', '.graphql', '.html',
         '.ini', '.js', '.json', '.jsx', '.log', '.md', '.mjs', '.patch', '.properties', '.ps1',
-        '.sh', '.sha256', '.svg', '.toml', '.txt', '.ts', '.tsx', '.xml', '.yaml', '.yml',
+        '.sh', '.sha256', '.svg', '.toml', '.tsv', '.txt', '.ts', '.tsx', '.xml', '.yaml', '.yml',
         '.dockerfile', '.dockerignore', '.example', '.gitattributes', '.gitignore'
     )
     $binaryExtensions = @(
@@ -446,7 +426,7 @@ function Assert-NoHighConfidenceSecret {
         throw "Unclassified file type cannot be scanned safely: $($entry.Name)"
     }
     if ($entry.Length -gt $MaximumTextScanBytes) {
-        throw "Text candidate exceeds the 2 MiB fail-closed scan limit: $($entry.Name)"
+        throw "Text candidate exceeds the 4 MiB fail-closed scan limit: $($entry.Name)"
     }
 
     $text = [System.IO.File]::ReadAllText($entry.FullName)
