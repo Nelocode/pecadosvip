@@ -6,7 +6,7 @@ import { getSyntheticServiceMedia, isSyntheticServiceMediaKey } from '../../../.
 export async function GET(request: Request, context: { params: Promise<{ service: string }> }) {
   const { service } = await context.params;
   if (!isSyntheticServiceMediaKey(service)) return new NextResponse('Not found', { status: 404 });
-  const media = getSyntheticServiceMedia(service);
+  const media = getSyntheticServiceMedia(service, 'es');
   try {
     const file = await readFile(resolve(process.cwd(), media.sourcePath));
     return new NextResponse(file, {
@@ -15,7 +15,7 @@ export async function GET(request: Request, context: { params: Promise<{ service
         'Cache-Control': 'public, max-age=31536000, immutable'
       }
     });
-  } catch (e) {
+  } catch {
     return new NextResponse('Not found', { status: 404 });
   }
 }

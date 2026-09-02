@@ -1,5 +1,13 @@
 import { createRequire } from 'node:module';
-import { cp, lstat, mkdir, readFile, readdir, rm } from 'node:fs/promises';
+import {
+  copyFile,
+  cp,
+  lstat,
+  mkdir,
+  readFile,
+  readdir,
+  rm,
+} from 'node:fs/promises';
 import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +16,9 @@ const repositoryRoot = resolve(scriptDirectory, '..');
 const standaloneRoot = resolve(repositoryRoot, 'dist', 'standalone');
 const repositoryRequire = createRequire(resolve(repositoryRoot, 'package.json'));
 const buildOnlyRuntimeExclusions = Object.freeze(['image-size']);
+const runtimeAssetPaths = Object.freeze([
+  'assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
+]);
 
 type PackageDescriptor = {
   name?: unknown;
@@ -89,6 +100,31 @@ async function removeBuildOnlyRuntimePackages(): Promise<string[]> {
   return removed;
 }
 
+async function copyRuntimeAsset(relativePath: string): Promise<void> {
+  const pathSegments = relativePath.split('/');
+  const source = resolve(repositoryRoot, ...pathSegments);
+  const destination = resolve(standaloneRoot, ...pathSegments);
+  if (
+    !pathIsInside(repositoryRoot, source) ||
+    !pathIsInside(standaloneRoot, destination)
+  ) {
+    throw new Error(`Runtime asset path escapes an approved root: ${relativePath}.`);
+  }
+
+  const sourceStats = await lstat(source);
+  if (!sourceStats.isFile() || sourceStats.isSymbolicLink()) {
+    throw new Error(`Runtime asset is absent or unsafe: ${relativePath}.`);
+  }
+
+  await mkdir(dirname(destination), { recursive: true });
+  await rm(destination, { force: true });
+  await copyFile(source, destination);
+  const destinationStats = await lstat(destination);
+  if (!destinationStats.isFile() || destinationStats.isSymbolicLink()) {
+    throw new Error(`Runtime asset was not copied as a regular file: ${relativePath}.`);
+  }
+}
+
 async function main(): Promise<void> {
   const serverPath = resolve(standaloneRoot, 'server.js');
   const serverStats = await lstat(serverPath);
@@ -103,11 +139,15 @@ async function main(): Promise<void> {
     resolve(standaloneRoot, 'node_modules'),
   );
   const removedBuildOnlyPackages = await removeBuildOnlyRuntimePackages();
+  for (const relativePath of runtimeAssetPaths) {
+    await copyRuntimeAsset(relativePath);
+  }
 
   process.stdout.write(
     `${JSON.stringify({
       result: 'standalone-runtime-peers-prepared',
       packages: ['react', 'react-dom', 'scheduler'],
+      runtimeAssets: runtimeAssetPaths,
       removedBuildOnlyPackages,
       removedSourceMaps,
       root: 'dist/standalone',

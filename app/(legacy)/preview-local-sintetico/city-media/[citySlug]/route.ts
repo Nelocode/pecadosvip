@@ -6,7 +6,7 @@ import { getSyntheticCityMedia, isSyntheticCityMediaSlug } from '../../../../../
 export async function GET(request: Request, context: { params: Promise<{ citySlug: string }> }) {
   const { citySlug } = await context.params;
   if (!isSyntheticCityMediaSlug(citySlug)) return new NextResponse('Not found', { status: 404 });
-  const media = getSyntheticCityMedia(citySlug);
+  const media = getSyntheticCityMedia(citySlug, 'es');
   try {
     const file = await readFile(resolve(process.cwd(), media.sourcePath));
     return new NextResponse(file, {
@@ -15,7 +15,7 @@ export async function GET(request: Request, context: { params: Promise<{ citySlu
         'Cache-Control': 'public, max-age=31536000, immutable'
       }
     });
-  } catch (e) {
+  } catch {
     return new NextResponse('Not found', { status: 404 });
   }
 }

@@ -27,6 +27,13 @@
 !public
 !public/**
 
+# The reviewed synthetic home hero is served by a runtime route from this
+# exact repository-relative path. Keep every other source asset excluded.
+!assets
+!assets/synthetic-hero
+!assets/synthetic-hero/selected
+!assets/synthetic-hero/selected/home-hero-editorial-v01.webp
+
 !scripts
 !scripts/prepare-standalone.ts
 !scripts/production-holding-smoke.ts

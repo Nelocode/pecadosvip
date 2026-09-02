@@ -108,6 +108,10 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     '!lib/**',
     '!public',
     '!public/**',
+    '!assets',
+    '!assets/synthetic-hero',
+    '!assets/synthetic-hero/selected',
+    '!assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
     '!scripts',
     '!scripts/prepare-standalone.ts',
     '!scripts/production-holding-smoke.ts',
@@ -186,6 +190,9 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     'assets/synthetic-decor/selected/border-filigree-mosaic-v04.webp',
     'assets/synthetic-decor/selected/border-filigree-left-v05.webp',
     'assets/synthetic-decor/selected/border-filigree-right-v05.webp',
+    'assets/synthetic-hero/ASSET_MANIFEST.csv',
+    'assets/synthetic-hero/master/home-hero-editorial-v01.png',
+    'assets/synthetic-hero/selected/unreviewed-hero.webp',
   ]) {
     assert.equal(
       isExcludedByDockerignore(fixture, patterns),
@@ -199,6 +206,7 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
     'lib/content/repository.ts',
     'public/images/holding.webp',
     'patches/image-size@2.0.2.patch',
+    'assets/synthetic-hero/selected/home-hero-editorial-v01.webp',
   ];
   for (const fixture of publicFixtures) {
     assert.equal(
@@ -207,4 +215,21 @@ test('Docker build context uses a reviewed deny-all allowlist', async () => {
       `${fixture} must remain available to the builder.`,
     );
   }
+});
+
+test('standalone preparation copies the reviewed hero to its runtime source path', async () => {
+  const prepareStandalone = await readFile(
+    join(repositoryRoot, 'scripts', 'prepare-standalone.ts'),
+    'utf8',
+  );
+
+  assert.match(
+    prepareStandalone,
+    /const runtimeAssetPaths = Object\.freeze\(\[\s*'assets\/synthetic-hero\/selected\/home-hero-editorial-v01\.webp',\s*\]\);/u,
+  );
+  assert.match(
+    prepareStandalone,
+    /const destination = resolve\(standaloneRoot, \.\.\.pathSegments\);/u,
+  );
+  assert.match(prepareStandalone, /await copyRuntimeAsset\(relativePath\);/u);
 });
