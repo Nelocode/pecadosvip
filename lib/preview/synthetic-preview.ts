@@ -7,6 +7,8 @@ import type { Availability, CitySlug } from '../content/types.ts';
 export const SYNTHETIC_PREVIEW_PATH = '/preview-local-sintetico';
 export const SYNTHETIC_PREVIEW_FLAG = 'PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW';
 
+export type SyntheticMediaScope = 'local-preview' | 'public-beta';
+
 export type SyntheticPreviewEnvironment = {
   NODE_ENV?: string;
   PECADOSVIP_LOCAL_SYNTHETIC_PREVIEW?: string;
@@ -252,20 +254,24 @@ export function buildSyntheticPreviewMediaHeaders(
   };
 }
 
-export function getSyntheticPreviewProfiles(): SyntheticPreviewProfile[] {
-  return previewProfiles.map((candidate) => structuredClone(candidate));
+export function getSyntheticPreviewProfiles(
+  scope: SyntheticMediaScope = 'local-preview',
+): SyntheticPreviewProfile[] {
+  return previewProfiles.map((candidate) => scopedProfile(candidate, scope));
 }
 
 export function getSyntheticPreviewProfile(
   slug: string,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticPreviewProfile | undefined {
   const candidate = previewProfiles.find((item) => item.slug === slug);
-  return candidate ? structuredClone(candidate) : undefined;
+  return candidate ? scopedProfile(candidate, scope) : undefined;
 }
 
 export function getSyntheticPreviewAsset(
   profileSlug: string,
   role: string,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticPreviewMedia | undefined {
   if (!syntheticPreviewAssetRoles.includes(role as SyntheticPreviewAssetRole)) {
     return undefined;
@@ -273,13 +279,14 @@ export function getSyntheticPreviewAsset(
   const candidate = previewProfiles
     .find((item) => item.slug === profileSlug)
     ?.media.find((item) => item.role === role);
-  return candidate ? structuredClone(candidate) : undefined;
+  return candidate ? scopedMedia(candidate, scope) : undefined;
 }
 
 export function filterSyntheticPreviewProfiles(
   filters: SyntheticPreviewFilters,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticPreviewProfile[] {
-  return getSyntheticPreviewProfiles()
+  return getSyntheticPreviewProfiles(scope)
     .filter(
       (candidate) =>
         filters.city === undefined ||
@@ -290,4 +297,25 @@ export function filterSyntheticPreviewProfiles(
         filters.availability === undefined ||
         candidate.availability === filters.availability,
     );
+}
+
+function scopedMedia(
+  candidate: SyntheticPreviewMedia,
+  scope: SyntheticMediaScope,
+): SyntheticPreviewMedia {
+  const cloned = structuredClone(candidate);
+  if (scope === 'public-beta') {
+    cloned.desktopUrl = `/beta-media/profiles/${candidate.sourcePath.split('/')[2]}/${candidate.role}`;
+  }
+  return cloned;
+}
+
+function scopedProfile(
+  candidate: SyntheticPreviewProfile,
+  scope: SyntheticMediaScope,
+): SyntheticPreviewProfile {
+  const cloned = structuredClone(candidate);
+  cloned.media = cloned.media.map((item) => scopedMedia(item, scope));
+  cloned.cover = cloned.media[0]!;
+  return cloned;
 }

@@ -3,9 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Locale } from '../../lib/i18n/locales';
 import {
+  syntheticExperienceHome,
+  syntheticExperienceProfiles,
+  syntheticExperienceServices,
+  type SyntheticExperienceMode,
+} from '../../lib/preview/synthetic-experience';
+import {
   getSyntheticServiceMessages,
   type SyntheticServiceMessages,
 } from '../../lib/preview/synthetic-services';
+import { getSyntheticBetaCopy } from '../../lib/preview/synthetic-beta-copy';
 
 function withLocale(path: string, locale: Locale): string {
   return `${path}?lang=${locale}`;
@@ -18,14 +25,11 @@ const languageNames: Readonly<Record<Locale, string>> = {
   it: 'Italiano',
 };
 
-function previewAnchor(locale: Locale, anchor: string): string {
-  return `/preview-local-sintetico?lang=${locale}${anchor}`;
-}
-
 function languageLinks(
   path: string,
   locale: Locale,
   ariaLabel: string,
+  mode: SyntheticExperienceMode,
   onNavigate?: () => void,
 ) {
   return (
@@ -33,7 +37,11 @@ function languageLinks(
       {(['es', 'en', 'fr', 'it'] as const).map((candidate) => (
         <a
           aria-current={candidate === locale ? 'page' : undefined}
-          href={withLocale(path, candidate)}
+          href={
+            mode === 'public-beta'
+              ? path.replace(`/${locale}`, `/${candidate}`)
+              : withLocale(path, candidate)
+          }
           hrefLang={candidate}
           key={candidate}
           lang={candidate}
@@ -50,14 +58,16 @@ function navLinks(
   messages: SyntheticServiceMessages,
   locale: Locale,
   current: 'services' | 'detail',
+  mode: SyntheticExperienceMode,
   onNavigate?: () => void,
 ) {
+  const home = syntheticExperienceHome(locale, mode);
   const links = [
-    { href: previewAnchor(locale, '#inicio'), label: messages.navigation.home },
-    { href: previewAnchor(locale, '#perfiles'), label: messages.navigation.profiles },
-    { href: withLocale('/preview-local-sintetico/servicios', locale), label: messages.navigation.services, current: current === 'services' || current === 'detail' },
-    { href: previewAnchor(locale, '#cobertura'), label: messages.navigation.coverage },
-    { href: previewAnchor(locale, '#seguridad'), label: messages.navigation.controls },
+    { href: `${home}#inicio`, label: messages.navigation.home },
+    { href: syntheticExperienceProfiles(locale, mode), label: messages.navigation.profiles },
+    { href: syntheticExperienceServices(locale, mode), label: messages.navigation.services, current: current === 'services' || current === 'detail' },
+    { href: `${home}#cobertura`, label: messages.navigation.coverage },
+    { href: `${home}#seguridad`, label: messages.navigation.controls },
   ];
 
   return links.map((link) => (
@@ -78,14 +88,17 @@ export default function SyntheticServicesHeader({
   current,
   documentTitle,
   documentDescription,
+  mode = 'local-preview',
 }: {
   locale: Locale;
   languagePath: string;
   current: 'services' | 'detail';
   documentTitle: string;
   documentDescription: string;
+  mode?: SyntheticExperienceMode;
 }) {
   const messages = getSyntheticServiceMessages(locale);
+  const betaMessages = getSyntheticBetaCopy(locale);
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -96,11 +109,13 @@ export default function SyntheticServicesHeader({
     const descriptionMeta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const skipLinkElement = document.querySelector<HTMLAnchorElement>('.skip-link');
 
-    root.lang = locale;
-    document.title = documentTitle;
-    if (descriptionMeta) descriptionMeta.content = documentDescription;
-    if (skipLinkElement) skipLinkElement.textContent = messages.navigation.skipLink;
-  }, [documentDescription, documentTitle, locale, messages.navigation.skipLink]);
+    if (mode === 'local-preview') {
+      root.lang = locale;
+      document.title = documentTitle;
+      if (descriptionMeta) descriptionMeta.content = documentDescription;
+      if (skipLinkElement) skipLinkElement.textContent = messages.navigation.skipLink;
+    }
+  }, [documentDescription, documentTitle, locale, messages.navigation.skipLink, mode]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -176,16 +191,16 @@ export default function SyntheticServicesHeader({
       id="service-top"
       ref={headerRef}
     >
-      <a className="public-brand synthetic-preview-brand" href={previewAnchor(locale, '#inicio')}>
+      <a className="public-brand synthetic-preview-brand" href={`${syntheticExperienceHome(locale, mode)}#inicio`}>
         <span>PecadosVip</span>
-        <small>{messages.navigation.previewLabel}</small>
+        <small>{mode === 'public-beta' ? betaMessages.navigation.betaStatus : messages.navigation.previewLabel}</small>
       </a>
 
       <nav className="public-nav synthetic-services-desktop-nav" aria-label={messages.navigation.primaryAria}>
-        {navLinks(messages, locale, current)}
+        {navLinks(messages, locale, current, mode)}
       </nav>
 
-      {languageLinks(languagePath, locale, messages.navigation.languageAria)}
+      {languageLinks(languagePath, locale, messages.navigation.languageAria, mode)}
 
       <button
         className="synthetic-preview-reservation"
@@ -224,10 +239,11 @@ export default function SyntheticServicesHeader({
             languagePath,
             locale,
             messages.navigation.languageAria,
+            mode,
             () => setMenuOpen(false),
           )}
           <nav aria-label={messages.navigation.mobileAria}>
-            {navLinks(messages, locale, current, () => setMenuOpen(false))}
+            {navLinks(messages, locale, current, mode, () => setMenuOpen(false))}
           </nav>
           <p>{messages.footer.tagline}</p>
         </div>

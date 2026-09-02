@@ -72,4 +72,4 @@ El script vuelve a comprobar archivos, temporales, inventario, ZIP y hash final,
 
 ## Estado del paquete
 
-Este archivo es solo una transferencia local de etapa. No es un release, no despliega, no hace commit ni push y no habilita producción. productionActivation se reporta siempre como false. La publicación continúa en NO-GO hasta cerrar aprobación legal, derechos y consentimientos, contenido real, UAT, infraestructura y autorización explícita.
+Este archivo es solo una transferencia local de etapa. No despliega, no hace commit ni push. La versión actual puede publicar una beta sintética no indexable, pero `productionActivation:false` sigue significando que no existe activación comercial. Contacto, reservas, pagos y analítica permanecen desactivados. La oferta real continúa en NO-GO hasta cerrar aprobación legal, derechos y consentimientos, contenido real, revisión lingüística humana, UAT y autorización explícita.

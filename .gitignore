@@ -52,6 +52,7 @@ next-env.d.ts
 /output/design-qa/
 /output/imagegen/
 /output/reference-felina/
+/output/playwright/public-beta-*.png
 /output/preview-services.*.log
 /work/
 /tsconfig.tsbuildinfo

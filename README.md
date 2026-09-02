@@ -1,6 +1,6 @@
 # PecadosVip Web
 
-> Estado actual: **candidato 98/100 de ejecución técnica local; no operacional en producción, no apto para publicación y sin autorización de push o despliegue**.
+> Estado actual: **beta sintética pública y no indexable; navegación y recursos visuales operativos, sin activación comercial**.
 
 Este repositorio conserva la base pública existente de Madrid y Barcelona y añade el control de proyecto, los contratos de contenido y las puertas de publicación necesarias para continuar el producto de forma segura. Un build correcto no significa que el alcance, el contenido, la conformidad legal o la aceptación del cliente estén completos.
 
@@ -25,13 +25,13 @@ Este repositorio conserva la base pública existente de Madrid y Barcelona y añ
 - Auditoría determinista de catálogos con 0 hallazgos y retest Chromium local ES/EN/FR/IT en `PASS WITH LIMITS` técnico. El dictamen lingüístico sigue `PENDIENTE DE REVISIÓN HUMANA` y la publicación, `NO DETERMINABLE POR FALTA DE EVIDENCIA`.
 - Artefactos de gobierno, trazabilidad, riesgos, QA y handoff provisional.
 
-Todavía no están implementados un CMS productivo, autenticación mediante proveedor, base de datos transaccional, almacenamiento de objetos/CDN, cifrado en reposo, legales aprobados, perfiles/medios reales, canales reales, proveedor/CMP de analítica ni ciudades restantes. El CMS persistente incluido es exclusivamente local para desarrollo y pruebas y no publica contenido en el sitio. También siguen pendientes la revisión humana de EN/FR/IT, la revisión jurídica de cuerpos legales, tecnología asistiva y navegación completa por locale, staging y E2E desplegado; el holding, el legal bloqueado, el 404 localizado y su reflow principal sí fueron comprobados en Chromium local.
+Todavía no están implementados un CMS productivo, autenticación mediante proveedor, base de datos transaccional, almacenamiento de objetos/CDN, cifrado en reposo, textos legales aprobados, perfiles/medios reales, canales comerciales ni proveedor/CMP de analítica. El CMS persistente incluido es exclusivamente local para desarrollo y pruebas y no publica contenido en la beta. También siguen pendientes la revisión lingüística humana ES/EN/FR/IT, la revisión jurídica, pruebas con tecnología asistiva, UAT comercial y aprobación de contenido real. La beta sintética sí se valida en Chromium y standalone local; esas pruebas no sustituyen la verificación posterior del despliegue.
 
 ## Checkpoint técnico local 98
 
 El checkpoint obtiene **98/100** en el ledger técnico local: inventario y evidencia 15/15, arquitectura 9/10, implementación e integración 45/45, QA y correcciones 24/25, y empaquetado/handoff 5/5. La captura durable sobre `73249861acb9874a310e9f112450d00a65a4b1e3` registra **155/155 pruebas PASS**, además de lint, typecheck, build, validador i18n, artefactos de release, smoke fail-closed y audit de dependencias en PASS. La remediación local posterior amplía la suite a 167 pruebas y añade hardening Docker/Vinext y evidencia visual multilingüe; no cambia el score ni abre producción. El manifiesto histórico está en `evidence/98-local-technical-checkpoint/evidence-manifest.json`, SHA-256 `7EC3DB4BDF77E732E8B22D8EC6E1B5C3646CF27F406E21E5C75F64AE78A7A512`.
 
-Los checkpoints 87 y 95 siguen siendo antecedentes durables separados. El porcentaje 98 es únicamente un proxy técnico local: la verificación estricta continúa en **2/20 requisitos** y la decisión pública/legal es **`NO-GO`**.
+Los checkpoints 87, 95 y 98 siguen siendo antecedentes durables separados. El porcentaje 98 fue únicamente un proxy técnico local: su decisión pública/legal era **`NO-GO`**. La etapa actual permite solo la beta sintética descrita arriba; la oferta comercial y la conformidad legal continúan sin aprobación.
 
 ## Requisitos locales
 
@@ -176,7 +176,7 @@ Las dos rutas específicas del candidato deben ser absolutas, disjuntas de los o
 
 La exportación es determinista para fuentes equivalentes, valida que las fuentes no cambien durante sus lecturas, rechaza enlaces simbólicos y URLs de medios locales y compromete el destino mediante staging y renombrado. Aun así, no obtiene un lock global entre `profiles.json` y el archivo de referencias: detener escritores sigue siendo obligatorio para evitar una combinación temporal incoherente. El artefacto no se importa en la aplicación, no cambia `next.config.ts`, no levanta servidor, no habilita indexación y no constituye release, despliegue ni aceptación.
 
-Cuando el release agregado está bloqueado, `vinext start` muestra únicamente una pantalla neutral en todas las rutas públicas, aunque se configuren banderas de contacto. El comando `pnpm run dev:preview` habilita solo en desarrollo y loopback la ruta no indexable `/preview-local-sintetico`: integra los seis perfiles adultos ficticios Valeria, Sofía, Lucía, Julia, Mia y Alicia, sus portadas y galerías, filtros de maqueta y fichas navegables. Todo se identifica como generado con IA; la disponibilidad y las ciudades son simuladas, y contacto, reserva y lecturas del CMS permanecen desactivados. Un middleware de Vite exclusivo del servidor de desarrollo entrega únicamente los archivos permitidos, mientras las rutas del preview y de sus imágenes devuelven 404 en el build de producción. Las capturas anteriores de `output/playwright/final-preview/` documentan una versión histórica del harness, no el catálogo actual, contenido real, staging ni el release público final.
+El build de producción expone una beta sintética no indexable en `/{locale}` y redirige `/` a `/es`. Integra las identidades adultas ficticias Valeria, Sofía, Lucía, Julia, Mia y Alicia, sus portadas y galerías, filtros, fichas y catálogo de servicios en ES/EN/FR/IT. Todo se identifica como generado con IA; disponibilidad, cobertura y servicios son propuestas por confirmar. Contacto, reservas, pagos, analítica y lecturas del CMS permanecen desactivados. Los medios públicos salen únicamente por `/beta-media/*` con allowlist, confinamiento de ruta, rechazo de symlinks, límite de tamaño y cabeceras defensivas. El harness `/preview-local-sintetico` continúa limitado a desarrollo loopback y responde 404 en producción.
 
 Vinext `1.0.0-beta.3` produjo errores reales en la navegación cliente de `next/link` durante el smoke pre-boundary. Las rutas públicas usan temporalmente enlaces HTML nativos; la navegación se verificó en aquel UI sin errores de consola. Esta excepción y el preview deben revisarse al actualizar o estabilizar Vinext.
 
@@ -190,7 +190,7 @@ Sin configuración aprobada:
 - No se emiten canonicales ni JSON-LD con un dominio supuesto.
 - Formularios y canales externos permanecen deshabilitados.
 - Dos banderas de entorno no pueden activar contacto por sí solas: el release agregado también debe estar aprobado.
-- Las rutas públicas muestran únicamente el holding neutral; el borrador no se renderiza en producción hasta que el agregado sea válido.
+- Inicio, perfiles y servicios localizados muestran únicamente la beta sintética señalizada; el contenido comercial real sigue sujeto al gate agregado.
 - Las rutas legales localizadas conocidas muestran el holding neutral mientras el release esté bloqueado; sus equivalentes legacy sin prefijo devuelven 404. Los cuerpos no aparecen en el pie hasta que documento y release estén aprobados.
 - Registros `draft`, `hidden`, `archived` o sin evidencia no entran al manifiesto público.
 
@@ -200,7 +200,7 @@ Las cabeceras declaradas son defensa en profundidad, no prueba de entrega por un
 
 ## Datos y contenidos
 
-No hay perfiles reales ni medios personales en este repositorio. Los candidatos completamente sintéticos del preview viven en `assets/synthetic-profiles/` y su proyección local en `lib/preview/synthetic-preview.ts`; conservan `public_path` vacío, revisión humana y legal pendientes, y no se copian a `public/`, al CMS ni al artefacto productivo. La carga pública futura exige evidencia trazable de mayoría de edad, consentimiento, derechos de uso y aprobación de contenido.
+No hay perfiles reales ni medios personales en este repositorio. Los candidatos completamente sintéticos viven en `assets/synthetic-profiles/` y se proyectan mediante `lib/preview/synthetic-preview.ts`; conservan `public_path` vacío y no se importan al CMS. Una allowlist copia solo los recursos sintéticos revisados al artefacto productivo de la beta. Cualquier carga de contenido real exige evidencia trazable de mayoría de edad, consentimiento, derechos de uso y aprobación de contenido.
 
 ### Límite del repositorio CMS local
 

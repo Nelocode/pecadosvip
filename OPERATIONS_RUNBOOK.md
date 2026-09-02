@@ -26,7 +26,7 @@ pnpm run start
 pnpm run release:verify
 ```
 
-`pnpm run validate` es la puerta base: lint, tipos, pruebas y build. `pnpm run i18n:validate` verifica el contrato local de locales, catálogos y rutas. `pnpm run release:verify` añade ese validador, scorecard, inventario estructurado del lockfile, higiene/integridad de `dist` y smoke HTTP del holding. Ninguno incluye revisión lingüística humana, accesibilidad real con tecnología asistiva, seguridad completa, proveedor, contenido real ni UAT.
+`pnpm run validate` es la puerta base: lint, tipos, pruebas y build. `pnpm run i18n:validate` verifica el contrato local de locales, catálogos y rutas. `pnpm run release:verify` añade ese validador, scorecard, inventario estructurado del lockfile, higiene/integridad de `dist` y smoke HTTP de la beta pública. Ninguno incluye revisión lingüística humana, accesibilidad real con tecnología asistiva, seguridad completa, proveedor, contenido real ni UAT.
 
 ## Operación multilingüe segura
 
@@ -222,16 +222,16 @@ El comando falla si el working tree no está limpio, ejecuta `pnpm run release:v
 
 ## Estado público esperado sin configuración
 
-- El build contiene las familias localizadas `/{locale}`, `/{locale}/madrid`, `/{locale}/barcelona`, `/{locale}/perfiles`, `/{locale}/perfiles/:slug`, `/{locale}/contacto` y `/{locale}/legal/:document`, pero el gate agregado bloquea su contenido público.
+- El build contiene una beta sintética navegable en `/{locale}`, `/{locale}/perfiles`, `/{locale}/perfiles/:slug`, `/{locale}/servicios` y `/{locale}/servicios/:slug`. El contenido comercial real continúa bloqueado por el gate agregado.
 - Las rutas sin prefijo se conservan únicamente como legacy `noindex`; no deben tratarse como canónicas.
-- Cada raíz localizada responde con el holding neutral mientras el release esté cerrado; no expone el borrador.
+- `/` redirige a `/es`; las cuatro raíces localizadas muestran únicamente la beta sintética señalizada.
 - `/preview-local-sintetico` responde 404 en producción y solo se habilita mediante `pnpm run dev:preview` en desarrollo loopback.
-- Las rutas legales y los perfiles dinámicos sin contenido localizado aprobado responden de forma cerrada; no hacen fallback silencioso al español.
+- Las rutas legales y los perfiles comerciales sin contenido aprobado responden de forma cerrada; la beta sintética sí dispone de copy explícito por locale, sin fallback silencioso al español.
 - `robots.txt` bloquea crawling.
 - `sitemap.xml` no publica URLs.
 - Todas las rutas públicas emiten `noindex, nofollow`.
 - No se emiten canonicales ni JSON-LD con un origen supuesto.
-- Contacto y analítica permanecen deshabilitados.
+- Contacto, reserva, pagos, analítica y administración permanecen deshabilitados.
 
 El manifiesto construye las familias canónicas por cada locale admitido y añade ciudades, perfiles y legales que sean publicables. La regla `headers()` de `next.config.ts` usa `/:path*` para añadir cabeceras, no para redirigir. No existe una regla `redirects()` configurada.
 
@@ -300,7 +300,7 @@ git status --short
 
 `release:verify` construye `dist/standalone`, exige los peers runtime, valida por separado los dos artefactos y arranca exactamente el entrypoint del contenedor en loopback. Si no hay motor Docker, registra imagen como `NOT_TESTED`; no sustituyas esa evidencia con una inspección estática.
 
-En EasyPanel configura el repositorio privado y una rama/SHA que sí contenga `Dockerfile`, contexto raíz `/`, Dockerfile `Dockerfile` y puerto de contenedor `3000`. No pongas secretos en `GIT_SHA` ni en build args. Después del deploy autorizado registra commit, image ID/digest, usuario efectivo, healthcheck, URL, proxy/TLS y smoke externo. El resultado esperado sigue siendo el holding neutral con noindex; cualquier exposición de preview, contacto o legales bloqueados es incidente.
+En EasyPanel configura el repositorio y una rama/SHA que sí contenga `Dockerfile`, contexto raíz `/`, Dockerfile `Dockerfile` y puerto de contenedor `3000`. No pongas secretos en `GIT_SHA` ni en build args. Después del deploy autorizado registra commit, image ID/digest, usuario efectivo, healthcheck, URL, proxy/TLS y smoke externo. El resultado esperado es la beta sintética con `noindex`; cualquier exposición del preview interno, administración, APIs de conversión o cuerpos legales no aprobados es incidente.
 
 Rollback: selecciona el SHA/digest previamente verificado en EasyPanel, conserva logs del fallo, repite healthcheck y smoke, y no mezcles rollback del contenedor con cambios DNS o habilitación de contenido. La guía paso a paso está en `SUBIR_PROYECTO.md`.
 

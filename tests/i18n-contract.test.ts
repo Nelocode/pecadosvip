@@ -203,7 +203,7 @@ test('localized root controls html lang and selector endonyms while legacy stays
   assert.doesNotMatch(layout, /es_ES|en_US|fr_FR|it_IT/);
 });
 
-test('dynamic legal and profile bodies fail closed outside the approved source locale', () => {
+test('legal bodies retain the source-locale gate while synthetic beta profiles are explicitly multilingual and noindex', () => {
   const profile = readFileSync(
     new URL('../app/[locale]/perfiles/[slug]/page.tsx', import.meta.url),
     'utf8',
@@ -212,10 +212,14 @@ test('dynamic legal and profile bodies fail closed outside the approved source l
     new URL('../app/[locale]/legal/[document]/page.tsx', import.meta.url),
     'utf8',
   );
-  for (const source of [profile, legal]) {
-    assert.match(source, /SOURCE_LOCALE/);
-    assert.match(source, /<ReleaseHoldingPage[\s\S]*?locale=\{locale\}/);
-  }
+  assert.match(legal, /SOURCE_LOCALE/);
+  assert.match(legal, /<ReleaseHoldingPage[\s\S]*?locale=\{locale\}/);
+
+  assert.doesNotMatch(profile, /SOURCE_LOCALE|getRuntimeVisibilityState|ReleaseHoldingPage/);
+  assert.match(profile, /getSyntheticPreviewProfile\(slug, 'public-beta'\)/);
+  assert.match(profile, /getSyntheticBetaCopy\(locale\)/);
+  assert.match(profile, /buildSyntheticBetaMetadata/);
+  assert.match(profile, /mode: 'public-beta'/);
 });
 
 test('localized legal routes show the equivalent holding state before locale-specific gates', () => {
@@ -259,19 +263,29 @@ test('localized 404 copy comes from the selected locale and returns home safely'
   }
 });
 
-test('localized holding state keeps the language selector on the equivalent route', () => {
+test('localized holding routes keep equivalent language navigation while beta routes use their isolated renderer', () => {
   const holding = readFileSync(
     new URL('../app/components/ReleaseHoldingPage.tsx', import.meta.url),
     'utf8',
   );
   assert.match(holding, /<LanguageSelector locale=\{locale\} semanticPath=\{semanticPath\}/);
+  const contact = readFileSync(
+    new URL('../app/[locale]/contacto/page.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(contact, /<ReleaseHoldingPage locale=\{locale\} semanticPath="\/contacto"/);
+
   for (const path of [
     '../app/[locale]/page.tsx',
     '../app/[locale]/perfiles/page.tsx',
-    '../app/[locale]/contacto/page.tsx',
+    '../app/[locale]/perfiles/[slug]/page.tsx',
+    '../app/[locale]/servicios/page.tsx',
+    '../app/[locale]/servicios/[slug]/page.tsx',
   ]) {
     const source = readFileSync(new URL(path, import.meta.url), 'utf8');
-    assert.match(source, /<ReleaseHoldingPage locale=\{locale\} semanticPath=/);
+    assert.match(source, /buildSyntheticBetaMetadata/);
+    assert.match(source, /mode: 'public-beta'/);
+    assert.doesNotMatch(source, /ReleaseHoldingPage|getRuntimeVisibilityState/);
   }
 });
 

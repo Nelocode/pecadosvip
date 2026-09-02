@@ -8,6 +8,7 @@ export default function ProfileCard({
   profileHref,
   locale,
   disclosure,
+  compactDisclosure = 'Imagen IA',
   preserveFullImage = true,
   variant = 'default',
   headingLevel = 2,
@@ -16,6 +17,7 @@ export default function ProfileCard({
   profileHref?: string | null;
   locale?: Locale;
   disclosure?: string;
+  compactDisclosure?: string;
   preserveFullImage?: boolean;
   variant?: 'default' | 'featured-compact';
   headingLevel?: 2 | 3 | 4 | 5 | 6;
@@ -64,7 +66,7 @@ export default function ProfileCard({
           <p className="profile-card-disclosure">
             {variant === 'featured-compact' ? (
               <>
-                <span aria-hidden="true">Imagen IA</span>
+                <span aria-hidden="true">{compactDisclosure}</span>
                 <span className="visually-hidden">{disclosure}</span>
               </>
             ) : disclosure}

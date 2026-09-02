@@ -4,6 +4,11 @@ import { useMemo, useState } from 'react';
 
 import type { Locale } from '../../lib/i18n/locales';
 import {
+  syntheticExperienceService,
+  syntheticExperienceServices,
+  type SyntheticExperienceMode,
+} from '../../lib/preview/synthetic-experience';
+import {
   getSyntheticServiceMessages,
   syntheticServiceGroups,
   type SyntheticServiceCard as SyntheticServiceCardData,
@@ -25,10 +30,12 @@ export default function SyntheticServiceExplorer({
   catalog,
   initialGroup,
   locale,
+  mode = 'local-preview',
 }: {
   catalog: SyntheticServiceCardData[];
   initialGroup?: SyntheticServiceGroup;
   locale: Locale;
+  mode?: SyntheticExperienceMode;
 }) {
   const messages = getSyntheticServiceMessages(locale);
   const [query, setQuery] = useState('');
@@ -90,7 +97,7 @@ export default function SyntheticServiceExplorer({
   return (
     <div className="synthetic-service-explorer">
       <form
-        action="/preview-local-sintetico/servicios#service-catalog"
+        action={`${syntheticExperienceServices(locale, mode)}#service-catalog`}
         className="synthetic-service-filters"
         method="get"
         onSubmit={(event) => event.preventDefault()}
@@ -98,7 +105,9 @@ export default function SyntheticServiceExplorer({
       >
         <fieldset>
           <legend>{messages.hub.filterLegend}</legend>
-          <input name="lang" type="hidden" value={locale} />
+          {mode === 'local-preview' ? (
+            <input name="lang" type="hidden" value={locale} />
+          ) : null}
           <label className="synthetic-service-search" htmlFor="service-search">
             {messages.hub.searchLabel}
             <input
@@ -186,6 +195,7 @@ export default function SyntheticServiceExplorer({
               badgeLabel={messages.media.generatedBadge}
               key={service.slug}
               locale={locale}
+              mode={mode}
               selection={{
                 selected: selectedSlugs.includes(service.slug),
                 addLabel: messages.hub.addToSelection,
@@ -217,7 +227,7 @@ export default function SyntheticServiceExplorer({
             <ol>
               {selectedServices.map((service) => (
                 <li key={service.slug}>
-                  <a href={`/preview-local-sintetico/servicios/${service.slug}?lang=${locale}`}>
+                  <a href={syntheticExperienceService(locale, service.slug, mode)}>
                     {service.name}
                   </a>
                   <button

@@ -159,15 +159,15 @@ test('complete release renders the public experience in production', () => {
   assert.equal(state.renderPublicExperience, true);
 });
 
-test('every implemented public content route wires the runtime visibility boundary', () => {
-  const routes = [
-    '../app/(legacy)/page.tsx',
+test('approved-content routes retain runtime visibility gates while synthetic beta routes use an isolated noindex boundary', () => {
+  const gatedRoutes = [
     '../app/(legacy)/madrid/page.tsx',
     '../app/(legacy)/barcelona/page.tsx',
     '../app/(legacy)/perfiles/page.tsx',
     '../app/(legacy)/perfiles/[slug]/page.tsx',
+    '../app/(legacy)/servicios/page.tsx',
+    '../app/(legacy)/servicios/[slug]/page.tsx',
     '../app/(legacy)/contacto/page.tsx',
-    '../app/[locale]/page.tsx',
     '../app/[locale]/madrid/page.tsx',
     '../app/[locale]/barcelona/page.tsx',
     '../app/[locale]/girona/page.tsx',
@@ -175,12 +175,11 @@ test('every implemented public content route wires the runtime visibility bounda
     '../app/[locale]/toledo/page.tsx',
     '../app/[locale]/guadalajara/page.tsx',
     '../app/[locale]/segovia/page.tsx',
-    '../app/[locale]/perfiles/page.tsx',
-    '../app/[locale]/perfiles/[slug]/page.tsx',
     '../app/[locale]/contacto/page.tsx',
+    '../app/[locale]/legal/[document]/page.tsx',
   ];
 
-  for (const route of routes) {
+  for (const route of gatedRoutes) {
     const source = readFileSync(new URL(route, import.meta.url), 'utf8');
     if (
       route.endsWith('/madrid/page.tsx') ||
@@ -213,6 +212,40 @@ test('every implemented public content route wires the runtime visibility bounda
   assert.match(supplementalCitySource, /<CityLanding/);
   assert.match(supplementalCitySource, /getRuntimeCityPresentation/);
   assert.match(supplementalCitySource, /presentation\.routeIndexable/);
+
+  const legacyLegal = readFileSync(
+    new URL('../app/(legacy)/legal/[document]/page.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(legacyLegal, /getPublicLegalDocument\([\s\S]*?getRuntimeContentSnapshot\(\)/);
+  assert.match(legacyLegal, /if \(!publicDocument\) \{[\s\S]*?notFound\(\)/);
+
+  const legacyRoot = readFileSync(
+    new URL('../app/(legacy)/page.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(legacyRoot, /redirect\('\/es'\)/);
+  assert.doesNotMatch(legacyRoot, /getRuntimeVisibilityState|ReleaseHoldingPage/);
+
+  for (const route of [
+    '../app/[locale]/page.tsx',
+    '../app/[locale]/perfiles/page.tsx',
+    '../app/[locale]/perfiles/[slug]/page.tsx',
+    '../app/[locale]/servicios/page.tsx',
+    '../app/[locale]/servicios/[slug]/page.tsx',
+  ]) {
+    const source = readFileSync(new URL(route, import.meta.url), 'utf8');
+    assert.match(source, /buildSyntheticBetaMetadata/);
+    assert.match(source, /mode: 'public-beta'/);
+    assert.doesNotMatch(source, /getRuntimeVisibilityState|ReleaseHoldingPage/);
+  }
+
+  const betaMetadata = readFileSync(
+    new URL('../lib/preview/synthetic-beta-metadata.ts', import.meta.url),
+    'utf8',
+  );
+  assert.match(betaMetadata, /robots:\s*\{[\s\S]*?index:\s*false[\s\S]*?follow:\s*false/);
+  assert.doesNotMatch(betaMetadata, /alternates:|canonical:/);
 });
 
 test('callers receive isolated runtime snapshots', () => {

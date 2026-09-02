@@ -32,12 +32,15 @@ export const DEFAULT_BUILD_ARTIFACT_BUDGETS: Readonly<BuildArtifactBudgets> =
 
 export const DEFAULT_STANDALONE_ARTIFACT_BUDGETS: Readonly<BuildArtifactBudgets> =
   Object.freeze({
+    // The public beta has 70 exact allowlisted media assets (~49.86 MiB).
+    // These rounded ceilings retain bounded deployment headroom without
+    // relaxing file-count, JavaScript, stylesheet or single-file limits.
     maxFileCount: 4_096,
     maxJavaScriptBytes: 32 * 1024 * 1024,
-    maxMediaBytes: 8 * 1024 * 1024,
+    maxMediaBytes: 64 * 1024 * 1024,
     maxSingleFileBytes: 4 * 1024 * 1024,
     maxStylesheetBytes: 1024 * 1024,
-    maxTotalBytes: 48 * 1024 * 1024,
+    maxTotalBytes: 96 * 1024 * 1024,
   });
 
 export const REQUIRED_BUILD_FILES = Object.freeze([
@@ -95,7 +98,7 @@ type BudgetResult = {
 export type BuildArtifactReport = {
   schema: 'pecadosvip.build-artifact-report';
   version: 2;
-  policyVersion: 3;
+  policyVersion: 4;
   artifactProfile: BuildArtifactProfile;
   excludedTopLevelDirectories: string[];
   result: 'FAIL' | 'PASS';
@@ -479,7 +482,7 @@ export async function validateBuildArtifact(
   return {
     schema: 'pecadosvip.build-artifact-report',
     version: 2,
-    policyVersion: 3,
+    policyVersion: 4,
     artifactProfile,
     excludedTopLevelDirectories: uniqueExcludedTopLevelDirectories,
     result: violations.length === 0 ? 'PASS' : 'FAIL',

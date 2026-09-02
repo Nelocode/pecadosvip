@@ -2,6 +2,7 @@ import type { PublicMedia } from '../content/public-profiles.ts';
 import { citySlugs } from '../content/types.ts';
 import type { CitySlug } from '../content/types.ts';
 import type { Locale } from '../i18n/locales.ts';
+import type { SyntheticMediaScope } from './synthetic-preview.ts';
 
 export type SyntheticCityMediaSlug = CitySlug | 'sitges';
 
@@ -177,12 +178,16 @@ export function isSyntheticCityMediaSlug(value: unknown): value is SyntheticCity
 export function getSyntheticCityMedia(
   citySlug: SyntheticCityMediaSlug,
   locale: Locale,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticCityMedia {
   const definition = mediaDefinitions[citySlug];
   return {
     citySlug,
     kind: 'image',
-    desktopUrl: `/preview-local-sintetico/city-media/${citySlug}`,
+    desktopUrl:
+      scope === 'public-beta'
+        ? `/beta-media/cities/${citySlug}`
+        : `/preview-local-sintetico/city-media/${citySlug}`,
     alt: definition.alt[locale],
     order: syntheticCityMediaSlugs.indexOf(citySlug),
     sourcePath: `assets/synthetic-cities/selected/${definition.filename}`,

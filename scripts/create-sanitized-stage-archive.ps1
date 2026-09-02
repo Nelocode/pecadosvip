@@ -208,9 +208,10 @@ Si el repositorio ya existe y no está vacío, clónalo primero y copia dentro e
 
     corepack enable
     pnpm install --frozen-lockfile
-    pnpm run dev:preview
+    pnpm run dev
 
-Abre http://localhost:3000/preview-local-sintetico?lang=es#inicio.
+Abre http://localhost:3000/es. También están disponibles /en, /fr y /it.
+El preview interno /preview-local-sintetico sigue reservado al modo de desarrollo.
 
 ## Opción C — EasyPanel con Dockerfile
 
@@ -220,7 +221,7 @@ Abre http://localhost:3000/preview-local-sintetico?lang=es#inicio.
 4. Configura los valores NEXT_PUBLIC_* durante el build; cambiarlos solo en runtime no recompila el cliente.
 5. Revisa el healthcheck y los logs antes de asociar dominio/TLS.
 
-Importante: el build público permanece deliberadamente en **holding fail-closed**. El preview sintético funciona solo en desarrollo; no se publica dentro del artefacto de producción. Antes de abrir producción hacen falta contenido real aprobado, derechos/consentimientos, legales, revisión humana de idiomas, accesibilidad, staging, UAT y autorización separada de despliegue/indexación.
+Importante: el build público sirve una **beta sintética y no indexable**. Permite navegar por inicio, perfiles y servicios en cuatro idiomas, pero mantiene desactivados contacto, reservas, pagos y analítica. No constituye activación comercial. Antes de ofrecer servicios reales hacen falta contenido aprobado, derechos/consentimientos, textos legales, revisión lingüística humana, UAT y autorizaciones separadas para canales comerciales e indexación.
 
 ## Estado de esta copia
 
@@ -275,6 +276,9 @@ $manifest = [ordered]@{
     head = $head
     remote = $remote
     includesLocalChanges = $dirty
+    publicSyntheticBeta = $true
+    commercialProductionActivation = $false
+    indexingEnabled = $false
     productionActivation = $false
     sourceFileCount = $included.Count
     sourceBytes = $totalBytes
@@ -353,5 +357,8 @@ $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.T
     branch = $branch
     head = $head
     includesLocalChanges = $dirty
+    publicSyntheticBeta = $true
+    commercialProductionActivation = $false
+    indexingEnabled = $false
     productionActivation = $false
 } | ConvertTo-Json -Depth 3

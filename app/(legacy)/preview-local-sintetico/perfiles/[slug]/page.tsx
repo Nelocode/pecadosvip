@@ -9,8 +9,24 @@ import {
   syntheticPreviewAssetRoles,
   type SyntheticPreviewAssetRole,
 } from '../../../../../lib/preview/synthetic-preview';
-import type { Locale } from '../../../../../lib/i18n/locales';
+import {
+  LOCALE_ENDONYMS,
+  SUPPORTED_LOCALES,
+  type Locale,
+} from '../../../../../lib/i18n/locales';
+import { interpolate } from '../../../../../lib/i18n/catalog';
 import { isSyntheticServiceLocale } from '../../../../../lib/preview/synthetic-services';
+import {
+  getSyntheticBetaCopy,
+  type SyntheticBetaProfileSlug,
+} from '../../../../../lib/preview/synthetic-beta-copy';
+import {
+  syntheticExperienceHome,
+  syntheticExperienceProfile,
+  syntheticExperienceProfiles,
+  type SyntheticExperienceMode,
+  withSyntheticQuery,
+} from '../../../../../lib/preview/synthetic-experience';
 import PublicProfileMedia from '../../../../components/PublicProfileMedia';
 import SyntheticFiligree from '../../../../components/SyntheticFiligree';
 
@@ -27,17 +43,12 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-type SyntheticProfilePageProps = {
+export type SyntheticProfilePageProps = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+  localeOverride?: Locale;
+  mode?: SyntheticExperienceMode;
 };
-
-const availabilityLabels = {
-  available: 'Disponible · simulación',
-  limited: 'Disponibilidad limitada · simulación',
-  unavailable: 'No disponible · simulación',
-  'on-request': 'Bajo consulta · simulación',
-} as const;
 
 function selectedRole(
   raw: string | string[] | undefined,
@@ -51,25 +62,33 @@ function selectedRole(
 export default async function SyntheticProfilePage({
   params,
   searchParams,
+  localeOverride,
+  mode = 'local-preview',
 }: SyntheticProfilePageProps) {
-  const requestHeaders = await headers();
-  const previewEnvironment = getSyntheticPreviewBuildEnvironment(import.meta.env);
-  if (
-    !isSyntheticPreviewRequestAllowed(
-      requestHeaders.get('host'),
-      previewEnvironment,
-    )
-  ) {
-    notFound();
+  if (mode === 'local-preview') {
+    const requestHeaders = await headers();
+    const previewEnvironment = getSyntheticPreviewBuildEnvironment(import.meta.env);
+    if (
+      !isSyntheticPreviewRequestAllowed(
+        requestHeaders.get('host'),
+        previewEnvironment,
+      )
+    ) {
+      notFound();
+    }
   }
 
   const { slug } = await params;
-  const profile = getSyntheticPreviewProfile(slug);
+  const profile = getSyntheticPreviewProfile(slug, mode);
   if (!profile) notFound();
 
   const query = await searchParams;
   const rawLocale = typeof query.lang === 'string' ? query.lang : undefined;
-  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const locale: Locale = localeOverride ?? (
+    isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es'
+  );
+  const messages = getSyntheticBetaCopy(locale);
+  const editorial = messages.profiles[profile.slug as SyntheticBetaProfileSlug];
   const activeRole = selectedRole(query.foto);
   const activeMedia =
     profile.media.find((candidate) => candidate.role === activeRole) ??
@@ -77,16 +96,29 @@ export default async function SyntheticProfilePage({
 
   return (
     <div className="public-page synthetic-preview-page synthetic-profile-page">
-      <SyntheticFiligree />
+      <SyntheticFiligree mode={mode} />
       <header className="public-header synthetic-preview-header">
-        <a className="public-brand" href={`/preview-local-sintetico?lang=${locale}#inicio`}>
+        <a className="public-brand" href={`${syntheticExperienceHome(locale, mode)}#inicio`}>
           PecadosVip
         </a>
-        <strong>PREVIEW LOCAL · NO PUBLICAR</strong>
+        <nav className="synthetic-service-language" aria-label={messages.navigation.languageAria}>
+          {SUPPORTED_LOCALES.map((candidate) => (
+            <a
+              aria-current={candidate === locale ? 'page' : undefined}
+              href={syntheticExperienceProfile(candidate, profile.slug, mode)}
+              hrefLang={candidate}
+              key={candidate}
+              lang={candidate}
+            >
+              {LOCALE_ENDONYMS[candidate]}
+            </a>
+          ))}
+        </nav>
+        <strong className="synthetic-preview-local-status">{mode === 'public-beta' ? messages.profile.statusBanner : 'PREVIEW LOCAL · NO PUBLICAR'}</strong>
       </header>
       <main id="main-content" tabIndex={-1}>
-        <nav className="synthetic-profile-breadcrumb" aria-label="Migas de pan">
-          <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Perfiles sintéticos</a>
+        <nav className="synthetic-profile-breadcrumb" aria-label={messages.profile.breadcrumbAria}>
+          <a href={syntheticExperienceProfiles(locale, mode)}>{messages.profile.breadcrumbProfiles}</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{profile.displayName}</span>
         </nav>
@@ -94,22 +126,35 @@ export default async function SyntheticProfilePage({
         <article className="profile-detail synthetic-profile-detail" aria-labelledby="profile-detail-title">
           <section
             className="profile-detail-media synthetic-profile-media"
-            aria-label={`Galería sintética de ${profile.displayName}`}
+            aria-label={interpolate(messages.profile.galleryAria, { name: editorial.displayName })}
           >
             <div className="profile-detail-image synthetic-profile-active-image">
               <PublicProfileMedia
-                media={activeMedia}
+                media={{
+                  ...activeMedia,
+                  alt: interpolate(messages.profile.galleryAria, { name: editorial.displayName }),
+                }}
                 priority
                 sizes="(max-width: 780px) 90vw, 52vw"
               />
-              <span>IMAGEN GENERADA CON IA</span>
+              <span>{messages.profile.imageGenerated}</span>
             </div>
-            <nav className="synthetic-profile-thumbnails" aria-label="Seleccionar fotografía">
-              {profile.media.map((candidate) => (
+            <nav className="synthetic-profile-thumbnails" aria-label={messages.profile.selectPhotoAria}>
+              {profile.media.map((candidate, index) => {
+                const label = candidate.role === 'cover'
+                  ? messages.profile.coverLabel
+                  : interpolate(messages.profile.sceneLabel, { number: String(index) });
+                return (
                 <a
                   aria-current={candidate.role === activeRole ? 'true' : undefined}
-                  aria-label={`Mostrar ${candidate.label.toLowerCase()} de ${profile.displayName}`}
-                  href={`/preview-local-sintetico/perfiles/${profile.slug}?lang=${locale}&foto=${candidate.role}`}
+                  aria-label={interpolate(messages.profile.showPhotoAria, {
+                    label: label.toLocaleLowerCase(locale),
+                    name: editorial.displayName,
+                  })}
+                  href={withSyntheticQuery(
+                    syntheticExperienceProfile(locale, profile.slug, mode),
+                    { foto: candidate.role },
+                  )}
                   key={candidate.role}
                 >
                   <PublicProfileMedia
@@ -117,68 +162,66 @@ export default async function SyntheticProfilePage({
                     sizes="(max-width: 780px) 22vw, 120px"
                     preserveFullImage={false}
                   />
-                  <span>{candidate.role === 'cover' ? 'Portada' : candidate.role.slice(-2)}</span>
+                  <span>{candidate.role === 'cover' ? messages.profile.coverLabel : candidate.role.slice(-2)}</span>
                 </a>
-              ))}
+                );
+              })}
             </nav>
           </section>
 
           <div className="profile-detail-copy synthetic-profile-copy">
-            <p className="public-eyebrow">{profile.syntheticNotice}</p>
-            <h1 id="profile-detail-title">{profile.displayName}</h1>
+            <p className="public-eyebrow">{messages.profile.syntheticNotice}</p>
+            <h1 id="profile-detail-title">{editorial.displayName}</h1>
             <p className="synthetic-profile-summary">
-              {profile.age} años · {profile.citySlugs.join(' · ')}
+              {interpolate(messages.profile.ageYears, { age: profile.age })} · {profile.citySlugs.map((city) => messages.cities[city as keyof typeof messages.cities] ?? city).join(' · ')}
             </p>
-            <p>{profile.biography}</p>
+            <p>{editorial.biography}</p>
 
             <dl>
               <div>
-                <dt>Identidad</dt>
-                <dd>Completamente ficticia</dd>
+                <dt>{messages.profile.identityLabel}</dt>
+                <dd>{messages.profile.identityValue}</dd>
               </div>
               <div>
-                <dt>Estado visual</dt>
-                <dd>{availabilityLabels[profile.availability]}</dd>
+                <dt>{messages.profile.visualStatusLabel}</dt>
+                <dd>{messages.profile.availability[profile.availability]}</dd>
               </div>
               <div>
-                <dt>Origen visual</dt>
-                <dd>Generación sintética con IA</dd>
+                <dt>{messages.profile.visualOriginLabel}</dt>
+                <dd>{messages.profile.visualOriginValue}</dd>
               </div>
               <div>
-                <dt>Publicación</dt>
-                <dd>No autorizada</dd>
+                <dt>{messages.profile.publicationLabel}</dt>
+                <dd>{messages.profile.publicationValue}</dd>
               </div>
             </dl>
 
             <section className="synthetic-profile-concept" aria-labelledby="profile-concept-title">
-              <h2 id="profile-concept-title">Concepto de la maqueta</h2>
+              <h2 id="profile-concept-title">{messages.profile.conceptTitle}</h2>
               <ul>
-                {profile.conceptTags.map((tag) => (
+                {editorial.conceptTags.map((tag) => (
                   <li key={tag}>{tag}</li>
                 ))}
               </ul>
             </section>
 
             <div className="synthetic-profile-disabled-contact" role="note">
-              <strong>Contacto y reserva desactivados</strong>
-              <p>
-                Esta ficha solo demuestra navegación y presentación. No envía
-                datos ni abre canales externos.
-              </p>
+              <strong>{messages.profile.contactDisabledTitle}</strong>
+              <p>{messages.profile.contactDisabledBody}</p>
               <button type="button" disabled>
-                Contactar · no disponible en preview
+                {messages.profile.contactDisabledButton}
               </button>
             </div>
-            <a className="synthetic-profile-back" href={`/preview-local-sintetico?lang=${locale}#perfiles`}>
-              ← Volver a todos los perfiles
+            <a className="synthetic-profile-back" href={syntheticExperienceProfiles(locale, mode)}>
+              ← {messages.profile.backToProfiles}
             </a>
           </div>
         </article>
       </main>
       <footer className="public-footer synthetic-preview-footer">
-        <p>Harness local no indexable · sin canales externos</p>
-        <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>Ver catálogo</a>
-        <span>Revisión humana y legal pendiente</span>
+        <p>{messages.profile.footerTagline}</p>
+        <a href={syntheticExperienceProfiles(locale, mode)}>{messages.profile.footerCatalog}</a>
+        <span>{messages.profile.footerStatus}</span>
       </footer>
     </div>
   );

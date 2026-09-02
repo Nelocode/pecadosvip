@@ -3,6 +3,14 @@ import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import type { Locale } from '../../../../lib/i18n/locales';
+import { getSyntheticBetaCopy } from '../../../../lib/preview/synthetic-beta-copy';
+import {
+  syntheticExperienceHome,
+  syntheticExperienceProfiles,
+  syntheticExperienceService,
+  syntheticExperienceServices,
+  type SyntheticExperienceMode,
+} from '../../../../lib/preview/synthetic-experience';
 import {
   getSyntheticCityMedia,
   syntheticCityMediaSlugs,
@@ -58,50 +66,66 @@ function previewEnvironment() {
   return getSyntheticPreviewBuildEnvironment(import.meta.env);
 }
 
+export type SyntheticServicesPageProps = {
+  searchParams: Promise<RawSearchParams>;
+  localeOverride?: Locale;
+  mode?: SyntheticExperienceMode;
+};
+
 export default async function SyntheticServicesPage({
   searchParams,
-}: {
-  searchParams: Promise<RawSearchParams>;
-}) {
-  const requestHeaders = await headers();
-  if (
-    !isSyntheticPreviewRequestAllowed(
-      requestHeaders.get('host'),
-      previewEnvironment(),
-    )
-  ) {
-    notFound();
+  localeOverride,
+  mode = 'local-preview',
+}: SyntheticServicesPageProps) {
+  if (mode === 'local-preview') {
+    const requestHeaders = await headers();
+    if (
+      !isSyntheticPreviewRequestAllowed(
+        requestHeaders.get('host'),
+        previewEnvironment(),
+      )
+    ) {
+      notFound();
+    }
   }
 
   const raw = await searchParams;
   const rawLocale = single(raw.lang);
-  const locale: Locale = isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es';
+  const locale: Locale = localeOverride ?? (
+    isSyntheticServiceLocale(rawLocale) ? rawLocale : 'es'
+  );
   const rawGroup = single(raw.category);
   const validGroup =
     rawGroup === undefined || rawGroup === 'all' || isSyntheticServiceGroup(rawGroup);
   const selectedGroup = isSyntheticServiceGroup(rawGroup) ? rawGroup : undefined;
   const messages = getSyntheticServiceMessages(locale);
+  const betaMessages = getSyntheticBetaCopy(locale);
   const fullCatalog = getSyntheticServiceCatalog(locale);
-  const heroMedia = getSyntheticServiceMedia('company-private-lounge', locale);
+  const heroMedia = getSyntheticServiceMedia('company-private-lounge', locale, mode);
   const editorialMedia = getSyntheticServiceMedia(
     'preferences-silk-envelope',
     locale,
+    mode,
   );
+  const homePath = syntheticExperienceHome(locale, mode);
+  const profilesPath = syntheticExperienceProfiles(locale, mode);
+  const servicesPath = syntheticExperienceServices(locale, mode);
 
   return (
     <div className="public-page synthetic-preview-page synthetic-services-page" id="service-top" lang={locale}>
-      <SyntheticFiligree />
+      <SyntheticFiligree mode={mode} />
       <SyntheticServicesHeader
         current="services"
         documentDescription={messages.hub.lead}
         documentTitle={`${messages.hub.title} | PecadosVip`}
-        languagePath="/preview-local-sintetico/servicios"
+        languagePath={servicesPath}
         locale={locale}
+        mode={mode}
       />
 
       <main id="main-content" tabIndex={-1}>
         <nav className="synthetic-service-breadcrumb" aria-label={messages.navigation.breadcrumbAria}>
-          <a href={`/preview-local-sintetico?lang=${locale}#inicio`}>{messages.navigation.home}</a>
+          <a href={`${homePath}#inicio`}>{messages.navigation.home}</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">{messages.navigation.services}</span>
         </nav>
@@ -158,7 +182,7 @@ export default async function SyntheticServicesPage({
             <div className="public-empty-state public-empty-state-error" role="alert">
               <strong>{messages.hub.filterLegend}</strong>
               <p>{messages.hub.catalogLead}</p>
-              <a href={`/preview-local-sintetico/servicios?lang=${locale}#service-catalog`}>
+              <a href={`${servicesPath}#service-catalog`}>
                 {messages.hub.resetFilter}
               </a>
             </div>
@@ -167,6 +191,7 @@ export default async function SyntheticServicesPage({
               catalog={fullCatalog}
               initialGroup={selectedGroup}
               locale={locale}
+              mode={mode}
             />
           )}
         </section>
@@ -185,7 +210,7 @@ export default async function SyntheticServicesPage({
             <p className="public-eyebrow">{messages.hub.editorialEyebrow}</p>
             <h2 id="services-editorial-title">{messages.hub.editorialTitle}</h2>
             <p>{messages.hub.editorialBody}</p>
-            <a className="public-secondary-action" href={`/preview-local-sintetico?lang=${locale}#perfiles`}>
+            <a className="public-secondary-action" href={profilesPath}>
               {messages.navigation.profiles}
             </a>
           </div>
@@ -214,14 +239,14 @@ export default async function SyntheticServicesPage({
             <h2 id="services-coverage-title">{messages.hub.coverageTitle}</h2>
             <p>{messages.hub.coverageBody}</p>
             <p className="synthetic-city-disclosure">
-              {getSyntheticCityMedia('madrid', locale).disclosure}
+              {getSyntheticCityMedia('madrid', locale, mode).disclosure}
             </p>
           </div>
           <div className="synthetic-services-city-directory">
             {syntheticCityMediaSlugs.map((citySlug, index) => {
-              const cityMedia = getSyntheticCityMedia(citySlug, locale);
+              const cityMedia = getSyntheticCityMedia(citySlug, locale, mode);
               return (
-                <a href={`/preview-local-sintetico?lang=${locale}#city-${citySlug}`} key={citySlug}>
+                <a href={`${homePath}#city-${citySlug}`} key={citySlug}>
                   <figure className="synthetic-services-city-media">
                     <PublicProfileMedia
                       media={cityMedia}
@@ -261,7 +286,7 @@ export default async function SyntheticServicesPage({
           <h2 id="services-directory-title">{messages.hub.directoryTitle}</h2>
           <div>
             {fullCatalog.map((service) => (
-              <a href={`/preview-local-sintetico/servicios/${service.slug}?lang=${locale}`} key={service.slug}>
+              <a href={syntheticExperienceService(locale, service.slug, mode)} key={service.slug}>
                 {service.name}
               </a>
             ))}
@@ -275,14 +300,23 @@ export default async function SyntheticServicesPage({
           <p>{messages.footer.tagline}</p>
         </div>
         <nav aria-label={messages.navigation.footerAria}>
-          <a href={`/preview-local-sintetico?lang=${locale}#inicio`}>{messages.navigation.home}</a>
-          <a href={`/preview-local-sintetico?lang=${locale}#perfiles`}>{messages.navigation.profiles}</a>
+          <a href={`${homePath}#inicio`}>{messages.navigation.home}</a>
+          <a href={profilesPath}>{messages.navigation.profiles}</a>
           <a href="#service-top">{messages.footer.top}</a>
         </nav>
         <span>{messages.footer.status}</span>
       </footer>
 
-      <SyntheticPreviewNotice {...messages.notice} />
+      <SyntheticPreviewNotice
+        {...(mode === 'public-beta'
+          ? {
+              label: `${betaMessages.navigation.betaStatus} · 18+`,
+              body: betaMessages.servicesSection.conversionBody,
+              accept: messages.notice.accept,
+              restore: messages.notice.restore,
+            }
+          : messages.notice)}
+      />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import type { SyntheticMediaScope } from './synthetic-preview.ts';
+
 export const syntheticDecorMediaKeys = [
   'border-filigree',
   'border-filigree-left',
@@ -47,11 +49,15 @@ export function isSyntheticDecorMediaKey(
 
 export function getSyntheticDecorMedia(
   key: SyntheticDecorMediaKey,
+  scope: SyntheticMediaScope = 'local-preview',
 ): SyntheticDecorMedia {
   const definition = mediaDefinitions[key];
   return {
     key,
-    desktopUrl: `/preview-local-sintetico/decor-media/${key}`,
+    desktopUrl:
+      scope === 'public-beta'
+        ? `/beta-media/decor/${key}`
+        : `/preview-local-sintetico/decor-media/${key}`,
     sourcePath: `assets/synthetic-decor/selected/${definition.filename}`,
     contentType: 'image/webp',
     width: definition.width,

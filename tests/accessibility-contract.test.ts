@@ -68,7 +68,6 @@ test('document language and keyboard bypass target stay explicit', () => {
 
 test('site header and footer remain outside the main landmark', () => {
   const routes = [
-    '(legacy)/page.tsx',
     '(legacy)/contacto/page.tsx',
     '(legacy)/perfiles/page.tsx',
     '(legacy)/perfiles/[slug]/page.tsx',
@@ -88,6 +87,17 @@ test('site header and footer remain outside the main landmark', () => {
     assert.ok(mainEnd > main, `${route} closes the main landmark`);
     assert.ok(footer > mainEnd, `${route} places the site footer after main`);
   }
+
+  const syntheticHome = readAppFile('(legacy)/preview-local-sintetico/page.tsx');
+  const syntheticHeader = syntheticHome.indexOf('<header ');
+  const syntheticMain = syntheticHome.indexOf('<main id="main-content" tabIndex={-1}>');
+  const syntheticMainEnd = syntheticHome.lastIndexOf('</main>');
+  const syntheticFooter = syntheticHome.lastIndexOf('<footer ');
+
+  assert.ok(syntheticHeader >= 0, 'shared synthetic home has a site header');
+  assert.ok(syntheticMain > syntheticHeader, 'shared synthetic home places main after header');
+  assert.ok(syntheticMainEnd > syntheticMain, 'shared synthetic home closes the main landmark');
+  assert.ok(syntheticFooter > syntheticMainEnd, 'shared synthetic home places footer after main');
 });
 
 test('navigation and profile cards expose current location and unique link purpose', () => {
