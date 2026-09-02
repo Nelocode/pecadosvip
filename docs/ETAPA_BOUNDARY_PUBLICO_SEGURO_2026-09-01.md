@@ -42,4 +42,4 @@ Se restauró íntegramente `output/playwright/pv95/` desde el checkpoint histór
 
 Esta etapa no habilita reservas, contacto, indexación, contenido real, CMS productivo ni demo pública. Para mostrar el preview en un dominio externo se necesita una decisión aparte: hostname canónico aprobado, flag explícito de demo, política de proxy/Host, smoke externo y revisión de que no se abran canales de conversión.
 
-Las instrucciones de instalación, GitHub y EasyPanel están en `LEEME_PRIMERO_SUBIR_PROYECTO.md` y `SUBIR_PROYECTO.md`. Nunca se deben subir `.env`, tokens, credenciales, bases de datos, copias privadas ni datos personales.
+Las instrucciones versionadas de instalación, GitHub y EasyPanel están en `SUBIR_PROYECTO.md` y `STAGE_ARCHIVE_GUIDE.md`. Cada ZIP completo añade además un `LEEME_PRIMERO.md`, un inventario y un verificador generados para esa copia concreta. Nunca se deben subir `.env`, tokens, credenciales, bases de datos, copias privadas ni datos personales.
