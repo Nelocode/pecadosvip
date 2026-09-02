@@ -19,6 +19,10 @@ import {
   getSyntheticDecorMedia,
   isSyntheticDecorMediaKey,
 } from '../lib/preview/synthetic-decor-media.ts';
+import {
+  getSyntheticHeroMedia,
+  isSyntheticHeroMediaKey,
+} from '../lib/preview/synthetic-hero-media.ts';
 
 const syntheticMediaPattern =
   /^\/preview-local-sintetico\/media\/([a-z0-9-]+)\/([a-z0-9-]+)$/;
@@ -28,6 +32,8 @@ const syntheticCityMediaPattern =
   /^\/preview-local-sintetico\/city-media\/([a-z0-9-]+)$/;
 const syntheticDecorMediaPattern =
   /^\/preview-local-sintetico\/decor-media\/([a-z0-9-]+)$/;
+const syntheticHeroMediaPattern =
+  /^\/preview-local-sintetico\/hero-media\/([a-z0-9-]+)$/;
 const blockedHeaders = {
   'Cache-Control': 'private, no-store, max-age=0',
   'X-Content-Type-Options': 'nosniff',
@@ -59,7 +65,14 @@ export function localSyntheticMediaPlugin(): Plugin {
         const serviceMatch = syntheticServiceMediaPattern.exec(pathname);
         const cityMatch = syntheticCityMediaPattern.exec(pathname);
         const decorMatch = syntheticDecorMediaPattern.exec(pathname);
-        if (!profileMatch && !serviceMatch && !cityMatch && !decorMatch) {
+        const heroMatch = syntheticHeroMediaPattern.exec(pathname);
+        if (
+          !profileMatch &&
+          !serviceMatch &&
+          !cityMatch &&
+          !decorMatch &&
+          !heroMatch
+        ) {
           next();
           return;
         }
@@ -82,6 +95,7 @@ export function localSyntheticMediaPlugin(): Plugin {
         const serviceKey = serviceMatch?.[1];
         const citySlug = cityMatch?.[1];
         const decorKey = decorMatch?.[1];
+        const heroKey = heroMatch?.[1];
         const candidate = profileMatch
           ? getSyntheticPreviewAsset(profileMatch[1]!, profileMatch[2]!)
           : isSyntheticServiceMediaKey(serviceKey)
@@ -90,6 +104,8 @@ export function localSyntheticMediaPlugin(): Plugin {
               ? getSyntheticCityMedia(citySlug, 'es')
               : isSyntheticDecorMediaKey(decorKey)
                 ? getSyntheticDecorMedia(decorKey)
+                : isSyntheticHeroMediaKey(heroKey)
+                  ? getSyntheticHeroMedia(heroKey)
                 : undefined;
         if (!candidate) {
           response.writeHead(404, blockedHeaders);
@@ -106,7 +122,9 @@ export function localSyntheticMediaPlugin(): Plugin {
               ? 'synthetic-services'
               : cityMatch
                 ? 'synthetic-cities'
-                : 'synthetic-decor',
+                : decorMatch
+                  ? 'synthetic-decor'
+                  : 'synthetic-hero',
         );
         const filePath = resolve(process.cwd(), candidate.sourcePath);
         if (!filePath.startsWith(`${assetRoot}${sep}`)) {

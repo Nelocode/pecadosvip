@@ -429,3 +429,191 @@ final result: passed
 - Este es el cierre visual local vigente; no constituye activación productiva, aprobación legal, UAT ni autorización de publicación.
 
 final result: passed
+
+## Alineación de portada con la propuesta gráfica del cliente
+
+Fecha de cierre local: 2026-08-31
+
+### Fuente y estado comparado
+
+- Referencia aportada por el usuario: `C:\Users\artot\AppData\Local\Temp\codex-clipboard-1943ad7c-568c-479e-872b-e02418558677.png`, 1132 × 754 px.
+- Implementación: `/preview-local-sintetico?lang=es#inicio`, viewport solicitado 1132 × 754 CSS px; área útil capturada 1117 × 744 px por barras del navegador.
+- Comparación conjunta: `output/audit-20260831-reference-alignment/reference-vs-implementation-final.png`; referencia a la izquierda e implementación a la derecha, en el mismo estado inicial.
+- Catálogo final: `output/audit-20260831-reference-alignment/final-profiles-desktop-1132x754.png`.
+- Estado móvil solicitado: 390 × 844 CSS px; mediciones DOM sobre 375.2 px útiles.
+
+### Historial de hallazgos y correcciones
+
+- P1 corregido: el hero anterior usaba un retrato vertical de pie con `contain`, 650 px de alto y una composición distinta. Se creó un hero horizontal sintético 1536 × 1024, local-only, con identidad adulta ficticia, vestido negro, copa, luz ámbar y espacio negativo para el copy. El primer recorte cortaba la frente; el foco vertical se desplazó a 24 % en escritorio y 22 % en móvil hasta conservar la cara completa.
+- P1 corregido: la composición móvil apilaba copy e imagen y hacía el hero excesivamente largo. El estado final mantiene imagen y texto superpuestos en 340 px, con dos acciones visibles y sin desbordamiento.
+- P2 corregido: cabecera, logo, navegación y CTA no seguían la densidad de la propuesta. El lockup usa el favicon transparente real, siete destinos internos compactos y “Reserva privada” permanece desactivada con nombre accesible explícito.
+- P2 corregido: cobertura ocupaba dos grandes bloques fotográficos. Las ocho ciudades conservan imagen propia, ID, nombre y estado, pero se presentan como dos rutas compactas de cuatro destinos; en móvil las dos zonas forman un rail con `scroll-snap`.
+- P2 corregido: los seis perfiles se presentaban en una cuadrícula 3 × 2. Ahora forman una fila de seis tarjetas en escritorio y dos columnas en móvil, con caras completas, enlaces reales, estado, ciudad, edad y disclosure IA compacto.
+- P2 corregido: el formulario visual dominaba el home. Sigue completamente funcional dentro de un `details` nativo; se verificó Madrid + Disponible, con resultado “1 perfil ficticio” y Valeria como única tarjeta.
+- P2 corregido durante QA: una regla de apilamiento volvió relativa la navegación inferior móvil. El estado final restaura `position:fixed`, 63.2 px de alto y borde inferior del viewport a 844 px.
+
+### Superficies verificadas
+
+- Tipografía: serif editorial para titulares, sans compacta para navegación y controles, dos líneas estables en el hero y sin el corte tipográfico observado en iteraciones anteriores.
+- Espaciado: header 72 px, hero 342.1 px, franja de confianza 79.6 px; no existe desbordamiento horizontal en 1132 ni 390 px.
+- Imágenes: hero 1536 × 1024, ocho ciudades 1200 × 900 y seis perfiles 1086 × 1448 cargaron con `complete=true` y ancho natural válido. No hay placeholders ni activos estirados.
+- Interacciones: filtros GET, detalle de Valeria, 34 tarjetas de servicios, navegación por anclas y menú inferior funcionan. Reserva y contacto siguen desactivados. Cero enlaces externos en las rutas probadas.
+- Consola: sin errores de aplicación en la carga final; solo mensajes informativos de Vite/React y el evento esperado de reconexión causado por el reinicio controlado del servidor local.
+- Publicación: el hero nuevo vive fuera de `public/`, se entrega por middleware local allowlisted y tiene manifiesto, hashes, prompt y alcance `local_preview_only_no_publication`.
+
+### Decisiones deliberadas
+
+- Los mockups de tableta y teléfono pertenecen al tablero de presentación, no al contenido de la página real; no se incrustaron como decoración del sitio.
+- Las afirmaciones de “cobertura real”, atención 24/7 y disponibilidad comercial de la referencia no se copiaron como hechos. La maqueta conserva estados de confirmación y controles fail-closed.
+- La revisión humana, comercial, lingüística, de derechos y legal permanece pendiente; este QA visual no autoriza producción.
+
+No quedan hallazgos P0, P1 o P2 en el alcance de alineación de la portada.
+
+final result: passed
+
+## Logotipo ampliado y portada dividida por zonas
+
+Fecha de cierre local: 2026-09-01
+
+### Fuente y comparación equivalente
+
+- Referencia aportada por el usuario: `C:\Users\artot\AppData\Local\Temp\codex-clipboard-1943ad7c-568c-479e-872b-e02418558677.png`, tablero de 1132 × 753 px.
+- Implementación: `/preview-local-sintetico?lang=es#inicio`, viewport solicitado 1132 × 754 CSS px; área útil capturada 1117 × 744 px por las barras del navegador integrado.
+- Portada final: `output/audit-20260901-city-zones/after-desktop-1132x754.png`.
+- Zonas finales: `output/audit-20260901-city-zones/after-zones-desktop-1132x754.png`.
+- Estado móvil: `output/audit-20260901-city-zones/after-mobile-390x844.png`, viewport solicitado 390 × 844 CSS px.
+- Comparación conjunta principal: `output/audit-20260901-city-zones/reference-vs-city-zones-final-detail.png`; cada fila coloca la referencia y la implementación en una misma entrada visual. El tablero de referencia contiene mockups de dispositivos, por lo que la evaluación normaliza la composición contra el panel de escritorio y no trata esos mockups como contenido de la página.
+
+### Hallazgos, correcciones y fidelidad
+
+- P2 corregido: el lockup medido pasó de una marca de 38 × 38 px y nombre de 23.2 px a una marca efectiva de 48 × 48 px y nombre de 28.48 px. El conjunto conserva 48 px de alto y 229.19 px de ancho dentro de la cabecera de 72 px, sin colisión con navegación ni reserva.
+- P2 corregido: la cobertura y los perfiles ya no forman dos módulos inconexos. Madrid y Barcelona son dos artículos etiquetados, visibles en paralelo en escritorio, y cada uno reúne cuatro destinos, su CTA territorial y tres perfiles destacados.
+- P2 corregido durante QA: una regla antigua de 900 px quedaba anulada por la capa scoped posterior. La regla efectiva se movió después de la composición base; a 390 y 320 px las zonas se apilan a una columna y las tarjetas se mantienen en un rail horizontal propio, sin comprimir las dos ciudades en media pantalla.
+- P1 corregido durante la auditoría adversarial: entre 781 y 1100 px el control “Menú” apuntaba a una navegación inferior aún oculta. Ahora se llama “Zonas” y lleva a la sección visible y etiquetada `#perfiles`; a 902 px el destino está renderizado y el control no queda huérfano.
+- P1 corregido: el outline anterior descendía de H4 a H2 dentro de las tarjetas. La sección de perfiles tiene H2 propio; cada zona usa H3, sus bloques H4 y las seis tarjetas compactas H5.
+- P1/P2 corregido: un filtro exclusivo de disponibilidad ahora deriva las zonas reales del perfil, por lo que Lucía puede aparecer en Madrid y Barcelona sin alterar la presentación editorial 3 + 3 del estado inicial. Los enlaces de zona conservan el filtro de disponibilidad activo.
+- La portada sin filtros conserva una presentación editorial 3 + 3: Madrid muestra Valeria, Lucía y Alicia; Barcelona muestra Sofía, Julia y Mia.
+- La semántica exacta de filtros no se alteró: `city=madrid` devuelve Valeria, Lucía y Alicia en Madrid; `city=barcelona` devuelve Sofía, Lucía y Mia en Barcelona. Julia continúa siendo Girona, aunque editorialmente pertenezca a la zona visual de Barcelona.
+- Comparación final: no quedan diferencias P0, P1 o P2 dentro del alcance solicitado. P3 no bloqueante: revisar el oro y la densidad del mosaico en una pantalla física DPR 2/P3.
+
+### Accesibilidad, interacción y límites
+
+- Un solo `main`, un solo `h1`, dos zonas con IDs únicos y `aria-labelledby`, ocho ciudades con IDs únicos y cero IDs duplicados en el DOM observado.
+- El logotipo conserva icono decorativo con `alt=""` y `aria-hidden="true"`; el nombre visible sigue aportando la identidad textual.
+- Los enlaces territoriales, filtros GET, tarjetas de perfil y navegación interna son funcionales. No se observaron enlaces externos; reserva, contacto y pagos permanecen desactivados.
+- No hubo desbordamiento horizontal respecto al viewport en 1132, 902, 390 o 320 px. La cabecera de 320 px mantiene separación entre marca, reserva y el control “Zonas”.
+- Las seis imágenes de perfiles y las ocho referencias de ciudad cargaron con dimensiones naturales válidas en la evidencia final; la consola no contiene errores ni advertencias de aplicación, solo trazas informativas de Vite/React.
+- El preview sigue siendo local-only, `noindex`, sin activación comercial y con `productionActivation:false`. La revisión humana de idiomas, derechos, legal, UAT y publicación permanece pendiente.
+
+### Verificación final
+
+- `pnpm run validate`: aprobado.
+- ESLint y TypeScript: aprobados.
+- Pruebas: 206/206 aprobadas, incluida la nueva cobertura estructural y responsive de las dos zonas.
+- Build Vinext: cinco entornos aprobados; standalone generado y dependencias de runtime preparadas.
+- El tag anotado `v0.1.0-beta.1` no se movió y sigue resolviendo a `5212a0afa487a80830c5d26a7dd1080f0bfbba7e`.
+
+final result: passed
+
+## Ajuste final del logotipo de cabecera
+
+Fecha de cierre local: 2026-09-01
+
+### Fuente y comparación equivalente
+
+- Captura aportada por el usuario: `C:\Users\artot\AppData\Local\Temp\codex-clipboard-32b2e01d-f6a9-40fd-aef7-27639923f65d.png`, 1916 × 959 px.
+- Estado anterior medido en el navegador integrado: `output/audit-20260901-logo-scale/before-desktop-1916x959.png`.
+- Implementación final: `output/audit-20260901-logo-scale/after-desktop-1916x959.png`.
+- Comparación equivalente antes/después: `output/audit-20260901-logo-scale/before-vs-after-logo-final.png`.
+- Comparación conjunta con la captura del usuario: `output/audit-20260901-logo-scale/reference-vs-logo-final.png`.
+- Evidencia responsive: `after-tablet-902x800.png`, `after-mobile-390x844.png` y `after-narrow-320x700.png` dentro del mismo directorio de auditoría.
+
+### Medidas y fidelidad
+
+- Escritorio: el isotipo pasa de 48 × 48 px a 54 × 54 px; el nombre pasa de 28.48 a 31.2 px y la cabecera de 72 a 76 px. El lockup final mide 243.39 × 54 px.
+- La ampliación es proporcional y conserva el recurso real `/icon.png`, su transparencia, la tipografía serif, el subtítulo y la paleta existente; no se creó ni sustituyó ningún activo.
+- A 1916 px quedan 499.98 px entre el lockup y la navegación, y 16 px entre navegación y reserva.
+- A 902 px el lockup conserva 54 px de marca y 31.2 px de nombre; hay más de 365 px antes de Reserva y separación positiva entre Reserva, Zonas y Local.
+- A 390 y 320 px el isotipo usa 38 × 38 px y el nombre 21.12 px dentro de una cabecera de 68 px. En 320 px quedan 36.15 px entre marca y Reserva, y 4 px entre Reserva y Zonas.
+- En los cuatro viewports el ancho máximo observado se mantiene dentro del viewport solicitado y no hay superposición entre los controles hermanos de la cabecera.
+
+### Verificación final
+
+- Comparaciones completas y focales revisadas juntas en el navegador integrado; no quedan hallazgos P0, P1 o P2 dentro de este ajuste.
+- La consola no contiene errores de aplicación; solo mensajes informativos de Vite/React y la actualización CSS esperada.
+- `pnpm run validate`: aprobado con ESLint, TypeScript, 206/206 pruebas, cinco entornos Vinext y preparación standalone.
+- El cambio está limitado a la capa scoped del preview y sus contratos de prueba. Hero, navegación, zonas, filtros, perfiles y gates local-only permanecen sin cambios funcionales.
+- `productionActivation:false`; este pase valida el preview local y no constituye despliegue, publicación, UAT ni aprobación comercial o legal.
+
+final result: passed
+
+## Ampliación adicional del logotipo de cabecera
+
+Fecha de cierre local: 2026-09-01
+
+### Fuente y comparación equivalente
+
+- Estado de partida: `output/audit-20260901-logo-scale-v2/before-desktop-1916x959.png`.
+- Implementación final: `output/audit-20260901-logo-scale-v2/after-desktop-1916x959.png`.
+- Ambas capturas se tomaron a 1916 × 959 CSS px y DPR 1, por lo que no fue necesaria normalización geométrica.
+- Comparación completa conjunta: `output/audit-20260901-logo-scale-v2/before-vs-after-full-final.png`.
+- Comparación focal conjunta: `output/audit-20260901-logo-scale-v2/before-vs-after-logo-final.png`.
+- Evidencia responsive: `after-tablet-902x800.png`, `after-mobile-390x844.png` y `after-narrow-320x700.png` dentro del mismo directorio.
+
+### Medidas y hallazgos
+
+- Escritorio: el isotipo pasa de 54 × 54 px a 60 × 60 px; el nombre pasa de 31.2 a 33.6 px y la cabecera de 76 a 82 px. El lockup final mide 257.43 × 60 px.
+- A 1916 px quedan 485.94 px entre marca y navegación, y 16 px entre navegación y Reserva.
+- A 902 px el lockup conserva 257.43 px de ancho y quedan 351.3 px antes de Reserva.
+- A 390 px el isotipo queda en 40 × 40 px, el nombre en 22.08 px y la cabecera en 70 px; quedan 83.89 px antes de Reserva y 4 px antes del control de menú.
+- A 320 px se conservan 28.69 px entre marca y Reserva, y 4 px entre Reserva y menú.
+- No se observaron colisiones, recortes del lockup ni desbordamientos funcionales en los cuatro viewports. No quedan hallazgos P0, P1 o P2 dentro del alcance solicitado.
+
+### Verificación final
+
+- Consola final: 0 errores y 0 advertencias de aplicación.
+- `pnpm run validate`: aprobado con ESLint, TypeScript, 206/206 pruebas, cinco entornos Vinext y preparación standalone.
+- El ajuste no cambia hero, navegación, zonas, filtros, perfiles ni comportamiento. `productionActivation:false` permanece vigente.
+- La etapa valida el preview local; no representa despliegue, publicación, UAT ni activación comercial.
+
+final result: passed
+
+## Logotipo XL sin alterar la composición
+
+Fecha de cierre local: 2026-09-01
+
+### Fuente y comparación equivalente
+
+- Verdad visual de partida: `output/audit-20260901-logo-xl/before-desktop-1916x959.jpg`.
+- Implementación final: `output/audit-20260901-logo-xl/after-desktop-1916x959.jpg`.
+- Ambas capturas usan 1916 × 959 CSS px, DPR 1, estado superior de `/preview-local-sintetico?lang=es#inicio` y no requieren normalización de densidad.
+- Comparación completa conjunta: `output/audit-20260901-logo-xl/before-vs-after-full-final.jpg`.
+- Comparación focal conjunta de cabecera: `output/audit-20260901-logo-xl/before-vs-after-logo-final.jpg`.
+- Evidencia responsive final: capturas de 1180, 1179, 1132, 1101, 1100, 902, 781, 780, 390, 360 y 320 px dentro del mismo directorio.
+
+### Historial de comparación y correcciones
+
+- Iteración 1: el isotipo subió de 60 a 80 px y el nombre de 33.6 a 42.4 px. La composición permaneció estable, pero el aumento tipográfico todavía era moderado frente a la petición de una marca mucho más protagonista. Evidencia: `iteration-1-desktop-1916x959.jpg`.
+- Iteración 2: se mantuvo el límite vertical seguro de 80 px y el nombre aumentó a 60.8 px. Entre 1101 y 1179 px usa 56 px; en móvil el conjunto usa 56/27.2 px y, hasta 360 px, 48/24 px. La segunda comparación conjunta no encontró hallazgos P0, P1 o P2.
+
+### Medidas y estabilidad
+
+- A 1916 px el lockup final mide 401.69 × 80 px. La cabecera continúa en 82 px, el hero comienza exactamente en `y=82`, la navegación conserva `x=1000.16` y Reserva `x=1476.41`; ninguna de estas piezas cambió tamaño o posición respecto a la fuente.
+- Separación entre marca y siguiente control: 341.68 px a 1916; 67.38 px a 1180; 66.69 px a 1179; 52.59 px a 1132; 27.4 px a 1101; 207.04 px a 902; 96.33 px a 781; 41.3 px a 390; 37.11 px a 360 y 12.31 px a 320.
+- En todos los puntos observados el solapamiento calculado es 0 px. El ancho de contenido no supera el viewport solicitado. A 320 px, la diferencia entre `innerWidth` y `clientWidth` corresponde a la barra nativa del navegador integrado y no a un elemento nuevo fuera del lienzo.
+- El recurso de marca sigue siendo el PNG transparente real, solicitado a 96 × 96 px; no se añadió SVG, CSS art ni sustituto aproximado.
+
+### Superficies de fidelidad y verificación
+
+- Tipografía: se conserva Georgia/Times, el mismo peso óptico, color y jerarquía; solo aumenta la escala con un tramo protector para navegación completa.
+- Ritmo y layout: cabecera, hero, franja de confianza, zonas, botones y navegación mantienen sus dimensiones; el cambio queda contenido en el lockup.
+- Color: permanecen intactos los tokens negro, marfil y dorado.
+- Imagen: el isotipo conserva transparencia, nitidez y proporción sin recorte visible.
+- Copy: nombre y subtítulo no cambian.
+- Consola del navegador: 0 errores y 0 advertencias; únicamente mensajes informativos de Vite/React.
+- ESLint focal de los dos archivos TypeScript modificados: aprobado. TypeScript completo: aprobado.
+- Pruebas completas: 206/206 aprobadas.
+- Build Vinext: cinco entornos aprobados; salida standalone y dependencias de runtime preparadas.
+- `productionActivation:false` permanece vigente. Este pase local no demuestra despliegue ni activación comercial.
+
+final result: passed

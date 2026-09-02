@@ -224,6 +224,16 @@ Importante: el build público permanece deliberadamente en **holding fail-closed
 ## Guía técnica completa del repositorio
 
 "@
+if (
+    $simpleGuide.IndexOf([char]0x00C3) -ge 0 -or
+    $simpleGuide.IndexOf([char]0x00E2) -ge 0
+) {
+    # Windows PowerShell 5.1 may parse a UTF-8 script without BOM as Windows-1252.
+    # Repair that source-decoding artifact before writing the UTF-8 guide into the ZIP.
+    $simpleGuide = [System.Text.Encoding]::UTF8.GetString(
+        [System.Text.Encoding]::GetEncoding(1252).GetBytes($simpleGuide)
+    )
+}
 $fullGuide = [System.IO.File]::ReadAllText((Join-Path $repoRoot 'SUBIR_PROYECTO.md'))
 $guide = $simpleGuide + $fullGuide
 
