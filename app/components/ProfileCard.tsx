@@ -9,12 +9,16 @@ export default function ProfileCard({
   locale,
   disclosure,
   preserveFullImage = true,
+  variant = 'default',
+  headingLevel = 2,
 }: {
   profile: PublicProfileCard;
   profileHref?: string | null;
   locale?: Locale;
   disclosure?: string;
   preserveFullImage?: boolean;
+  variant?: 'default' | 'featured-compact';
+  headingLevel?: 2 | 3 | 4 | 5 | 6;
 }) {
   const effectiveLocale = locale ?? 'es';
   const messages = getCatalog(effectiveLocale).profiles;
@@ -25,15 +29,29 @@ export default function ProfileCard({
     'on-request': messages.availability.onRequest,
   };
   const headingId = `profile-${profile.slug}-title`;
+  const cityLabel = profile.citySlugs
+    .map((city) => `${city.charAt(0).toUpperCase()}${city.slice(1)}`)
+    .join(' · ');
   const href =
     profileHref === undefined
       ? locale
         ? localizedPath(locale, `/perfiles/${profile.slug}`)
         : `/perfiles/${profile.slug}`
       : profileHref;
+  const headingTags = {
+    2: 'h2',
+    3: 'h3',
+    4: 'h4',
+    5: 'h5',
+    6: 'h6',
+  } as const;
+  const HeadingTag = headingTags[headingLevel];
 
   return (
-    <article className="profile-card" aria-labelledby={headingId}>
+    <article
+      className={`profile-card${variant === 'featured-compact' ? ' profile-card--featured-compact' : ''}`}
+      aria-labelledby={headingId}
+    >
       <div className="profile-card-media">
         <PublicProfileMedia
           media={profile.cover}
@@ -43,11 +61,20 @@ export default function ProfileCard({
       </div>
       <div className="profile-card-copy">
         {disclosure ? (
-          <p className="profile-card-disclosure">{disclosure}</p>
+          <p className="profile-card-disclosure">
+            {variant === 'featured-compact' ? (
+              <>
+                <span aria-hidden="true">Imagen IA</span>
+                <span className="visually-hidden">{disclosure}</span>
+              </>
+            ) : disclosure}
+          </p>
         ) : null}
-        <h2 id={headingId}>{profile.displayName}</h2>
+        <HeadingTag className="profile-card-title" id={headingId}>
+          {profile.displayName}
+        </HeadingTag>
         <p>
-          {profile.citySlugs.join(' · ')} ·{' '}
+          {cityLabel} ·{' '}
           {interpolate(messages.card.ageYears, { age: profile.age })}
         </p>
         <span data-availability={profile.availability}>
